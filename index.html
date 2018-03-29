@@ -1,3 +1,149 @@
-# 28raining.github.io
+<!DOCTYPE html>
+<html lang="en">
 
-This is my page.
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Free Online Smith Chart Tool</title>
+	
+	<!-- web template taken from here https://startbootstrap.com/template-overviews/freelancer/ -->
+
+
+    <!-- Custom fonts for this template -->
+   <!-- <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">-->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="css/freelancer.css" rel="stylesheet">
+    <link href="css/smith_tool.css" rel="stylesheet">
+	<link href="css/style.css" rel="stylesheet">
+	
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+  </head>
+
+  <body id="page-top">
+
+    <!-- Navigation -->
+    <nav>
+      <div class="container">
+	    <div class="wdk_container">
+        Online Smith Chart Tool
+		</div>
+      </div>
+    </nav>
+
+    <!-- About Section -->
+    <section>
+      <div class="wdk_container">
+       <!-- <h2 class="text-center text-uppercase text-white">About</h2> -->
+		
+	  <div class="trans"></div>
+	  <div class="global_inputs">
+			<i>Operational Frequency</i><i>
+				<input type="number" value="2440" id="freq" onchange="freq_no_unit=this.value; schematic[0].freq=this.value; update_schem();"><div id="freq_sel" class="wrapper-dropdown-5" tabindex="1" onclick="change_class(this.id)"><div>MHz</div>
+					<ul class="dropdown">
+						<li onclick="updatespan(parentElement.parentElement.id,'Hz')"><a href="#">Hz</a></li>
+						<li onclick="updatespan(parentElement.parentElement.id,'KHz')"><a href="#">KHz</a></li>
+						<li onclick="updatespan(parentElement.parentElement.id,'MHz')"><a href="#">MHz</a></li>
+						<li onclick="updatespan(parentElement.parentElement.id,'GHz')"><a href="#">GHz</a></li>
+						<li onclick="updatespan(parentElement.parentElement.id,'THz')"><a href="#">THz</a></li></ul></div></i>
+			<i>Characteristic Impedance</i><i>
+			<input type="number" value="50" id="zo" onchange="schematic.zo=this.value; schematic[0].zo=this.value; update_schem();"><div class="ohms">Ω</div></i>
+
+			<i>Download this state</i><i>
+			<button class="button_block"><a id="downloadAnchorElem">Download schematic</a></button></i>
+
+			<i>Upload previous state</i><i><input class="button_block" type="file" id="file" name="file"/></i>
+		</div><div class="spacer"></div><div class="global_inputs">
+		
+			<i>Impedance:</i><i id="current_impedance"></i>
+			<i>Admittance:</i><i id="current_admittance"></i>
+			<i>Reflection Coefficient:</i><i id="current_reflection"></i>
+			<i>Reflection Coefficient:</i><i id="current_reflection_mag"></i>
+			
+		</div>
+
+	
+	<div id="schematic-picker">
+			<div class="cell-picker-text">
+				<b class="star-light arrow fa-1x"></b><b>Click to add</b><b class="star-light arrow fa-1x"></b>
+			</div><div class="cell cell_w_hover" onclick="clicked_cell('sc')">
+				<p>Series Capacitor</p><img src="/icons/capacitor_series.png" alt="Series Capacitor">
+			</div><div class="cell cell_w_hover" onclick="clicked_cell('pc')">
+				<p>Parallel Capacitor</p><img src="icons/capacitor_parallel.png" alt="Parallel Capacitor">
+			</div><div class="cell cell_w_hover" onclick="clicked_cell('si')">
+				<p>Series Inductor</p><img src="icons/inductor_series.png" alt="Series Inductor">
+			</div><div class="cell cell_w_hover" onclick="clicked_cell('pi')">
+				<p>Parallel Inductor</p><img src="icons/inductor_parallel.png" alt="Parallel Inductor">
+			</div><div class="cell cell_w_hover" onclick="clicked_cell('sr')">
+				<p>Series Resistor</p><img src="icons/resistor_series.png" alt="Series Resistor">
+			</div><div class="cell cell_w_hover" onclick="clicked_cell('pr')">
+				<p>Parallel Resistor</p><img src="icons/resistor_parallel.png" alt="Parallel Resistor">
+			</div><div class="cell cell_w_hover" onclick="clicked_cell('tl')">
+				<p>Transmission Line</p><img src="icons/transmission_line.png" alt="Transmission Line">
+			</div>
+	  </div>
+		
+	<div id="schematic"></div>
+	<div class="smith_chart">
+		<div class="hollow_holder">
+			<div class="hollowed_circle"></div>
+		</div>
+		<div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
+	</div>
+	 
+	<!--ADDING A COMMENT BOX!-->
+	<!--From here -->
+	<!-- https://www.freecommentscript.com/ -->
+	<!-- Begin Comments JavaScript Code -->
+	<!--<script type="text/javascript" async>function ajaxpath_5a9f8bc18a80d(url){return window.location.href == '' ? url : url.replace('&s=','&s=' + escape(window.location.href));}(function(){document.write('<div id="fcs_div_5a9f8bc18a80d"><a title="free comment script" href="http://www.freecommentscript.com">&nbsp;&nbsp;<b>Free HTML User Comments</b>...</a></div>');fcs_5a9f8bc18a80d=document.createElement('script');fcs_5a9f8bc18a80d.type="text/javascript";fcs_5a9f8bc18a80d.src=ajaxpath_5a9f8bc18a80d((document.location.protocol=="https:"?"https:":"http:")+"//www.freecommentscript.com/GetComments2.php?p=5a9f8bc18a80d&s=#!5a9f8bc18a80d");setTimeout("document.getElementById('fcs_div_5a9f8bc18a80d').appendChild(fcs_5a9f8bc18a80d)",1);})();</script><noscript><div><a href="http://www.freecommentscript.com" title="free html user comment box">Free Comment Script</a></div></noscript><!-- End Comments JavaScript Code -->
+	
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://will-kelsey-smith.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s); 
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+							
+      </div>
+    </section>
+
+    <div class="copyright py-4 text-center text-white">
+      <div class="container">
+        <small>Copyright &copy; Your Website 2018</small>
+      </div>
+    </div>
+
+    <!-- Scroll to Top Button (Only visible on small and extra-small screen sizes) -->
+    <div class="scroll-to-top d-lg-none position-fixed ">
+      <a class="js-scroll-trigger d-block text-center text-white rounded" href="#page-top">
+        <i class="fa fa-chevron-up"></i>
+      </a>
+    </div>
+   <script src="js/smith_tool.js"></script>
+  </body>
+
+
+
+</html>
