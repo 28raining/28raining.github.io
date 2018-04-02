@@ -22,7 +22,10 @@
     <link href="css/freelancer.css" rel="stylesheet">
     <link href="css/smith_tool.css" rel="stylesheet">
 	<link href="css/style.css" rel="stylesheet">
-	
+
+	<script>if(typeof window.Int16Array !== 'function')document.write("<scri"+"pt src='extras/typedarray.min.js'></scr"+"ipt>");</script>
+<script>document.write("<scri"+"pt src='extras/request_animation_frame.js'></scr"+"ipt>");</script>
+    <script src="download-master/download.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
   </head>
@@ -54,10 +57,10 @@
 						<li onclick="updatespan(parentElement.parentElement.id,'GHz')"><a href="#">GHz</a></li>
 						<li onclick="updatespan(parentElement.parentElement.id,'THz')"><a href="#">THz</a></li></ul></div></i>
 			<i>Characteristic Impedance</i><i>
-			<input type="number" value="50" id="zo" onchange="schematic.zo=this.value; schematic[0].zo=this.value; update_schem();"><div class="ohms">Ω</div></i>
+			<input type="number" value="50" id="zo" onchange="zo=this.value; schematic[0].zo=this.value; update_schem();"><div class="ohms">Ω</div></i>
 
 			<i>Download this state</i><i>
-			<button class="button_block"><a id="downloadAnchorElem">Download schematic</a></button></i>
+			<button class="button_block" onclick="download_state()">Download schematic</button></i>
 
 			<i>Upload previous state</i><i><input class="button_block" type="file" id="file" name="file"/></i>
 		</div><div class="spacer"></div><div class="global_inputs">
@@ -97,41 +100,27 @@
 		</div>
 		<div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
 	</div>
-	 
-	<!--ADDING A COMMENT BOX!-->
-	<!--From here -->
-	<!-- https://www.freecommentscript.com/ -->
-	<!-- Begin Comments JavaScript Code -->
-	<!--<script type="text/javascript" async>function ajaxpath_5a9f8bc18a80d(url){return window.location.href == '' ? url : url.replace('&s=','&s=' + escape(window.location.href));}(function(){document.write('<div id="fcs_div_5a9f8bc18a80d"><a title="free comment script" href="http://www.freecommentscript.com">&nbsp;&nbsp;<b>Free HTML User Comments</b>...</a></div>');fcs_5a9f8bc18a80d=document.createElement('script');fcs_5a9f8bc18a80d.type="text/javascript";fcs_5a9f8bc18a80d.src=ajaxpath_5a9f8bc18a80d((document.location.protocol=="https:"?"https:":"http:")+"//www.freecommentscript.com/GetComments2.php?p=5a9f8bc18a80d&s=#!5a9f8bc18a80d");setTimeout("document.getElementById('fcs_div_5a9f8bc18a80d').appendChild(fcs_5a9f8bc18a80d)",1);})();</script><noscript><div><a href="http://www.freecommentscript.com" title="free html user comment box">Free Comment Script</a></div></noscript><!-- End Comments JavaScript Code -->
-	
-<div id="disqus_thread"></div>
-<script>
 
-/**
-*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-/*
-var disqus_config = function () {
-this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
-this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-};
-*/
-(function() { // DON'T EDIT BELOW THIS LINE
-var d = document, s = d.createElement('script');
-s.src = 'https://will-kelsey-smith.disqus.com/embed.js';
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s); 
-})();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-                            
+		<div id="feedback_title">Please leave some feedback!</div>
+
+		<div id="disqus_thread"></div>
+		<script>
+		(function() { // DON'T EDIT BELOW THIS LINE
+		var d = document, s = d.createElement('script');
+		s.src = 'https://will-kelsey-smith.disqus.com/embed.js';
+		s.setAttribute('data-timestamp', +new Date());
+		(d.head || d.body).appendChild(s); 
+		})();
+		</script>
+		<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+									
 							
       </div>
     </section>
-
-    <div class="copyright py-4 text-center text-white">
-      <div class="container">
-        <small>Copyright &copy; Your Website 2018</small>
+	
+    
+      <div class="container"><div class="copyright">
+        Copyright &copy; Will Kelsey 2018
       </div>
     </div>
 
