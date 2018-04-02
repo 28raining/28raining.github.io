@@ -50,8 +50,9 @@ function updatespan(this_id,this_val) {
   var precision=3;
   var start_x_coord=0;
   var start_y_coord=0;
-  var end_x_coord=0;
-  var end_y_coord=0;
+  var end_x_coord=0.0;
+  var end_y_coord=0.0;
+  var real_old,imag_old=0.0;
   
   schematic.push({num: 0, type:'raw', zo : 50, freq:2440,unit:'MHz'});
   schematic.push({num : 1, type:'bb',real:1,imaginary:0,abs:50,abs_bb_i:0,unit:'null'});
@@ -310,10 +311,11 @@ function update_smith_chart() {
 //		if (sch_real) div.innerHTML += "<p"+schematic[i].real+"<b>j</b></p>";
 //		if (sch_real) div.innerHTML += "<p"+schematic[i].imaginary+"<b>j</b></p>";
 
-		div.innerHTML += "<div class=\"datapoint\">DP"+i+"</div>";
+		//div.innerHTML += "<div class=\"datapoint\">DP"+i+"</div>";
 
 		//can't remove back boxes...
-		if (schematic[i].type!='bb') div.innerHTML += "<div class=\"rem\" onclick=\"schematic.splice("+i+",1); update_smith_chart()\">x</div>";
+		if (schematic[i].type!='bb') div.innerHTML += "<div class=\"rem\" onclick=\"schematic.splice("+i+",1); update_smith_chart()\">DP"+i+"&nbsp &nbsp &nbsp X</div>";
+		else div.innerHTML += "<div class=\"rem\">DP"+i+"&nbsp &nbsp &nbsp &nbsp</div>";
 		//else  div.innerHTML += "<p>&nbsp</p>";
 		document.getElementById("schematic").appendChild(div);
 
@@ -321,17 +323,22 @@ function update_smith_chart() {
 		//Add the arc to the smith chart
 		if ( i > 1) {
 			var temp_trace = {}
+			var x_points, y_points;
 			
 			if ((schematic[i].type[0]=='s') || (schematic[i].type[0]=='b')) {
 				//For series elements plotted on normal curves....
 				var re = Number(schematic[i].real);
 				var im = Number(schematic[i].imaginary);
-				var [x_points,y_points] = arc_smith_points(real_old,imag_old,re+real_old,im+imag_old,false);
+				var temp_array = arc_smith_points(real_old,imag_old,re+real_old,im+imag_old,false);
+				x_points=temp_array[0];
+				y_points=temp_array[1];
 				real_old = re+real_old;
 				imag_old = im+imag_old;
 			} else if (schematic[i].type=='tl') {
 				//For transmission lines...
-				var [x_points,y_points] = arc_smith_points(real_old,imag_old,schematic[i].line_length,schematic[i].line_zo,"transmission_line",schematic[i].er);
+				var temp_array=arc_smith_points(real_old,imag_old,schematic[i].line_length,schematic[i].line_zo,"transmission_line",schematic[i].er);
+				x_points=temp_array[0];
+				y_points=temp_array[1];
 			}  else {
 				//For parallel elements plotted on rotated graph....
 				var start = one_over_complex(real_old,imag_old);
@@ -339,8 +346,12 @@ function update_smith_chart() {
 					//don't plot this point...
 				} else {
 					var schem_inv = one_over_complex(schematic[i].real,schematic[i].imaginary);
-					var [x_points,y_points] = arc_smith_points(start[0],start[1],start[0]+schem_inv[0],start[1]+schem_inv[1],true);
-					[real_old,imag_old] = one_over_complex(start[0]+schem_inv[0],start[1]+schem_inv[1]);
+					var temp_array = arc_smith_points(start[0],start[1],start[0]+schem_inv[0],start[1]+schem_inv[1],true);
+					x_points=temp_array[0];
+					y_points=temp_array[1];
+					temp_array=one_over_complex(start[0]+schem_inv[0],start[1]+schem_inv[1]);
+					real_old = temp_array[0];
+					imag_old = temp_array[1];
 				}
 			}
 			temp_trace = {
@@ -362,7 +373,12 @@ function update_smith_chart() {
 		}
 	}
 	
-	if (schematic.length==2) [end_x_coord,end_y_coord] = find_smith_coord(schematic[1].real,schematic[1].imaginary,false);
+	var temp_array = []
+	if (schematic.length == 2) {
+		temp_array = find_smith_coord(schematic[1].real,schematic[1].imaginary,false);
+		end_x_coord=temp_array[0];
+		end_y_coord=temp_array[1];
+	}
 	//console.log(schematic[0].real,schematic[0].imaginary,end_x_coord,end_y_coord)
 	layout_shapes.push({type: "rectangle", x0:Number(end_x_coord)-0.01,y0:Number(end_y_coord)-0.01,x1:Number(end_x_coord)+0.01,y1:Number(end_y_coord)+0.01});
 	textbox_trace.push({x:[Number(end_x_coord)+0.04],y:[Number(end_y_coord)-0.03],text:["DP"+(i-1)],mode:'text'});
@@ -374,16 +390,21 @@ function update_smith_chart() {
 	document.getElementById("current_impedance").innerHTML += "<div class=\"text_box\">"+Math.abs(imag_old*zo).toPrecision(3) + "j</div>";
 	
 	//Calculate the admittance
-	var [admittance_real,admittance_imaginary] = one_over_complex(real_old*zo,imag_old*zo);
+	var admittance_real,admittance_imaginary;
+	temp_array =  one_over_complex(real_old*zo,imag_old*zo);
+	admittance_real=temp_array[0];
+	admittance_imaginary=temp_array[1];
 	document.getElementById("current_admittance").innerHTML = "<div class=\"text_box\">"+(admittance_real).toPrecision(3)+"</div>";
 	if (admittance_imaginary < 0) document.getElementById("current_admittance").innerHTML += "<div class=\"text_box\">-</div>";
 	else document.getElementById("current_admittance").innerHTML += "<div class=\"text_box\">+</div>";
 	document.getElementById("current_admittance").innerHTML += "<div class=\"text_box\">"+Math.abs(admittance_imaginary).toPrecision(3) + "j</div>";
 	
 	//Calculate the reflection coefficient -current_admittance (zo-zimp) / (zo+zimp)
-	var [bot_real,bot_imag] = one_over_complex(zo + real_old*zo,imag_old*zo);
-	//console.log(real_old*zo,imag_old*zo);
-	//console.log(bot_real,bot_imag);
+	var bot_real,bot_imag;
+	temp_array = one_over_complex(zo + real_old*zo,imag_old*zo);
+	bot_real= temp_array[0];
+	bot_imag = temp_array[1];
+
 	var reflectio_coeff_real = ((zo - real_old*zo) * bot_real) + ((imag_old*zo)*bot_imag);
 	var reflectio_coeff_imag = ((imag_old*zo) * bot_real) + ((zo - real_old*zo) * bot_imag);
 	document.getElementById("current_reflection").innerHTML = "<div class=\"text_box\">"+(reflectio_coeff_real).toPrecision(3)+"</div>";
@@ -404,22 +425,7 @@ function update_smith_chart() {
 	//console.log("data");
 	//console.log(data);
 	//console.log(layout);
-	Plotly.newPlot('myDiv', data, {paper_bgcolor: 'rgba(255,255,255,0.2)', plot_bgcolor: 'rgba(255,255,255,0.0)', showlegend: false,margin:layout.margin, height:layout.height,width:layout.width,hovermode:layout.hovermode,xaxis:layout.xaxis,yaxis:layout.yaxis,shapes:layout.shapes.concat(layout_shapes)});
-
-	var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(schematic, null, "\t"));
-	var dlAnchorElem = document.getElementById('downloadAnchorElem');
-	dlAnchorElem.setAttribute("href",     dataStr     );
-	var myDate = new Date();
-	var date = myDate.getDate();
-	var month = myDate.getMonth();
-	var year = myDate.getFullYear();
-	var hour = myDate.getHours();
-	var minutes = myDate.getMinutes();
-	var seconds = myDate.getSeconds();
-
-	var ddmmyyyy = year + pad(month + 1) + pad(date) + pad(hour) + pad(minutes) + pad(seconds);
-	dlAnchorElem.setAttribute("download", "online_smith_tool_"+ddmmyyyy+".json");
-	
+	Plotly.newPlot('myDiv', data, {paper_bgcolor: 'rgba(255,255,255,0.2)', plot_bgcolor: 'rgba(255,255,255,0.0)', showlegend: false,margin:layout.margin, height:layout.height,width:layout.width,hovermode:layout.hovermode,xaxis:layout.xaxis,yaxis:layout.yaxis,shapes:layout.shapes.concat(layout_shapes)});	
 	
 }
 
@@ -460,7 +466,7 @@ function define_labels () {
 	trace_adm = {
 	  x: [0.56,0.27,-0.05,-0.4,-0.74,-0.88],
 	  y: [-0.03,-0.03,-0.03,-0.03,-0.03,-0.03,-0.03],
-	  text: ["<b>"+1000/5/zo+"</b>m","<b>"+1000/2/zo+"</b>m","<b>"+1000/zo+"</b>m","<b>"+1000*2/zo+"</b>m","<b>"+1000*5/zo+"</b>m","<b>"+1000*10/zo+"</b>m"],
+	  text: ["<b>"+(1000/5/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
 	  mode: 'text',
 	  textfont: {
 		color: 'rgba(0, 10, 163,0.3)'
@@ -470,7 +476,7 @@ function define_labels () {
 	trace_sus_pos = {
 	  x: [0.86,0.55,-0.04,-0.62,-0.89,-0.92],
 	  y: [0.4,0.78,0.97,0.72,0.31,0.15],
-	  text: ["<b>"+1000/5/zo+"</b>m","<b>"+1000/2/zo+"</b>m","<b>"+1000/zo+"</b>m","<b>"+1000*2/zo+"</b>m","<b>"+1000*5/zo+"</b>m","<b>"+1000*10/zo+"</b>m"],
+	  text: ["<b>"+(1000/5/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
 	  mode: 'text',
 	  textfont: {
 		color: 'rgba(255, 0, 250,0.3)'
@@ -480,7 +486,7 @@ function define_labels () {
 	trace_sus_neg = {
 	  x: [0.86,0.55,-0.04,-0.62,-0.89,-0.92],
 	  y: [-0.4,-0.78,-0.97,-0.72,-0.31,-0.15],
-	  text: ["<b>"+1000/5/zo+"</b>m","<b>"+1000/2/zo+"</b>m","<b>"+1000/zo+"</b>m","<b>"+1000*2/zo+"</b>m","<b>"+1000*5/zo+"</b>m","<b>"+1000*10/zo+"</b>m"],
+	  text: ["<b>"+(1000/5/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
 	  mode: 'text',
 	  textfont: {
 		color: 'rgba(255, 0, 250,0.3)'
@@ -556,7 +562,10 @@ function arc_smith_points(x1,y1,x2,y2,rotate,er) {
 	var x_coord=[];
 	var y_coord=[];
 	resolution = 100;
-	[start_x_coord,start_y_coord]=find_smith_coord(x1, y1,rotate);
+	var temp_array=[];
+	temp_array=find_smith_coord(x1, y1,rotate);
+	start_x_coord=temp_array[0];
+	start_y_coord=temp_array[1];
 
 	if (rotate == "transmission_line") {
 		var line_zo=y2;
@@ -573,24 +582,53 @@ function arc_smith_points(x1,y1,x2,y2,rotate,er) {
 			var top_imag_temp = (y1*zo + line_zo*tan_beta)* line_zo/zo;
 			var bot_real_temp = line_zo-y1*tan_beta*zo;
 			var bot_imag_temp = x1*tan_beta*zo;
-			[bot_real,bot_imag]=one_over_complex(bot_real_temp,bot_imag_temp);
+			var temp_array=one_over_complex(bot_real_temp,bot_imag_temp);
+			var bot_real=temp_array[0];
+			var bot_imag=temp_array[1];
 			var real_answer = (top_real_temp*bot_real)-(top_imag_temp*bot_imag);
 			var imag_answer = (top_real_temp*bot_imag)+(top_imag_temp*bot_real);
 			//console.log(real_answer,imag_answer,tan_beta);
-			[x_coord[i],y_coord[i]]=find_smith_coord(real_answer, imag_answer,false);
+			temp_array=find_smith_coord(real_answer,imag_answer,false);
+			x_coord[i]=temp_array[0];
+			y_coord[i]=temp_array[1];
 		} else {
-				[x_coord[i],y_coord[i]]=find_smith_coord(x1 + (x2-x1)*i/resolution, y1 + (y2-y1)*i/resolution,rotate);
+				temp_array=find_smith_coord(x1 + (x2-x1)*i/resolution, y1 + (y2-y1)*i/resolution,rotate);
+				x_coord[i]=temp_array[0];
+				y_coord[i]=temp_array[1];
 		}	
 	}
 	
 	if (rotate == "transmission_line") {
-		[end_x_coord,end_y_coord]=find_smith_coord(real_answer, imag_answer,false);
+		temp_array=find_smith_coord(real_answer, imag_answer,false);
+		end_x_coord=temp_array[0];
+		end_y_coord=temp_array[1];
+		real_old = real_answer;
+		imag_old = imag_answer;
 	} else {
-		[end_x_coord,end_y_coord]=find_smith_coord(x2, y2,rotate);
+		temp_array=find_smith_coord(x2, y2,rotate);
+		end_x_coord=temp_array[0];
+		end_y_coord=temp_array[1];
 	}
 	
 	//console.log([x_coord,y_coord]);
 	return [x_coord,y_coord];
+}
+
+function download_state() {
+	var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(schematic, null, "\t"));
+	//var dlAnchorElem = document.getElementById('downloadAnchorElem');
+	//dlAnchorElem.setAttribute("href",     dataStr     );
+	var myDate = new Date();
+	var date = myDate.getDate();
+	var month = myDate.getMonth();
+	var year = myDate.getFullYear();
+	var hour = myDate.getHours();
+	var minutes = myDate.getMinutes();
+	var seconds = myDate.getSeconds();
+
+	var ddmmyyyy = year + pad(month + 1) + pad(date) + pad(hour) + pad(minutes) + pad(seconds);
+	//dlAnchorElem.setAttribute("download", "online_smith_tool_"+ddmmyyyy+".json");
+	download(dataStr,"online_smith_tool_"+ddmmyyyy+".json","text/plain");
 }
 
 var layout = {
