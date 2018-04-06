@@ -57,6 +57,7 @@
 
 .cell_w_hover:hover { 
     background-color: rgb(133, 203, 247);
+    cursor: pointer;
 }
 
 .cell_w_hover:hover img { 
