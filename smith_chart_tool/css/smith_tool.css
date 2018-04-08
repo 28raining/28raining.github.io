@@ -232,6 +232,10 @@ h {
     text-align: center;
 }
 
+.upload {
+	cursor: url('../icons/icon_up.png'), pointer;
+}
+
 .button_block a {
 	color: white;
 }

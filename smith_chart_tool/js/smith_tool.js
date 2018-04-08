@@ -188,6 +188,10 @@ function update_smith_chart() {
 	
 	var myNode = document.getElementById("schematic");
 	myNode.innerHTML = '';
+	var point_div = document.createElement("div");
+	point_div.setAttribute('class', 'cell-picker-text');
+	point_div.innerHTML += "<b class=\"star-light arrow fa-1x\"></b><b>Your system</b><b class=\"star-light arrow fa-1x\"></b>";
+	document.getElementById("schematic").appendChild(point_div);
 	real_old = Number(schematic[1].real);
 	imag_old = Number(schematic[1].imaginary);
 		
