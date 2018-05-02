@@ -468,7 +468,7 @@ function define_labels () {
 	};
 
 	trace_adm = {
-	  x: [0.56,0.27,-0.05,-0.4,-0.74,-0.88],
+	  x: [0.53,0.26,-0.07,-0.4,-0.74,-0.88],
 	  y: [-0.03,-0.03,-0.03,-0.03,-0.03,-0.03,-0.03],
 	  text: ["<b>"+(1000/5/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
 	  mode: 'text',
@@ -478,8 +478,8 @@ function define_labels () {
 	};
 
 	trace_sus_pos = {
-	  x: [0.86,0.55,-0.04,-0.62,-0.89,-0.92],
-	  y: [0.4,0.78,0.97,0.72,0.31,0.15],
+	  x: [0.86,0.53,-0.07,-0.62,-0.89,-0.92],
+	  y: [0.4,0.79,0.97,0.72,0.31,0.15],
 	  text: ["<b>"+(1000/5/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
 	  mode: 'text',
 	  textfont: {
@@ -488,8 +488,8 @@ function define_labels () {
 	};
 
 	trace_sus_neg = {
-	  x: [0.86,0.55,-0.04,-0.62,-0.89,-0.92],
-	  y: [-0.4,-0.78,-0.97,-0.72,-0.31,-0.15],
+	  x: [0.86,0.53,-0.07,-0.62,-0.89,-0.92],
+	  y: [-0.4,-0.79,-0.97,-0.72,-0.31,-0.15],
 	  text: ["<b>"+(1000/5/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
 	  mode: 'text',
 	  textfont: {
