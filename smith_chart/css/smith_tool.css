@@ -144,7 +144,7 @@ input, .complex_box, .complex_box_wide {
 }
 
 .trans {
-	height:32px;
+	height:1rem;
 }
 
 .trans input {
