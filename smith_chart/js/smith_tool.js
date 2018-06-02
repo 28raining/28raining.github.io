@@ -34,7 +34,7 @@ function updatespan(this_id,this_val) {
 		schematic[sch_num].unit = this_val;
 		is_active[sch_num]="active";
 	}
-	console.log(this_id);
+	//console.log(this_id);
 	document.getElementById(this_id).children[0].innerText=this_val;
 	update_schem();
 	is_active=[];
@@ -346,9 +346,11 @@ function update_smith_chart() {
 			}  else {
 				//For parallel elements plotted on rotated graph....
 				var start = one_over_complex(real_old,imag_old);
-				if ((Math.abs(schematic[i].real) < 0.0001) && (Math.abs(schematic[i].imaginary) < 0.0001)) {
+				//if ((Math.abs(schematic[i].real) < 0.001) && (Math.abs(schematic[i].imaginary) < 0.001)) {
 					//don't plot this point...
-				} else {
+				//} else {
+                    if ((Math.abs(schematic[i].real) < 0.001) && (schematic[i].real != 0.0)) schematic[i].real=0.001;
+                    if ((Math.abs(schematic[i].imaginary) < 0.001) && (schematic[i].imaginary != 0.0)) schematic[i].imaginary=0.001;
 					var schem_inv = one_over_complex(schematic[i].real,schematic[i].imaginary);
 					var temp_array = arc_smith_points(start[0],start[1],start[0]+schem_inv[0],start[1]+schem_inv[1],true);
 					x_points=temp_array[0];
@@ -356,7 +358,7 @@ function update_smith_chart() {
 					temp_array=one_over_complex(start[0]+schem_inv[0],start[1]+schem_inv[1]);
 					real_old = temp_array[0];
 					imag_old = temp_array[1];
-				}
+				//}
 			}
 			temp_trace = {
 				x: x_points,
@@ -383,7 +385,7 @@ function update_smith_chart() {
 		end_x_coord=temp_array[0];
 		end_y_coord=temp_array[1];
 	}
-	//console.log(schematic[0].real,schematic[0].imaginary,end_x_coord,end_y_coord)
+	//console.log(schematic[1].real,schematic[0].imaginary,end_x_coord,end_y_coord)
 	layout_shapes.push({type: "rectangle", x0:Number(end_x_coord)-0.01,y0:Number(end_y_coord)-0.01,x1:Number(end_x_coord)+0.01,y1:Number(end_y_coord)+0.01});
 	textbox_trace.push({x:[Number(end_x_coord)+0.04],y:[Number(end_y_coord)-0.03],text:["DP"+(i-1)],mode:'text'});
 	
@@ -429,6 +431,7 @@ function update_smith_chart() {
 	//console.log("data");
 	//console.log(data);
 	//console.log(layout);
+	//console.log(layout_shapes);
 	Plotly.newPlot('myDiv', data, {paper_bgcolor: 'rgba(255,255,255,0.2)', plot_bgcolor: 'rgba(255,255,255,0.0)', showlegend: false,margin:layout.margin, height:layout.height,width:layout.width,hovermode:layout.hovermode,xaxis:layout.xaxis,yaxis:layout.yaxis,shapes:layout.shapes.concat(layout_shapes)});	
 	
 }
