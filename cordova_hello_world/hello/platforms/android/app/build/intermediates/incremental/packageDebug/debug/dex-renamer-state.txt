@@ -1,4 +1,0 @@
-#Tue Jun 05 12:33:39 PDT 2018
-base.0=C\:\\Users\\Will\\Documents\\GitHub\\cordova_hello_world\\hello\\platforms\\android\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\0
-renamed.0=classes.dex
-file.0=C\:\\Users\\Will\\Documents\\GitHub\\cordova_hello_world\\hello\\platforms\\android\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\0\\classes.dex
