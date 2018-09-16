@@ -1,0 +1,2 @@
+FSPAN cannot be bigger than F ootherwise -ve frequencies
+Why span unit differentit no work?
