@@ -35,11 +35,10 @@
 	<link href="css/style.css" rel="stylesheet">
 
 	<script>if(typeof window.Int16Array !== 'function')document.write("<scri"+"pt src='extras/typedarray.min.js'></scr"+"ipt>");</script>
-	<script>document.write("<scri"+"pt src='extras/request_animation_frame.js'></scr"+"ipt>");</script>
-  <script src="download-master/download.min.js"></script>
-	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-	<!--<script src="js/plotly.min.js"></script>-->
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.26.29/dist/sweetalert2.all.min.js"></script>
+<script>document.write("<scri"+"pt src='extras/request_animation_frame.js'></scr"+"ipt>");</script>
+    <script src="download-master/download.min.js"></script>
+	<!--	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>-->
+		<script src="js/plotly.min.js"></script>
 
   </head>
 
@@ -64,16 +63,15 @@
 	  <div class="trans"></div>
 	  <div class="global_inputs">
 			<i>Operational Frequency</i><i>
-				<input type="number" value="2440" id="freq" onchange="schematic[0].freq=Number(this.value); update_smith_chart();">
-				<div id="freq_sel" class="wrapper-dropdown-5" tabindex="1" onclick="change_class(this.id)"><div>MHz</div>
+				<input type="number" value="2440" id="freq" onchange="freq_no_unit=this.value; schematic[0].freq=this.value; update_schem();"><div id="freq_sel" class="wrapper-dropdown-5" tabindex="1" onclick="change_class(this.id)"><div>MHz</div>
 					<ul class="dropdown">
-						<li onclick="updatespan(parentElement.parentElement.id,'Hz','freq_unit')"><a href="#">Hz</a></li>
-						<li onclick="updatespan(parentElement.parentElement.id,'KHz','freq_unit')"><a href="#">KHz</a></li>
-						<li onclick="updatespan(parentElement.parentElement.id,'MHz','freq_unit')"><a href="#">MHz</a></li>
-						<li onclick="updatespan(parentElement.parentElement.id,'GHz','freq_unit')"><a href="#">GHz</a></li>
-						<li onclick="updatespan(parentElement.parentElement.id,'THz','freq_unit')"><a href="#">THz</a></li></ul></div></i>
+						<li onclick="updatespan(parentElement.parentElement.id,'Hz')"><a href="#">Hz</a></li>
+						<li onclick="updatespan(parentElement.parentElement.id,'KHz')"><a href="#">KHz</a></li>
+						<li onclick="updatespan(parentElement.parentElement.id,'MHz')"><a href="#">MHz</a></li>
+						<li onclick="updatespan(parentElement.parentElement.id,'GHz')"><a href="#">GHz</a></li>
+						<li onclick="updatespan(parentElement.parentElement.id,'THz')"><a href="#">THz</a></li></ul></div></i>
 			<i>Characteristic Impedance</i><i>
-			<input type="number" value="50" id="zo" onchange="zo=this.value; schematic[0].zo=this.value; update_smith_chart();"><div class="ohms">Ω</div></i>
+			<input type="number" value="50" id="zo" onchange="zo=this.value; schematic[0].zo=this.value; update_schem();"><div class="ohms">Ω</div></i>
 
 			<i>Download this state</i><i>
 			<button class="button_block" onclick="download_state()">Download schematic</button></i>
@@ -81,18 +79,6 @@
 			<i>Upload previous state</i><i><input class="button_block upload" type="file" id="file" name="file"/></i>
 		</div><div class="spacer"></div><div class="global_inputs">
 		
-			<i>Frequency span (&#8723)</i><i>
-				<input type="number" value="0" id="span" onchange="schematic[0].span=Number(this.value); update_smith_chart();">
-				<div id="span_sel" class="wrapper-dropdown-5" tabindex="1" onclick="change_class(this.id)">
-					<div>MHz</div>
-					<ul class="dropdown">
-						<li onclick="updatespan(parentElement.parentElement.id,'Hz','span_unit')"><a href="#">Hz</a></li>
-						<li onclick="updatespan(parentElement.parentElement.id,'KHz','span_unit')"><a href="#">KHz</a></li>
-						<li onclick="updatespan(parentElement.parentElement.id,'MHz','span_unit')"><a href="#">MHz</a></li>
-						<li onclick="updatespan(parentElement.parentElement.id,'GHz','span_unit')"><a href="#">GHz</a></li>
-						<li onclick="updatespan(parentElement.parentElement.id,'THz','span_unit')"><a href="#">THz</a></li>
-					</ul></div></i>
-
 			<i>Impedance:</i><i id="current_impedance"></i>
 			<i>Admittance:</i><i id="current_admittance"></i>
 			<i>Reflection Coefficient:</i><i id="current_reflection"></i>
@@ -159,7 +145,7 @@
         <i class="fa fa-chevron-up"></i>
       </a>
     </div>
-   <script src="js/smith_tool_new.js"></script>
+   <script src="js/smith_tool.js"></script>
   </body>
 
 
