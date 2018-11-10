@@ -1,8 +1,10 @@
-- remove spaces above stubs in schematic drawing
+- Make it mobile friendly so Google ranks it higher.
+-remove spaces above stubs in schematic drawing
 - move the text boxes to somewhere not blocked by the line
 - text boxes are still using global variables!?
 - Verify the span still works with stubs
 - make a test document for the smith tool, compare it to s/w tool
-- add ability to import s paramitors, the microwave website detailed how this works. Can also use fritzels help document and also I found another website
+- add ability to import s paramitors, the microwave website detailed how this works. Can also use fritzels help document and also I found another website from that rf tools page
 -change number box to text box for more area
-- span is not working on stub
+- span is not working on stub. because using wavelength?
+-I've seen nicer discus layouts. maybe they have less console errors too? look for new
