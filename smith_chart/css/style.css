@@ -1,11 +1,9 @@
 
 body {
 	font-family: 'Lato', 'Arial', sans-serif;
-	#background: #ddd url(../images/bg.jpg);
 	font-weight: 300;
 	font-size: 15px;
 	color: #333;
-	#overflow-y: scroll;
 }
 
 a {

@@ -125,7 +125,6 @@ i input {
 }
 
 input, .complex_box, .complex_box_wide {
-	#max-width:35%;
 	display:inline-block;
 	line-height:28px;
 	height:32px;
@@ -211,7 +210,6 @@ h {
 }
 
 .global_inputs {
-	#margin:20px;
 	display:inline-block;
 	width:47.5%;
 	padding-bottom:5px;
