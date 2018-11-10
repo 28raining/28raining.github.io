@@ -44,6 +44,7 @@ function updatespan(this_id,this_val,element) {
 	is_active=[];
 }
 
+  var num_elements=2;
   var schematic = [];
   var zo=50;
 	//var freq_multiplier=1e6;
@@ -58,8 +59,8 @@ function updatespan(this_id,this_val,element) {
 	var resolution = 100;
 	var span_resolution = 10;
   
-  schematic.push({type:'raw', zo : 50, freq:2440, er : 1, freq_unit:{unit:'MHz',multiplier:1e6}, span:0.0, span_unit:{unit:'MHz',multiplier:1e6}});
-  schematic.push({type:'bb',real:1,imaginary:0,abs:50,abs_bb_i:0,unit:'null'});
+  schematic.push({num: 0, type:'raw', zo : 50, freq:2440, freq_unit:{unit:'MHz',multiplier:1e6}, span:0.0, span_unit:{unit:'MHz',multiplier:1e6}});
+  schematic.push({num : 1, type:'bb',real:1,imaginary:0,abs:50,abs_bb_i:0,unit:'null'});
   
 function one_over_complex(real, imaginary) {
 	var realn = real/(real*real + imaginary*imaginary);
@@ -69,38 +70,40 @@ function one_over_complex(real, imaginary) {
 
 function clicked_cell(type) {
 	if (type == "pr") {
-		schematic.push({type:'pr',real:0,imaginary:0,abs:1,unit:'Ω'});
+		schematic.push({num : num_elements, type:'pr',real:0,imaginary:0,abs:1,unit:'Ω'});
 	} else if (type=="sr") {
-		schematic.push({type:'sr',real:0,imaginary:0,abs:1,unit:'Ω'});
+		schematic.push({num : num_elements, type:'sr',real:0,imaginary:0,abs:1,unit:'Ω'});
 	} else if (type=="si") {
-		schematic.push({type:'si',real:0,imaginary:0,abs:1,unit:'nH'});
+		schematic.push({num : num_elements, type:'si',real:0,imaginary:0,abs:1,unit:'nH'});
 	} else if (type=="pi") {
-		schematic.push({type:'pi',real:0,imaginary:0,abs:1,unit:'nH'});
+		schematic.push({num : num_elements, type:'pi',real:0,imaginary:0,abs:1,unit:'nH'});
 	} else if (type=="sc") {
-		schematic.push({type:'sc',real:0,imaginary:0,abs:1,unit:'pF'});
+		schematic.push({num : num_elements, type:'sc',real:0,imaginary:0,abs:1,unit:'pF'});
 	} else if (type=="pc") {
-		schematic.push({type:'pc',real:0,imaginary:0,abs:1,unit:'pF'});
+		schematic.push({num : num_elements, type:'pc',real:0,imaginary:0,abs:1,unit:'pF'});
 	} else if (type=="tl") {
-		schematic.push({type:'tl',line_length:1e-3,abs:1,line_zo:50,unit:'mm',real:0,imaginary:0});
+		schematic.push({num : num_elements, type:'tl',line_length:1e-3,abs:1,line_zo:50,er:4,unit:'mm',real:0,imaginary:0});
 	} else if (type=="ss") {
-		schematic.push({type:'ss',line_length:1e-3,abs:1,line_zo:50,unit:'mm',real:0,imaginary:0});
+		schematic.push({num : num_elements, type:'ss',line_length:1e-3,abs:1,line_zo:50,er:4,unit:'mm',real:0,imaginary:0});
 	} else if (type=="so") {
-		schematic.push({type:'so',line_length:1e-3,abs:1,line_zo:50,unit:'mm',real:0,imaginary:0});
+		schematic.push({num : num_elements, type:'so',line_length:1e-3,abs:1,line_zo:50,er:4,unit:'mm',real:0,imaginary:0});
 	}
 	update_smith_chart();
+	num_elements=num_elements+1;
 }
 
 function update_schem_abs(target_num, obj, complex) {
 	switch(schematic[target_num].type) {
 		case ("bb") :
 			if (complex=="abs") schematic[target_num].abs = Number(obj.value);
-      else schematic[target_num].abs_bb_i = Number(obj.value);
+			else schematic[target_num].abs_bb_i = Number(obj.value);
 			break;
     case ("tl") :
     case ("ss") :
-    case ("so") :
+    case ("sc") :
 			if (complex=="abs") schematic[target_num].abs = Number(obj.value);
 			else if (complex=="line_zo") schematic[target_num].line_zo = Number(obj.value);
+			else if (complex=="er") schematic[target_num].er = Number(obj.value);
 			break;
 		case ("sr") :
 		case ("pr") :
@@ -110,7 +113,7 @@ function update_schem_abs(target_num, obj, complex) {
 		case ("si"):
 			schematic[target_num].abs = Number(obj.value)
 			break;
-  }
+	}
 	update_smith_chart();
 }
 
@@ -197,9 +200,9 @@ function update_smith_chart() {
 	var layout_shapes = [];
 	var textbox_trace = [];
 	var span_impedance_re = [];
-  var span_impedance_im = [];
-  var end_x_coord = 0;
-  var end_y_coord = 0
+    var span_impedance_im = [];
+    var end_x_coord = 0;
+    var end_y_coord = 0
 	if (span_freq == 0) {
 		span_res = 0
 	} else {
@@ -213,16 +216,15 @@ function update_smith_chart() {
 	point_div.innerHTML += "<b class=\"star-light arrow fa-1x\"></b><b>Your system</b><b class=\"star-light arrow fa-1x\"></b>";
 	document.getElementById("schematic").appendChild(point_div);
 	var real_old = 0.0;
-  var imag_old = 0.0;
-  
+	var imag_old = 0.0;
+	for (var i= 0; i <= span_res*2; i++) {
+		span_impedance_re[i] = Number(schematic[1].real);;
+		span_impedance_im[i] = Number(schematic[1].imaginary);
+  }
+    
   //update black box
   update_schem_component(freq,true,1)
   draw_schematic(1);
-
-	for (var i= 0; i <= span_res*2; i++) {
-		span_impedance_re[i] = Number(schematic[1].real);
-		span_impedance_im[i] = Number(schematic[1].imaginary);
-  }    
 		
 	for (var i = 2; i < schematic.length; i++) {
 		//Add the arc to the smith chart
@@ -246,38 +248,27 @@ function update_smith_chart() {
 
             var temp_trace = {}
             var x_points, y_points;
-
-            if ((schematic[i].type=='ss') || (schematic[i].type=='so')) {
-              //if the stub is longer than 0.5 waves then there is a full circle. Trim to 1 wave so user can see if there are multiple loops
-              var wave_length = 3e8 / (frequency_at_sp*Math.sqrt(schematic[0].er));
-              //if (ln_length>wave_length) ln_length = wave_length + ln_length % wave_length;   
-              //for "ss" matching, can't assume that we start at 0 length
-              if (ln_length<(0.5*wave_length)) var start_at_qtr_wl = wave_length/4;
-              else start_at_qtr_wl = 0;
-              var start = one_over_complex(span_impedance_re[sp],span_impedance_im[sp]);
-              var temp_array = arc_smith_points(start[0],start[1],ln_length,schematic[i].line_zo,schematic[i].type,true,2*Math.PI*frequency_at_sp*Math.sqrt(schematic[0].er)/3e8,start_at_qtr_wl);
-              var schem_inv = one_over_complex(temp_array[4],temp_array[5]);
-              span_impedance_re[sp] = schem_inv[0];
-              span_impedance_im[sp] = schem_inv[1];
-
-            } else if (schematic[i].type[0]=='p') {
-              //For parallel elements plotted on rotated graph....
-              var start = one_over_complex(span_impedance_re[sp],span_impedance_im[sp]);
-              var schem_inv = one_over_complex(re,im);
-              var temp_array = arc_smith_points(start[0],start[1],start[0]+schem_inv[0],start[1]+schem_inv[1],schematic[i].type,true);
-              var schem_inv = one_over_complex(start[0]+schem_inv[0],start[1]+schem_inv[1]);
-              span_impedance_re[sp] = schem_inv[0];
-              span_impedance_im[sp] = schem_inv[1];
-            } else if ((schematic[i].type[0]=='s') || (schematic[i].type[0]=='b')) {
-              //For series elements plotted on normal curves....
-              var temp_array = arc_smith_points(span_impedance_re[sp],span_impedance_im[sp],re+span_impedance_re[sp],im+span_impedance_im[sp],"impedance",false);
-              span_impedance_re[sp] = span_impedance_re[sp] + re;
-              span_impedance_im[sp] = span_impedance_im[sp] + im;
+            
+            if ((schematic[i].type[0]=='s') || (schematic[i].type[0]=='b')) {
+                //For series elements plotted on normal curves....
+                var temp_array = arc_smith_points(span_impedance_re[sp],span_impedance_im[sp],re+span_impedance_re[sp],im+span_impedance_im[sp],false);
+                span_impedance_re[sp] = span_impedance_re[sp] + re;
+                span_impedance_im[sp] = span_impedance_im[sp] + im;
             } else if (schematic[i].type=='tl') {
-              //For transmission lines...
-              var temp_array = arc_smith_points(span_impedance_re[sp],span_impedance_im[sp],ln_length,schematic[i].line_zo,"transmission_line",false,2*Math.PI*frequency_at_sp*Math.sqrt(schematic[0].er)/3e8);
-              span_impedance_re[sp] = temp_array[4];
-              span_impedance_im[sp] = temp_array[5];
+                //For transmission lines...
+                var temp_array = arc_smith_points(span_impedance_re[sp],span_impedance_im[sp],ln_length,schematic[i].line_zo,"transmission_line",2*Math.PI*frequency_at_sp*Math.sqrt(schematic[i].er)/3e8);
+                span_impedance_re[sp] = temp_array[4];
+                span_impedance_im[sp] = temp_array[5];
+            }  else {
+                //For parallel elements plotted on rotated graph....
+                var start = one_over_complex(span_impedance_re[sp],span_impedance_im[sp]);
+                //if ((Math.abs(schematic[i].real) < 0.001) && (schematic[i].real != 0.0)) schematic[i].real=0.001;
+                //if ((Math.abs(schematic[i].imaginary) < 0.001) && (schematic[i].imaginary != 0.0)) schematic[i].imaginary=0.001;
+                var schem_inv = one_over_complex(re,im);
+                var temp_array = arc_smith_points(start[0],start[1],start[0]+schem_inv[0],start[1]+schem_inv[1],true);
+                var schem_inv = one_over_complex(start[0]+schem_inv[0],start[1]+schem_inv[1]);
+                span_impedance_re[sp] = schem_inv[0];
+                span_impedance_im[sp] = schem_inv[1];
             }
 
             //If at original frequency, save and plot the data points
@@ -288,6 +279,7 @@ function update_smith_chart() {
                 end_y_coord=temp_array[3];
                 real_old = span_impedance_re[sp];
                 imag_old = span_impedance_im[sp]
+
                 temp_trace = {
                     x: x_points,
                     y: y_points,
@@ -468,21 +460,6 @@ function draw_schematic(i) {
             unit = [' m','mm','um','λ'];
             sch_icon="transmission_line";
             break;
-        case ("ss") :
-            sch_label="Short Stub";
-            sch_imag=false;
-            sch_real=false;
-            sch_abs=true; //is actually length
-            unit = [' m','mm','um','λ'];
-            sch_icon="stub_short";
-            break;
-        case ("so") :
-            sch_label="Open Stub";
-            sch_imag=false;
-            sch_real=false;
-            sch_abs=true; //is actually length
-            unit = [' m','mm','um','λ'];
-            sch_icon="stub_open";
     }
     //div.innerHTML = "<p>"+sch_label+"</p>";
     div.innerHTML += "<img src=\"icons/"+sch_icon+".png\" alt="+sch_label+">";
@@ -508,15 +485,15 @@ function draw_schematic(i) {
         if (sch_real || sch_imag) var complex_box = "<div class=\"trans\"><div class=\"spacer\"></div>";
         
         if (sch_real) {
-            complex_box += "<div class=\""+divclass+"\">" + Number((schematic[i].real*zo).toPrecision(precision)) + "</div><div class=\"spacer\"></div>";
+            complex_box += "<div class=\""+divclass+"\">" + schematic[i].real + "</div><div class=\"spacer\"></div>";
         }
         if (sch_imag) {
             if (schematic[i].imaginary>=0) {
                 var sign = '+';
-                var imag_val =  Number((schematic[i].imaginary*zo).toPrecision(precision));
+                var imag_val = schematic[i].imaginary;
             } else {
                 var sign = '-';
-                var imag_val = Number((schematic[i].imaginary*-1*zo).toPrecision(precision));
+                var imag_val = Number((schematic[i].imaginary*-1).toPrecision(precision));
                // if ((Math.abs(imag_val) < 0.1) && (imag_val != 0)) imag_val = Number(imag_val).toExponential();
             }
             complex_box += "<div class=\"spacer\">"+sign+"</div><div class=\"spacer\"></div>";
@@ -524,10 +501,9 @@ function draw_schematic(i) {
         }
         if (sch_real || sch_imag) complex_box += "</div>";
         if (sch_real || sch_imag) div.innerHTML += complex_box;
-        
-        if ((schematic[i].type=='tl') || (schematic[i].type=='ss') || (schematic[i].type=='so')) {
+        if (schematic[i].type=='tl') {
             div.innerHTML +=  "<div class=\"global_inputs\"><div class=\"trans\"><p>Zo=</p><input class=\"trans\" type=\"text\" value="+schematic[i].line_zo+" onchange=\"update_schem_abs("+i+",this,'line_zo')\"></input></div>";
-          //  div.innerHTML +=  "<div class=\"global_inputs\"><div class=\"trans\"><p>e<sub>r</sub>=</p><input class=\"trans\" type=\"text\" value="+schematic[i].er+" onchange=\"update_schem_abs("+i+",this,'er')\"></input></div>";
+            div.innerHTML +=  "<div class=\"global_inputs\"><div class=\"trans\"><p>e<sub>r</sub>=</p><input class=\"trans\" type=\"text\" value="+schematic[i].er+" onchange=\"update_schem_abs("+i+",this,'er')\"></input></div>";
         }
 
     //can't remove black boxes...
@@ -607,10 +583,10 @@ function define_labels () {
 //function intersectTwoCircles(x1,y1,r1, x2,y2,r2) {
 function find_smith_coord(real,imaginary,rotate) {
 
-  //to prevent divide by zero errors...
 	if (imaginary > 0) imaginary = Math.max(imaginary,0.001);
 	else 			   imaginary = Math.min(imaginary,-0.001);
-  real = Math.max(real,0.001);
+  
+    real = Math.max(real,0.001);
   
 	if (rotate==true) {
 		var realn = real/(real*real + imaginary*imaginary);
@@ -618,12 +594,7 @@ function find_smith_coord(real,imaginary,rotate) {
 		//window.alert([real,imaginary,realn,imaginaryn]);
 		real = realn;
 		imaginary = imaginaryn;
-  }
-
-  //to prevent weird anomolys in the plot
-	if (imaginary > 0) imaginary = Math.max(imaginary,0.001);
-	else 			   imaginary = Math.min(imaginary,-0.001);
-  real = Math.max(real,0.001);
+	}
 	
 	//window.alert([realn,imaginaryn]);
 
@@ -667,11 +638,10 @@ function find_smith_coord(real,imaginary,rotate) {
   // note if gy == 0 and gx == 0 then the circles are tangent and there is only one solution
   // but that one solution will just be duplicated as the code is currently written
   if (rotate==true) { iy=-iy, ix=-ix; };
-
   return [ix, iy];
 }
 
-function arc_smith_points(x1,y1,x2,y2,type,rotate,beta,start_at_qtr_wl) {
+function arc_smith_points(x1,y1,x2,y2,rotate,beta) {
 	
 	var x_coord=[];
   var y_coord=[];
@@ -683,17 +653,18 @@ function arc_smith_points(x1,y1,x2,y2,type,rotate,beta,start_at_qtr_wl) {
   start_y_coord=temp_array[1];
   var real_old = 0;
   var imag_old = 0;
-  var tan_beta=0;
-  var stub_admittance_im=0;
 
-	//used for transmission lines and stubs
-  var line_zo=y2;
-  var line_length=x2;
-  var top_real_temp = x1 * line_zo;
+	if (rotate == "transmission_line") {
+		var line_zo=y2;
+		var line_length=x2;
+		//var rt_er=Math.sqrt(er);
+		//var beta = 2*Math.PI*freq*rt_er/3e8;
+		var top_real_temp = x1 * line_zo;
+	}
 	
 	for (i=0;i<resolution+1;i++) {
-		if (type == "transmission_line") {
-			tan_beta = Math.tan(beta * i*line_length/resolution);
+		if (rotate == "transmission_line") {
+			var tan_beta = Math.tan(beta * i*line_length/resolution);
 			var top_imag_temp = (y1*zo + line_zo*tan_beta)* line_zo/zo;
 			var bot_real_temp = line_zo-y1*tan_beta*zo;
 			var bot_imag_temp = x1*tan_beta*zo;
@@ -702,46 +673,27 @@ function arc_smith_points(x1,y1,x2,y2,type,rotate,beta,start_at_qtr_wl) {
 			var bot_imag=temp_array[1];
 			var real_answer = (top_real_temp*bot_real)-(top_imag_temp*bot_imag);
 			var imag_answer = (top_real_temp*bot_imag)+(top_imag_temp*bot_real);
-			temp_array=find_smith_coord(real_answer,imag_answer,rotate);
+			temp_array=find_smith_coord(real_answer,imag_answer,false);
 			x_coord[i]=temp_array[0];
-      y_coord[i]=temp_array[1];
-
-    } else if (type=="ss") {
-      if (start_at_qtr_wl==0) tan_beta = Math.tan(beta * i*line_length/resolution);
-      else tan_beta = Math.tan(beta * (start_at_qtr_wl + i*(line_length-start_at_qtr_wl)/resolution));
-      stub_admittance_im = -1/(tan_beta*line_zo/zo);
-      temp_array=find_smith_coord(x1, y1 + stub_admittance_im,rotate);
-      x_coord[i]=temp_array[0];
-      y_coord[i]=temp_array[1];
-    } else if (type=="so") {
-      tan_beta = Math.tan(beta * i*line_length/resolution);
-      stub_admittance_im = tan_beta/(line_zo/zo);
-      temp_array=find_smith_coord(x1, y1 + stub_admittance_im,rotate);
-      x_coord[i]=temp_array[0];
-      y_coord[i]=temp_array[1];
- 		} else {
-      temp_array=find_smith_coord(x1 + (x2-x1)*i/resolution, y1 + (y2-y1)*i/resolution,rotate);
-      x_coord[i]=temp_array[0];
-      y_coord[i]=temp_array[1];
+			y_coord[i]=temp_array[1];
+		} else {
+				temp_array=find_smith_coord(x1 + (x2-x1)*i/resolution, y1 + (y2-y1)*i/resolution,rotate);
+				x_coord[i]=temp_array[0];
+				y_coord[i]=temp_array[1];
 		}	
-  }
+	}
 	
-	if (type == "transmission_line")  {
-		temp_array=find_smith_coord(real_answer,imag_answer,rotate);
+	if (rotate == "transmission_line") {
+		temp_array=find_smith_coord(real_answer,imag_answer,false);
+		end_x_coord=temp_array[0];
+		end_y_coord=temp_array[1];
 		real_old = real_answer;
 		imag_old = imag_answer;
-  } 
-  else if ((type=="so") || (type=="ss")) {
-    real_old = x1;
-    imag_old = y1 + stub_admittance_im;
-  }/*
-    temp_array=find_smith_coord(x1,imag_answer,rotate);
-  } else {
+	} else {
 		temp_array=find_smith_coord(x2, y2,rotate);
-  }*/
-  
-  end_x_coord=temp_array[0];
-  end_y_coord=temp_array[1];
+		end_x_coord=temp_array[0];
+		end_y_coord=temp_array[1];
+	}
 	
 	return [x_coord,y_coord,end_x_coord,end_y_coord,real_old,imag_old];
 }

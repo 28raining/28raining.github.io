@@ -10,6 +10,7 @@
 	display: inline-block;
 	width: 13.5%;
 	border-right-style: solid;
+	border-bottom-style: dashed;
 	border-width:1px;
 	border-color: #2C3E50;
 	

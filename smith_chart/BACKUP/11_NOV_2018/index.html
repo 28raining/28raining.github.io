@@ -24,6 +24,7 @@
 
 
     <!-- Custom fonts for this template -->
+   <!-- <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">-->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
@@ -73,35 +74,31 @@
 						<li onclick="updatespan(parentElement.parentElement.id,'THz','freq_unit')"><a href="#">THz</a></li>
 					</ul>
 				</div></i>
-
-				<i>Frequency span (&#8723)</i><i>
-					<input type="number" value="0" id="span" onchange="schematic[0].span=Number(this.value); update_smith_chart();">
-					<div id="span_sel" class="wrapper-dropdown-5" tabindex="1" onclick="change_class(this.id)">
-						<div>MHz</div>
-						<ul class="dropdown">
-							<li onclick="updatespan(parentElement.parentElement.id,'Hz','span_unit')"><a href="#">Hz</a></li>
-							<li onclick="updatespan(parentElement.parentElement.id,'KHz','span_unit')"><a href="#">KHz</a></li>
-							<li onclick="updatespan(parentElement.parentElement.id,'MHz','span_unit')"><a href="#">MHz</a></li>
-							<li onclick="updatespan(parentElement.parentElement.id,'GHz','span_unit')"><a href="#">GHz</a></li>
-							<li onclick="updatespan(parentElement.parentElement.id,'THz','span_unit')"><a href="#">THz</a></li>
-						</ul></div></i>
-
 			<i>Characteristic Impedance</i><i>
 			<input type="number" value="50" id="zo" onchange="zo=this.value; schematic[0].zo=this.value; update_smith_chart();"><div class="ohms">Ω</div></i>
-
-			<i>Permitivity e<sub>r (note all λ=C/f&radic;e<sub>r</sub>)</i><i>
-			<input type="number" value="1" id="er" onchange="schematic[0].er=Number(this.value); update_smith_chart();"></i>
 
 			<i>Download this state</i><i>
 			<button class="button_block" onclick="download_state()">Download schematic</button></i>
 
+			<i>Upload previous state</i><i><input class="button_block upload" type="file" id="file" name="file"/></i>
 		</div><div class="spacer"></div><div class="global_inputs">
+		
+			<i>Frequency span (&#8723)</i><i>
+				<input type="number" value="0" id="span" onchange="schematic[0].span=Number(this.value); update_smith_chart();">
+				<div id="span_sel" class="wrapper-dropdown-5" tabindex="1" onclick="change_class(this.id)">
+					<div>MHz</div>
+					<ul class="dropdown">
+						<li onclick="updatespan(parentElement.parentElement.id,'Hz','span_unit')"><a href="#">Hz</a></li>
+						<li onclick="updatespan(parentElement.parentElement.id,'KHz','span_unit')"><a href="#">KHz</a></li>
+						<li onclick="updatespan(parentElement.parentElement.id,'MHz','span_unit')"><a href="#">MHz</a></li>
+						<li onclick="updatespan(parentElement.parentElement.id,'GHz','span_unit')"><a href="#">GHz</a></li>
+						<li onclick="updatespan(parentElement.parentElement.id,'THz','span_unit')"><a href="#">THz</a></li>
+					</ul></div></i>
 
 			<i>Impedance:</i><i id="current_impedance"></i>
 			<i>Admittance:</i><i id="current_admittance"></i>
 			<i>Reflection Coefficient:</i><i id="current_reflection"></i>
 			<i>Reflection Coefficient:</i><i id="current_reflection_mag"></i>
-			<i>Upload previous state</i><i><input class="button_block upload" type="file" id="file" name="file"/></i>
 			
 		</div>
 
@@ -123,11 +120,6 @@
 				<p>Parallel Resistor</p><img src="icons/resistor_parallel.png" alt="Parallel Resistor">
 			</div><div class="cell cell_w_hover" onclick="clicked_cell('tl')">
 				<p>Transmission Line</p><img src="icons/transmission_line.png" alt="Transmission Line">
-			</div><div class="cell-picker-text">
-			</div><div class="cell cell_w_hover" onclick="clicked_cell('so')">
-				<p>Open Stub</p><img src="icons/stub_open.png" alt="Transmission Line">
-			</div><div class="cell cell_w_hover" onclick="clicked_cell('ss')">
-				<p>Short Stub</p><img src="icons/stub_short.png" alt="Transmission Line">
 			</div>
 	  </div>
 		
