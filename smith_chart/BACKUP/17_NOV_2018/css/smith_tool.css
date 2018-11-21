@@ -8,7 +8,7 @@
 
 .cell {
 	display: inline-block;
-	width: 10%;
+	width: 13.5%;
 	border-right-style: solid;
 	border-bottom-style: dashed;
 	border-width:1px;
@@ -76,6 +76,17 @@
 	/* background-color: white; */
 }
 
+i { 
+	text-align: left;
+	font-style: normal;
+	border: 0px;
+	margin: 2px 0px;
+	display: inline-block;
+	width:50%;
+	vertical-align: middle;
+	/* background-color: white; */
+}
+
 b { 
 	text-align: center;
 	font-style: normal;
@@ -97,19 +108,8 @@ b {
 	padding:5px;
 }
 
-.global_inputs span { 
-	text-align: left;
-	font-style: normal;
-	border: 0px;
-	margin: 2px 0px;
-	display: inline-block;
-	width:40%;
-	vertical-align: middle;
-	line-height:normal;
-	/* background-color: white; */
-}
-
-.global_inputs input {
+i input {
+	min-width:55px;
 	width:50%;
 	display:inline-block;
 }
@@ -135,17 +135,7 @@ input, .complex_box, .complex_box_wide {
 }
 
 .complex_box_wide {
-	max-width:100%;
-}
-
-.complex_box_wide span {
-	width:45%;
-	display: inline-block;
-}
-.complex_box_wide input {
-	height:1.2rem;
-	width:45%;
-	display: inline-block;
+	max-width:60%;
 }
 
 .abs_box, .trans {
@@ -178,7 +168,7 @@ input, .complex_box, .complex_box_wide {
 }
 
 
-#smith_chart {
+.smith_chart {
   width:650px;
   height:650px;
   position: relative;
@@ -200,7 +190,7 @@ input, .complex_box, .complex_box_wide {
 
 .hollowed_circle {
     position:relative;
-    width:100%; height:100%;
+    width:650px; height:650px;
     margin:0 auto;
     overflow:hidden;
 }
@@ -209,7 +199,7 @@ input, .complex_box, .complex_box_wide {
     position:absolute;
     left:0px; top:0px;
     border-radius:100%;
-    width:100%; height:100%;
+    width:650px; height:650px;
     box-shadow: 0px 0px 0px 2000px #18BC9C;
 }
 
@@ -221,15 +211,15 @@ h {
 
 .global_inputs {
 	display:inline-block;
-	width:48%;
-	line-height:36px;
+	width:47.5%;
+	padding-bottom:5px;
 }
 
 .id_tag { 
 	width:100%;
 }
 
-.global_inputs .button_block {
+.button_block {
     display: block;
     width: 100%;
     border: none;
@@ -335,19 +325,6 @@ hr.star-dark:after {
 	text-align:center;
 	line-height : 72px;
 	vertical-align:middle;
-}
-
-@media only screen and (max-width: 800px) {
-    .global_inputs {
-        width:95%;
-	}
-	.cell {
-        width:20%;
-	}
-	section {
-		padding-left: 5px;
-		padding-right: 5px;
-	}
 }
 	
 

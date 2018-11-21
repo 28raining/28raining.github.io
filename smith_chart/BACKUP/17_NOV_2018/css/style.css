@@ -35,16 +35,13 @@ section {
     color: #fff;
     margin-bottom: 0;
     background-color: #007bff;
+    padding: 0 0;
     display: block;
-    width: 100%;
-    padding-right: 15px;
-    padding-left: 15px;
-    margin-right: auto;
-    margin-left: auto;
 }
 
 .wdk_container { 
-    max-width: 1100px;
+max-width: 1000px;
+    min-width: 800px;
     width: 100%;
     padding-right: 15px;
     padding-left: 15px;
@@ -179,11 +176,4 @@ section {
 .wrapper-dropdown-5.active .dropdown {
     border-bottom: 1px solid rgba(0,0,0,0.2);
     max-height: 400px;
-}
-
-@media only screen and (max-width: 800px) {
-	section {
-		padding-left: 5px;
-		padding-right: 5px;
-	}
 }

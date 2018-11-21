@@ -31,6 +31,9 @@ var arrow_select = {
 }
 //because of device scaling we have a global ctx with the same scaling. see the initialise function
 var ctx = "";
+var dpr = 4;
+var padding = 2;   //padding between wave and top/bottom
+var row_seperator_height=2;
 
 function draw_timing_diagram () {
     console.log(timing_diagram);
@@ -47,20 +50,21 @@ function draw_timing_diagram () {
     for (i=0;i<timing_diagram.canvas.length;i++) {
         label_list += '<p id="row'+i+'_label" class="label" onclick="row_select('+i+')">Row'+i+'</p>';
         label_list += '<div id="row'+i+'_bar" class="row_bar" draggable="true" ondragstart="drag(event)"></div>'
-        sum_heights += timing_diagram.canvas[i].row_height;
+        sum_heights += timing_diagram.canvas[i].row_height; 
         timing_diagram.canvas[i].current_x=1;
     }
 
     //add the HTML
     document.getElementById('canvas_labels').innerHTML = label_list;
-    canvas.height = sum_heights;
+    canvas.height = sum_heights*dpr;
     ctx.clearRect(0,0,canvas.width,sum_heights);
+    ctx.scale(4, 4);
     
     for (i=0;i<timing_diagram.canvas.length;i++){
         //size the label and the drag bars
         row_height = timing_diagram.canvas[i].row_height;
         document.getElementById('row'+i+'_label').setAttribute("style", "height:"+row_height+"px;");
-        document.getElementById('row'+i+'_bar').setAttribute("style", "top:"+(row_height+y_offset)+"px;");     
+        document.getElementById('row'+i+'_bar').setAttribute("style", "top:"+(row_height+y_offset)+"px;");   
         for (j=0; j<timing_diagram.canvas[i].shapes.length;j++) {
             //draw shapes on the canvas
             start_x=timing_diagram.canvas[i].current_x;
@@ -73,6 +77,7 @@ function draw_timing_diagram () {
             hover_divs += '<div class="hover_div" onclick="select_brick('+brick+','+i+','+j+')" style='+style+'></div>'
         }
         y_offset += row_height;
+        ctx.stroke();
     }  
     ctx.stroke();
 
@@ -88,10 +93,14 @@ function draw_timing_diagram () {
     //console.log(timing_diagram.canvas_width,timing_diagram.xdiv_spacing);
     //ctx.beginPath();
     for (i=0; i<num_dividers; i+=1) {
+        ctx.beginPath();
         ctx.moveTo(i*timing_diagram.xdiv_spacing,0);
         ctx.lineTo(i*timing_diagram.xdiv_spacing,y_offset); 
+        ctx.strokeStyle = "#b4b4b4";
+        ctx.closePath();
         ctx.stroke();  
     }
+    //ctx.globalAlpha = 0.3;
     //ctx.closePath();
     ctx.stroke(); 
 
@@ -226,7 +235,6 @@ function select_arrow(id, arrow_num) {
 function initialise_draw(canvas_id) {
     var canvas = document.getElementById(canvas_id);
     var ctx = "";
-    var dpr = 4
     canvas.width = 50 * dpr;
     canvas.height = 50 * dpr;
     ctx = canvas.getContext('2d');
@@ -262,7 +270,14 @@ function ana_sine(ctx,start_y,row_num,shape_num) {
     var i=0;
     var z=0;
     var start_x=0,old_x=0,old_y=0;
-    var height = timing_diagram.canvas[row_num].row_height;
+    if (row_num==0) {
+        height = timing_diagram.canvas[row_num].row_height - (2*padding);
+        start_y = start_y + padding;
+    } else {
+        height = timing_diagram.canvas[row_num].row_height - (2*padding) - row_seperator_height;  
+        start_y = start_y + row_seperator_height + padding;
+    }  
+    //var height = timing_diagram.canvas[row_num].row_height;
     var freq = timing_diagram.canvas[row_num].shapes[shape_num].freq;
     var repeats = timing_diagram.canvas[row_num].shapes[shape_num].repeats;
     var phase = timing_diagram.canvas[row_num].shapes[shape_num].phase * 2*Math.PI / 360;
@@ -278,16 +293,23 @@ function ana_sine(ctx,start_y,row_num,shape_num) {
             old_x=start_x + i;
             old_y=start_y + new_y;
         }
-        timing_diagram.canvas[row_num].current_x += i;
+        timing_diagram.canvas[row_num].current_x += i-1;
     }
 }
 
 function dig_pclk(ctx,start_y,row_num,shape_num){
     //calculate height scaler and y_offset
-    height = timing_diagram.canvas[row_num].row_height;
+    if (row_num==0) {
+        height = timing_diagram.canvas[row_num].row_height - (2*padding);
+        start_y = start_y + padding;
+    } else {
+        height = timing_diagram.canvas[row_num].row_height - (2*padding) - row_seperator_height;  
+        start_y = start_y + row_seperator_height + padding;
+    }  
     period = 1/timing_diagram.canvas[row_num].shapes[shape_num].freq;
     repeats = timing_diagram.canvas[row_num].shapes[shape_num].repeats;
     y_offset = 0;
+    
 
     for (z=0;z<=repeats;z++) {
         start_x_int = timing_diagram.canvas[row_num].current_x;
@@ -328,7 +350,7 @@ function initialise() {
 function setupCanvas(canvas) {
     // Get the device pixel ratio, falling back to 1.
     //var dpr = window.devicePixelRatio || 1;
-    var dpr = 4;
+
     // Get the size of the canvas in CSS pixels.
     var rect = canvas.getBoundingClientRect();
     // Give the canvas pixel dimensions of their CSS
@@ -393,7 +415,8 @@ function select_brick (type, row, shape) {
                 inner_html += '<div class="brick_control"><label>Frequency:</label><input type="number" value=1 onchange="mod_change_freq('+row+','+shape+',this.value)"></div>';    
                 inner_html += '<div class="brick_control"><label>Up arrow?:</label><input type="checkbox" onclick="mod_up_arrow('+row+','+shape+',this.checked)"></div>';    
                 inner_html += '<div class="brick_control"><label>Down arrow?:</label><input type="checkbox" onclick="mod_down_arrow('+row+','+shape+',this.checked)"></div>';    
-                inner_html += '<div class="brick_control"><label># Repeats?:</label><input type="number" value=0 onchange="mod_repeat_shape('+row+','+shape+',this.value)"></div>';    
+                inner_html += '<div class="brick_control"><label># Repeats?:</label><input type="number" value=0 onchange="mod_repeat_shape('+row+','+shape+',this.value)"></div>';  
+                inner_html += '<div class="brick_control"><label onclick="mod_remove_brick('+row+','+shape+')">Remove brick:</label></div>';      
             break;
             case "sine":
                 inner_html += '<div class="brick_control"><label>Frequency:</label><input type="number" value=1 onchange="mod_change_freq('+row+','+shape+',this.value)"></div>';    
@@ -454,6 +477,11 @@ function mod_chose_hook (side,id) {
     arrow_select.is_waiting=true;
     arrow_select.side=side;
     arrow_select.id=id;
+}
+
+function mod_remove_brick(row,shape) {
+    timing_diagram.canvas.splice(timing_diagram.row.shape,1); 
+    draw_timing_diagram();    
 }
 
 function canvas_click(evt) {

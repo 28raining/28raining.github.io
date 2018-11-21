@@ -7,8 +7,6 @@
 
 - modify text color and sizes
 
-- Increase the canvas resolution by 4x. ALMOST DONE< SCALE IS NOT WORKING
-
 - Add analog waveforms. Just do one for now, then finish up the other tasks
 -- SIN, can be phase shifted to COS
 -- Linear
@@ -19,8 +17,9 @@
 
 - Arrows NEED to snap to I think, to the lines. This could just be rounding on the x-scale. On the y-scale, maybe have an option to snap it to 25%, 50%, 75%?
 
-- not all arrow is highlighted. And the opacity goes down when arrow is added, because missing a storke or start pth?
+- Clicking on the canvas causes a redraw 5 times. Woops!
 
+- make the drag bars easier to grab, may need to make them taller and have another div inside with the border. Also fix the height scaling
 
 4. Remove individual shapes
 

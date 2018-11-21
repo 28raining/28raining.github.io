@@ -18,10 +18,6 @@ a {
 .container {
 	width: 100%;
 	position: relative;
-	padding-right: 15px;
-    padding-left: 15px;
-    margin-right: auto;
-    margin-left: auto;
 }
 
 .clr {

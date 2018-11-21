@@ -526,7 +526,7 @@ function draw_schematic(i) {
         if (sch_real || sch_imag) div.innerHTML += complex_box;
         
         if ((schematic[i].type=='tl') || (schematic[i].type=='ss') || (schematic[i].type=='so')) {
-            div.innerHTML +=  "<div class=\"complex_box_wide\"><span>Zo = </span><input class=\"trans\" type=\"text\" value="+schematic[i].line_zo+" onchange=\"update_schem_abs("+i+",this,'line_zo')\"></input></span></div>";
+            div.innerHTML +=  "<div class=\"global_inputs\"><div class=\"trans\"><p>Zo=</p><input class=\"trans\" type=\"text\" value="+schematic[i].line_zo+" onchange=\"update_schem_abs("+i+",this,'line_zo')\"></input></div>";
           //  div.innerHTML +=  "<div class=\"global_inputs\"><div class=\"trans\"><p>e<sub>r</sub>=</p><input class=\"trans\" type=\"text\" value="+schematic[i].er+" onchange=\"update_schem_abs("+i+",this,'er')\"></input></div>";
         }
 
@@ -1172,35 +1172,5 @@ var layout = {
 	 
   ]
 };
-
-function resize_fn(x) {
-  if (window.matchMedia("(max-width: 400px)").matches) { // If media query matches
-      layout.width = 200;
-      layout.height = 200;
-  } else if (window.matchMedia("(max-width: 600px)").matches) { 
-    layout.width = 325;
-    layout.height = 325;
-  } else if (window.matchMedia("(max-width: 800px)").matches) { 
-    layout.width = 525;
-    layout.height = 525;
-  } else {
-    layout.width = 650;
-    layout.height = 650;
-  }
-  var smith_holder = document.getElementById("smith_chart");
-  smith_holder.style.width = layout.width + "px";
-  smith_holder.style.height = layout.height + "px";
-  update_smith_chart();
-  console.log("executing a resize");
-}
-
-//var size_gt_800 = window.matchMedia("(min-width: 800px)");
-var size_lt_800 = window.matchMedia("(max-width: 800px)");
-var size_lt_600 = window.matchMedia("(max-width: 600px)");
-var size_lt_400 = window.matchMedia("(max-width: 400px)");
-resize_fn(size_lt_800) // Call listener function at run time
-size_lt_800.addListener(resize_fn); // Attach listener function on state changes
-size_lt_600.addListener(resize_fn); // Attach listener function on state changes
-size_lt_400.addListener(resize_fn);
 
 update_smith_chart();
