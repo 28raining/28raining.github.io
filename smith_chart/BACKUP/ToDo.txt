@@ -1,1 +1,0 @@
-set a maximum width, otherwise its quite straining to read it all

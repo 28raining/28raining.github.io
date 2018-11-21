@@ -1174,12 +1174,15 @@ var layout = {
 };
 
 function resize_fn(x) {
-  if (window.matchMedia("(max-width: 400px)").matches) { // If media query matches
-      layout.width = 200;
-      layout.height = 200;
+  if (window.matchMedia("(max-width: 300px)").matches) { // If media query matches
+    layout.width = 200;
+    layout.height = 200;
+  } else if (window.matchMedia("(max-width: 400px)").matches) { 
+    layout.width = 290;
+    layout.height = 290;
   } else if (window.matchMedia("(max-width: 600px)").matches) { 
-    layout.width = 325;
-    layout.height = 325;
+    layout.width = 390;
+    layout.height = 390;
   } else if (window.matchMedia("(max-width: 800px)").matches) { 
     layout.width = 525;
     layout.height = 525;
@@ -1198,9 +1201,11 @@ function resize_fn(x) {
 var size_lt_800 = window.matchMedia("(max-width: 800px)");
 var size_lt_600 = window.matchMedia("(max-width: 600px)");
 var size_lt_400 = window.matchMedia("(max-width: 400px)");
+var size_lt_300 = window.matchMedia("(max-width: 300px)");
 resize_fn(size_lt_800) // Call listener function at run time
 size_lt_800.addListener(resize_fn); // Attach listener function on state changes
 size_lt_600.addListener(resize_fn); // Attach listener function on state changes
 size_lt_400.addListener(resize_fn);
+size_lt_300.addListener(resize_fn);
 
 update_smith_chart();

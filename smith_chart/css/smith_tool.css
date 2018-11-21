@@ -337,6 +337,10 @@ hr.star-dark:after {
 	vertical-align:middle;
 }
 
+.modebar{
+	display: none !important;
+}
+
 @media only screen and (max-width: 800px) {
     .global_inputs {
         width:95%;
@@ -347,6 +351,15 @@ hr.star-dark:after {
 	section {
 		padding-left: 5px;
 		padding-right: 5px;
+	}
+	.cell-picker-text {
+		width:15%;
+	}
+	.cell p {
+		font-size: 0.75rem;
+	}
+	b.star-light:after, b.star-dark:after {
+		font-size: 1.5rem;
 	}
 }
 	
