@@ -1,4 +1,7 @@
-
+WHY WHEN THE ROW NAME IS CLICKED DOES IT REDRAW?
+1. Increase stroke width a bit. Start the first key with an x offset or move the x-dividers across by a few px 
+2. Make row names editable
+2.5. Modify row height with a slider in th emain canvas tab?
 3. Add arrows
 -- add bent arrow option, with slide bar for how bent
 -- add text box in middle of arrow

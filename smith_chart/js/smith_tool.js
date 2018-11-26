@@ -56,7 +56,8 @@ function updatespan(this_id,this_val,element) {
  // var end_y_coord=0.0;
 //var real_old,imag_old=0.0;
 	var resolution = 100;
-	var span_resolution = 10;
+  var span_resolution = 10;
+  var fontsize=12;
   
   schematic.push({type:'raw', zo : 50, freq:2440, er : 1, freq_unit:{unit:'MHz',multiplier:1e6}, span:0.0, span_unit:{unit:'MHz',multiplier:1e6}});
   schematic.push({type:'bb',real:1,imaginary:0,abs:50,abs_bb_i:0,unit:'null'});
@@ -549,7 +550,8 @@ function define_labels () {
 	  text: ["<b>"+10*zo+"</b>","<b>"+5*zo+"</b>","<b>"+2*zo+"</b>","<b>"+1*zo+"</b>","<b>"+0.5*zo+"</b>","<b>"+0.2*zo+"</b>"],
 	  mode: 'text',
 	  textfont: {
-		color: 'rgba(252, 114, 2,0.5)'
+      color: 'rgba(252, 114, 2,0.5)',
+      size:fontsize
 	  }
 	};
 
@@ -559,7 +561,8 @@ function define_labels () {
 	  text: ["<b>"+10*zo+"</b>","<b>"+5*zo+"</b>","<b>"+2*zo+"</b>","<b>"+1*zo+"</b>","<b>"+0.5*zo+"</b>","<b>"+0.2*zo+"</b>"],
 	  mode: 'text',
 	  textfont: {
-		color: 'rgba(252, 114, 2,0.5)'
+      color: 'rgba(252, 114, 2,0.5)',
+      size:fontsize
 	  }
 	};
 
@@ -569,7 +572,8 @@ function define_labels () {
 	  text: ["<b>∞</b>","<b>"+10*zo+"</b>","<b>"+4*zo+"</b>","<b>"+2*zo+"</b>","<b>"+1*zo+"</b>","<b>"+0.5*zo+"</b>","<b>"+0.2*zo+"</b>","<b>0</b>"],
 	  mode: 'text',
 	  textfont: {
-		color: 'rgba(150, 0, 0,0.5)'
+      color: 'rgba(150, 0, 0,0.5)',
+      size:fontsize
 	  }
 	};
 
@@ -579,7 +583,8 @@ function define_labels () {
 	  text: ["<b>"+(1000/5/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
 	  mode: 'text',
 	  textfont: {
-		color: 'rgba(0, 10, 163,0.3)'
+      color: 'rgba(0, 10, 163,0.3)',
+      size:fontsize
 	  }
 	};
 
@@ -589,7 +594,8 @@ function define_labels () {
 	  text: ["<b>"+(1000/5/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
 	  mode: 'text',
 	  textfont: {
-		color: 'rgba(255, 0, 250,0.3)'
+      color: 'rgba(255, 0, 250,0.3)',
+      size:fontsize
 	  }
 	};
 
@@ -599,7 +605,8 @@ function define_labels () {
 	  text: ["<b>"+(1000/5/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
 	  mode: 'text',
 	  textfont: {
-		color: 'rgba(255, 0, 250,0.3)'
+      color: 'rgba(255, 0, 250,0.3)',
+      size:fontsize
 	  }
 	};
 }
@@ -1177,24 +1184,29 @@ function resize_fn(x) {
   if (window.matchMedia("(max-width: 300px)").matches) { // If media query matches
     layout.width = 200;
     layout.height = 200;
+    fontsize = 7;
   } else if (window.matchMedia("(max-width: 400px)").matches) { 
     layout.width = 290;
     layout.height = 290;
+    fontsize = 8;
   } else if (window.matchMedia("(max-width: 600px)").matches) { 
     layout.width = 390;
     layout.height = 390;
+    fontsize = 10;
   } else if (window.matchMedia("(max-width: 800px)").matches) { 
     layout.width = 525;
     layout.height = 525;
+    fontsize = 12;
   } else {
     layout.width = 650;
     layout.height = 650;
+    fontsize = 12;
   }
   var smith_holder = document.getElementById("smith_chart");
   smith_holder.style.width = layout.width + "px";
   smith_holder.style.height = layout.height + "px";
   update_smith_chart();
-  console.log("executing a resize");
+ // console.log("executing a resize");
 }
 
 //var size_gt_800 = window.matchMedia("(min-width: 800px)");

@@ -1,1 +1,2 @@
-- simplify disqus
+- add s parameters
+- add what other stuff that guy asked for

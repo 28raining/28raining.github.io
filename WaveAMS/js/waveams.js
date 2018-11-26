@@ -48,7 +48,7 @@ function draw_timing_diagram () {
     
     //draw the labels,drag bars. Reset some variables
     for (i=0;i<timing_diagram.canvas.length;i++) {
-        label_list += '<p id="row'+i+'_label" class="label" onclick="row_select('+i+')">Row'+i+'</p>';
+        label_list += '<input type="text" id="row'+i+'_label" class="label" onclick="row_select('+i+')" value="Row'+i+'"></input>';
         label_list += '<div id="row'+i+'_bar" class="row_bar" draggable="true" ondragstart="drag(event)"></div>'
         sum_heights += timing_diagram.canvas[i].row_height; 
         timing_diagram.canvas[i].current_x=1;
