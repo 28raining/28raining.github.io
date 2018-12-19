@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  
+  <meta charset="utf-8">
+  <meta name="author" content="Will Kelsey">
+	<meta name="description" content="Free Online Smith Chart Tool">
+  <meta name="keywords" content="Matching,Impedance,Smith,Chart,Tool,Free,Interactive,50ohm,50,Circle,Windows,Mac,Android,IOS">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Free Online Smith Chart Tool</title>
+	
+	<!-- web template taken from here https://startbootstrap.com/template-overviews/freelancer/ -->
+
+
+    <!-- Custom fonts for this template -->
+	<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">-->
+
+    <!-- Custom styles for this template -->
+    <link href="css/freelancer.css" rel="stylesheet">
+    <link href="css/smith_tool.css" rel="stylesheet">
+	<link href="css/style.css" rel="stylesheet">
+
+	<script>if(typeof window.Int16Array !== 'function')document.write("<scri"+"pt src='extras/typedarray.min.js'></scr"+"ipt>");</script>
+	<script>document.write("<scri"+"pt src='extras/request_animation_frame.js'></scr"+"ipt>");</script>
+	<!--<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>=-->
+	<script src="js/plotly.min.js"></script>
+
+  </head>
+
+  <body id="page-top">
+
+    <!-- Navigation -->
+    <nav>
+      <div class="container">
+	    	<div class="wdk_container">
+        	Current Probe graphing tool
+				</div>
+      </div>
+    </nav>
+
+    <!-- About Section -->
+    <section>
+			<div class="wdk_container">
+			<div class="trans"></div>
+			<!-- <h2 class="text-center text-uppercase text-white">About</h2> -->
+			<p> Stream current data to this window </p>
+	
+		
+		<div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
+
+							
+      </div>
+    </section>
+	
+    
+      <div class="container"><div class="copyright">
+        Copyright &copy; Will Kelsey 2018. www.will-kelsey.com/smith_chart
+        
+      </div>
+    </div>
+
+    <!-- Scroll to Top Button (Only visible on small and extra-small screen sizes) -->
+    <div class="scroll-to-top d-lg-none position-fixed ">
+      <a class="js-scroll-trigger d-block text-center text-white rounded" href="#page-top">
+        <i class="fa fa-chevron-up"></i>
+      </a>
+    </div>
+	 <script src="js/current_probe.js"></script>
+	 
+  </body>
+
+
+
+</html>

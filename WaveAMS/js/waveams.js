@@ -19,7 +19,11 @@ var timing_diagram = {
     selected_arrow:-1,
     highlighted_arrow:-1,
     canvas_width:800,
-    xdiv_spacing:100
+    xdiv_spacing:100,
+    labels:{
+        label_width:100,
+        label_name:["Row0","Row1"] 
+    }
 };
 var last_move=[];
 var drag_row_num=0;
@@ -48,7 +52,7 @@ function draw_timing_diagram () {
     
     //draw the labels,drag bars. Reset some variables
     for (i=0;i<timing_diagram.canvas.length;i++) {
-        label_list += '<input type="text" id="row'+i+'_label" class="label" onclick="row_select('+i+')" value="Row'+i+'"></input>';
+        label_list += '<input type="text" id="row'+i+'_label" class="label" onclick="row_select('+i+')" value="'+timing_diagram.labels.label_name[i]+'" onchange="timing_diagram.labels.label_name['+i+']=this.value"></input>';
         label_list += '<div id="row'+i+'_bar" class="row_bar" draggable="true" ondragstart="drag(event)"></div>'
         sum_heights += timing_diagram.canvas[i].row_height; 
         timing_diagram.canvas[i].current_x=1;
@@ -56,9 +60,25 @@ function draw_timing_diagram () {
 
     //add the HTML
     document.getElementById('canvas_labels').innerHTML = label_list;
+    document.getElementById('canvas_labels').style.width = timing_diagram.labels.label_width + 'px';
     canvas.height = sum_heights*dpr;
     ctx.clearRect(0,0,canvas.width,sum_heights);
     ctx.scale(4, 4);
+
+    //Draw the x-axis dividers
+    var num_dividers = timing_diagram.canvas_width/timing_diagram.xdiv_spacing;
+    for (i=0; i<num_dividers; i+=1) {
+        ctx.beginPath();
+        ctx.moveTo(i*timing_diagram.xdiv_spacing,0);
+        ctx.lineTo(i*timing_diagram.xdiv_spacing,sum_heights); 
+        ctx.strokeStyle = "#b4b4b4";
+        ctx.stroke();  
+    }
+    //ctx.closePath();
+
+    ctx.beginPath();
+    ctx.lineWidth="2";
+    ctx.strokeStyle = "#000000";
     
     for (i=0;i<timing_diagram.canvas.length;i++){
         //size the label and the drag bars
@@ -88,20 +108,6 @@ function draw_timing_diagram () {
     row_select(timing_diagram.selected_row);
     document.getElementById('canvas_hover_divs').innerHTML = hover_divs;
 
-    //Draw the x-axis dividers
-    var num_dividers = timing_diagram.canvas_width/timing_diagram.xdiv_spacing;
-    //console.log(timing_diagram.canvas_width,timing_diagram.xdiv_spacing);
-    //ctx.beginPath();
-    for (i=0; i<num_dividers; i+=1) {
-        ctx.beginPath();
-        ctx.moveTo(i*timing_diagram.xdiv_spacing,0);
-        ctx.lineTo(i*timing_diagram.xdiv_spacing,y_offset); 
-        ctx.strokeStyle = "#b4b4b4";
-        ctx.closePath();
-        ctx.stroke();  
-    }
-    //ctx.globalAlpha = 0.3;
-    //ctx.closePath();
     ctx.stroke(); 
 
 }
@@ -155,7 +161,7 @@ function draw_arrow(ctx,id) {
     ctx.beginPath();
     ctx.moveTo(px[0],py[0]);
     ctx.lineTo(px[1],py[1]);  
-    ctx.closePath();
+    //ctx.closePath();
     ctx.stroke(); 
 
     //now draw the arrow ends
@@ -166,12 +172,12 @@ function draw_arrow(ctx,id) {
         y2[j] = line_length*Math.sin(l2_angle[j] * Math.PI/180);
         switch (timing_diagram.arrows[id].end) {
             case 1:
+                //just lines
                 ctx.beginPath();
                 ctx.moveTo(px[j],py[j]);
                 ctx.lineTo(px[j]+x1[j],py[j]-y1[j]);
                 ctx.moveTo(px[j],py[j]);
                 ctx.lineTo(px[j]+x2[j],py[j]-y2[j]);
-                ctx.closePath();
                 ctx.stroke();
                 break;
             case 2:
@@ -194,6 +200,18 @@ function draw_arrow(ctx,id) {
     }
     //return settings to normal
     ctx.strokeStyle = '#666666';
+
+    //Add text to to the arrow
+    //var text_x = Math.min(px[0],px[1]) + ((Math.max(px[0],px[1])-Math.min(px[0],px[1])) * timing_diagram.arrows[id].offset) - 50;
+    //var text_y = Math.min(py[0],py[1]) + ((Math.max(py[0],py[1])-Math.min(py[0],py[1])) * timing_diagram.arrows[id].offset);
+    var text_x = px[0] + ((px[1]-px[0]) * timing_diagram.arrows[id].offset) - 50;
+    var text_y = py[0] + ((py[1]-py[0]) * timing_diagram.arrows[id].offset) 
+    ctx.font = "15px Arial";
+    // var text_width = ctx.measureText("Arrow Text").width;
+    // var text_height = ctx.measureText("Arrow Text").height;
+    // ctx.fillRect(text_x, text_y, text_width, 100);
+    //Just note that this way of "measuring" height is not accurate. You can measure height of a font by using a temporary div/span element and get the calculated style from that when font and text is set for it.
+    ctx.fillText(timing_diagram.arrows[id].text,text_x,text_y);
 }
 
 function generate_arrow_dropdown() {
@@ -385,7 +403,9 @@ function add(brick){
                 row_num:[0,0],
                 y_percent:[0,0],
                 x:[0,0],
-                end:1
+                end:1,
+                text:"Arrow text",
+                offset:0.5
             })
             //select_brick ("arrow", timing_diagram.arrows.length-1);
             timing_diagram.selected_arrow=timing_diagram.arrows.length-1;
@@ -427,21 +447,37 @@ function select_brick (type, row, shape) {
         document.getElementById("tab_brick").innerHTML = inner_html;
         change_tab("tab_brick");
     } else if (type=="arrow") {
+        var arr = timing_diagram.selected_arrow;
         if (timing_diagram.arrows.length==0) {
             inner_html = "After you have added an arrow, modify its properties here."
         } else {
-            inner_html += '<div class="brick_control"><label onclick="mod_chose_hook(0,'+timing_diagram.selected_arrow+')">Chose location of left hook</label></div>';    
-            inner_html += '<div class="brick_control"><label onclick="mod_chose_hook(1,'+timing_diagram.selected_arrow+')">Chose location of right hook</label></div>';    
+            inner_html += '<div class="brick_control"><label onclick="mod_chose_hook(0,'+arr+')">Chose location of left hook</label></div>';    
+            inner_html += '<div class="brick_control"><label onclick="mod_chose_hook(1,'+arr+')">Chose location of right hook</label></div>';    
             inner_html += '<div class="brick_control"><label>Select arrow to modify</label></div>';
             inner_html += '<div class="brick_control"><label>'+generate_arrow_dropdown()+'</label></div>';
             inner_html += '<div class="brick_control"><label onclick="delete_arrow()">Delete selected arrow</label></div>';
             inner_html += '<div class="brick_control"><label>'+generate_arrow_end_dropdown()+'</label></div>';
-            if (timing_diagram.selected_arrow > -1) {
+            inner_html += '<div class="brick_control"><input type="text" value="'+timing_diagram.arrows[arr].text+'" onchange="timing_diagram.arrows['+arr+'].text=this.value; draw_timing_diagram()"></input></div>';
+            inner_html += '<div class="brick_control"><label>Some pretty font selector here</label></div>';
+            inner_html += '<div class="brick_control"><div id="tap_arrow_loc"></div></div>';
+            if (arr > -1) {
                 arrow_select.fresh=true;
                 mod_chose_hook (0,timing_diagram.selected_arrow);
             }
         }
         document.getElementById("tab_arrow").innerHTML = inner_html;
+
+        var tapSlider = document.getElementById('tap_arrow_loc');
+        noUiSlider.create(tapSlider, {
+            start: 0.5,
+            behaviour: 'tap',
+            connect: [false, true],
+            range: {
+                'min': 0,
+                'max': 1
+            }
+        });
+        tapSlider.noUiSlider.on('change.one', function(values,handle) {timing_diagram.arrows[arr].offset=values[handle]; draw_timing_diagram();});
         change_tab("tab_arrow");
     }
 }
@@ -489,6 +525,7 @@ function canvas_click(evt) {
     var canvas = document.getElementById('main_canvas');
     //var arrow_select = window.arrow_select;
     //coordsDiv.value = (evt.clientX - canvas.offsetLeft) + ' ' + (evt.clientY-offtop);
+    var x_click_coord = evt.clientX - canvas.offsetLeft - canvas.parentElement.offsetLeft;
     if (arrow_select.is_waiting) {
         //find row number of where the user just clicked. Then save to the global variable
         var row_num=0;
@@ -504,14 +541,17 @@ function canvas_click(evt) {
         }
         timing_diagram.arrows[arrow_select.id].row_num[arrow_select.side] = row_num;
         timing_diagram.arrows[arrow_select.id].y_percent[arrow_select.side] = ((evt.clientY-offtop)-sum_of_heights)/row_height;
-        timing_diagram.arrows[arrow_select.id].x[arrow_select.side] = evt.clientX - canvas.offsetLeft - canvas.parentElement.offsetLeft;
+        timing_diagram.arrows[arrow_select.id].x[arrow_select.side] = x_click_coord;
         if (arrow_select.fresh == true) {
             mod_chose_hook(1,arrow_select.id);
             arrow_select.fresh=false;
         }
         else arrow_select.is_waiting=false;
     }
-    draw_timing_diagram();
+    //if the user clicked on a label, don't redraw the diagram
+    if (x_click_coord > timing_diagram.labels.label_width) {
+        draw_timing_diagram();
+    }
 }
 
 function highlight_under_hover(evt){
@@ -583,6 +623,7 @@ function addToIndex(i) {
         y_offset:0,
         shapes:[]     
     },);
+    timing_diagram.labels.label_name.splice(i, 0, "UN NAMED");
     draw_timing_diagram();
 }
 

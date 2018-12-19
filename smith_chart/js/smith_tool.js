@@ -2,6 +2,7 @@
 document.getElementById('file').addEventListener('change', readFile, false);
 
 function expo(x, f) {
+  console.log(x,f);
   return Number.parseFloat(x).toExponential(f);
 }
 

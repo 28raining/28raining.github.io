@@ -1,17 +1,21 @@
-WHY WHEN THE ROW NAME IS CLICKED DOES IT REDRAW?
-1. Increase stroke width a bit. Start the first key with an x offset or move the x-dividers across by a few px 
-2. Make row names editable
-2.5. Modify row height with a slider in th emain canvas tab?
+-- Stop the squashing of the canvas
+-- Add font selector for arrow font
+Move canvas to top
+
+4. modify text color and sizes
+
 3. Add arrows
 -- add bent arrow option, with slide bar for how bent
--- add text box in middle of arrow
 -- redraw control panel on arrow delete
 -- change arrow color
 
-- modify text color and sizes
+-- Add a slider for the phase of the sine wave
+
+
+
+5. Make the drag bars highter
 
 - Add analog waveforms. Just do one for now, then finish up the other tasks
--- SIN, can be phase shifted to COS
 -- Linear
 -- X^2
 -- 1/X
@@ -46,3 +50,4 @@ At the end of this I need to:
 6. debug the loading time without discuss. Make sure using all teh CDN's
 7. Add logical expressions?
 8. Save their work in a cookie?
+2.5. Modify row height with a slider in th emain canvas tab?
