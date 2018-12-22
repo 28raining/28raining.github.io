@@ -42,3 +42,10 @@ navigator.usb.requestDevice({ filters: [{ vendorId: 0x2341 }] })
   console.log('Received: ' + decoder.decode(result.data));
 })
 .catch(error => { console.log(error); });
+
+navigator.bluetooth.requestDevice({
+    acceptAllDevices: true,
+    optionalServices: ['battery_service']
+  })
+  .then(device => {console.log(device.name);})
+  .catch(error => { console.log(error); });
