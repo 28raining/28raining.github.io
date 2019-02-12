@@ -20,7 +20,7 @@ function showPortOpen() {
 	broadcast("COM","COM,OPEN")
 }
 function readSerialData(data) {
-	console.log(data);
+	//console.log(data);
 	//console.log(data.toString('hex'));
 	if (connections.length > 0) {
 		broadcast("raw",data);
@@ -67,6 +67,7 @@ function msg_from_html(data) {
 	console.log(rx);
 	if (rx[0]=='refresh') {
 		counter=0;
+		if (myPort.isOpen) myPort.close();
 		SerialPort.list(function (err, ports) {
 			ports.forEach(function(port) {
 					port_list = port_list + "," + port.comName;

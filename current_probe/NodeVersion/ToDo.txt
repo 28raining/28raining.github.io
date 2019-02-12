@@ -8,6 +8,10 @@
 #5a - Use node to pipe real arduino data to the browser
 #5b - status showing com open. etc.
 4 - Start plotting real data. Here is a good place to test the time scale knob
+-- Make graph between 0 and 2^16
+-- Make the offset and scaler knobs work
+-- Make the time sclae work
+-- Add an autorange button
 5 - add different load resistors, or buy a potentiometer. Now can verify the offset and y-scale knobs. Vary from 1K to 100K or something
 6 - use the Gohm or Mohm resistors to characterise the lowest possible readings with my setup
 7 - Must develop a trigger methodology. First, create a test setup which somehow pulses the current (use PI GPIO?)

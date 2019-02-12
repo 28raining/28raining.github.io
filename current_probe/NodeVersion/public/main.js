@@ -4,11 +4,13 @@ var i_ma=0;
 var samples_per_grid = 10;
 var grids_per_graph = 10;
 var samples_per_data_point = 1;
-var time_unit = 100e-6;
+var time_unit = 1000e-6;
 var grid_width = 10e-3;
 var fps = 10;
 var total_points = samples_per_grid * grids_per_graph;
 var last_result_time=0;
+
+var y_scaler=1;
 
 var samples = 20;
 var speed = 1000;
@@ -42,7 +44,7 @@ function refresh_npm(){
   $('#knob_y_offset_ma').val(0).trigger('change');
   $('#knob_y_offset_ua').val(0).trigger('change');
   $('#knob_y_offset_na').val(0).trigger('change');
-  $('#knob_y_offset_na').val(0).trigger('change');
+  $('#knob_time_scale').val(0).trigger('change');
   $('#knob_y_scale').val(0).trigger('change');
   document.getElementById("com_status").innerHTML="COM CLOSED";
 }
@@ -123,8 +125,8 @@ function showData(result) {
       unplotted_array.sort(function(a, b){
         return a - b;
       });
-      result_high = unplotted_array[0];
-      result_low = unplotted_array[unplotted_array.length-1];
+      result_high = unplotted_array[0]/y_scaler;
+      result_low = unplotted_array[unplotted_array.length-1]/y_scaler;
 
       values_high.unshift({
         x: result_time/samples_per_data_point,
@@ -148,10 +150,11 @@ function showData(result) {
   }
 }
 
-function initialize() {
+
+//When the user changes a knob, clear the results array and change the axes
+function update_settings () {
 
   samples_per_data_point = (grid_width / samples_per_grid) / time_unit;
-  speed = 1000 / fps; //time between plots in ms
 
   for (i=0;i<=total_points;i++){
     values_high.push({
@@ -162,6 +165,53 @@ function initialize() {
       x: i,
       y: -0.1
     });
+    labels.push(i)
+  }
+}
+
+var options = {
+  events: [],
+  animation: {
+      duration: 0, // general animation time
+  },
+  hover: {
+      animationDuration: 0, // duration of animations when hovering an item
+  },
+  responsiveAnimationDuration: 0, // animation duration after a resize
+  responsive: true,
+  legend: false,
+  scales: {
+    xAxes: [{
+      display: true,
+      gridlines:{
+        display:true,
+      },
+      ticks: {
+        display:true,
+        maxTicksLimit:10,
+        stepSize:1,
+        min:0,
+        max:100,
+        precision:0,
+        beginAtZero:true
+      }
+    }],
+    yAxes: [{
+      ticks: {
+        max: 70000,
+        min: 0
+      }
+    }]
+  }
+}
+
+function initialize() {
+
+  update_settings ();
+
+  speed = 1000 / fps; //time between plots in ms
+
+  for (i=0;i<=total_points;i++){
     labels.push(i)
   }
 
@@ -188,45 +238,7 @@ function initialize() {
         fill: '-1'
       }]
     },
-    options: {
-        events: [],
-        animation: {
-            duration: 0, // general animation time
-        },
-        hover: {
-            animationDuration: 0, // duration of animations when hovering an item
-        },
-        responsiveAnimationDuration: 0, // animation duration after a resize
-        responsive: true,
-     // animation: {
-     //   duration: speed * 1.5,
-      //  easing: 'linear'
-     // },
-      legend: false,
-      scales: {
-        xAxes: [{
-          display: true,
-          gridlines:{
-            display:true,
-          },
-          ticks: {
-            display:true,
-            maxTicksLimit:10,
-            stepSize:1,
-            min:0,
-            max:100,
-            precision:0,
-            beginAtZero:true
-          }
-        }],
-        yAxes: [{
-          ticks: {
-            max: 1,
-            min: -1
-          }
-        }]
-      }
-    }
+    options: options,
   }));
 }
 
@@ -247,19 +259,39 @@ function advance() {
 
 function update_time_scale(value) {
   console.log("Time scaler is: " + time_scale_options[value].mx);
+  grid_width=time_scale_options[value].mx / 1000;
+  update_settings ()
 }
 
 function update_y_scale(value) {
   console.log("Y scaler is: " + y_scale_options[value].mx);
+  y_scaler = y_scale_options[value].mx;
 }
 
 function update_y_offset() {
-  console.log("Y offset is: " + (i_na + i_ua*1000 + i_ma*1000000) + "nA");
+  var y_offset = (i_na + i_ua*1000 + i_ma*1000000);
+  console.log("Y offset is: " + y_offset + "nA");
+
+ /* options.scales.yAxes=[{
+    ticks: {
+      max: 70000+y_offset,
+      min: y_offset
+    }
+  }];*/
+
+  charts.forEach(function(chart) {
+    chart.options.scales.yAxes=
+    [{
+      ticks: {
+        max: 70000+y_offset,
+        min: y_offset
+      }
+    }];
+  });
+
 }
 
 var time_scale_options = [
-  {text:'1ms',  mx:1},
-  {text:'2ms',  mx:2},
   {text:'5ms',  mx:5},
   {text:'10ms', mx:10},
   {text:'20ms', mx:20},
@@ -271,7 +303,7 @@ var time_scale_options = [
   {text:'2s',   mx:2000},
   {text:'5s',   mx:5000},
   {text:'10s',  mx:10000},
-  {text:'1ms',  mx:1},
+  {text:'5ms',  mx:5},
 ];
 
 var y_scale_options = [
@@ -308,7 +340,7 @@ $(function() {
     width:150,
     cursor:20,
     min:0,
-    max:13,
+    max:11,
     height:150,
     thickness:.3,
     displayPrevious:true,
