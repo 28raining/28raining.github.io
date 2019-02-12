@@ -1,0 +1,96 @@
+<!--
+  Awesome documentation on how to open serial port
+  https://itp.nyu.edu/physcomp/labs/labs-serial-communication/lab-serial-communication-with-node-js/
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <link href="style.css" rel="stylesheet">
+  <link href="table.css" rel="stylesheet">
+  <link href="radio.css" rel="stylesheet">
+  <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+  <script src="notify.min.js"></script>
+  <script src="../node_modules/jquery-knob/dist/jquery.knob.min.js"></script>
+</head>
+<body>
+
+<!-- START OF TABLE. Can be found here https://freefrontend.com/css-tables/ and https://codepen.io/travisw/pen/EvbKwd -->
+<div class="background">
+  <div class="container">
+    <div class="panel pricing-table">
+
+      <div class="pricing-plan">
+        <button onclick="connect_to_node()">Connect to Node</button>
+        <button onclick="refresh_npm()">Refresh</button>
+      </div>
+      
+      <div class="pricing-plan">
+        <h2 class="pricing-header">Connection to Node</h2>
+        <div id ="node_status" class="pricing-features">CLOSED</div>
+      </div>
+      
+      <div class="pricing-plan">
+        <h2 class="pricing-header">Connection to Current Probe</h2>
+        <div class="pricing-features"><select id="COM_list" onchange="select_com(this.value)"></select></div>
+        <div id ="com_status" class="pricing-features">COM CLOSED</div>
+      </div>
+      
+      <div class="pricing-plan">
+        <h2 class="pricing-header">Current Range</h2>
+        <!-- START OF RADIO BUTTON, find it here: https://freefrontend.com/css-radio-buttons/ https://codepen.io/dsenneff/pen/ZoLVZW -->
+        <fieldset>
+          <div class="toggle">
+            <input type="radio" name="sizeBy" id="res_auto" checked="checked" /><label for="res_auto">Auto-Range</label>
+            <input type="radio" name="sizeBy" id="res_100m" /><label for="res_100m">10uA <-> 100mA</label>
+            <input type="radio" name="sizeBy" id="res_100u" /><label for="res_100u">10nA <-> 100uA</label>
+          </div>
+        </fieldset>
+        <!-- End of radio button -->
+      </div>
+    
+      
+    </div>
+  </div>
+</div>
+
+
+<div class="background">
+  <div class="container">
+    <div class="panel pricing-table">
+      
+      <div class="pricing-plan">
+          <h2 class="pricing-header">time per grid</h2>
+        <input id="knob_time_scale" class="knob" value="0" class="pricing-img">
+      </div>
+      
+      <div class="pricing-plan">
+          <h2 class="pricing-header">current per grid</h2>
+        <input id="knob_y_scale" class="knob" value="0" class="pricing-img">
+        </div>
+      
+      <div class="pricing-plan">
+          <h2 class="pricing-header">Y-offset</h2>
+          <input id="knob_y_offset_na" class="knob" value="0" class="pricing-img">
+          <input id="knob_y_offset_ua" class="knob" value="0" class="pricing-img">
+          <input id="knob_y_offset_ma" class="knob" value="0" class="pricing-img">
+      </div>
+    
+      
+    </div>
+  </div>
+</div>
+
+<!-- END OF TABLE -->
+
+<div id="chart_wrapper">
+  <canvas id="chart0" style="width:512px;height:320px"></canvas>
+</div>
+
+
+</body>
+<script src="../node_modules/chart.js/dist/Chart.js"></script>
+<script src="functions.js"></script>
+<script src="main.js"></script>
+</html>

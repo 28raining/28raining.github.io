@@ -1,2 +1,3 @@
 - add s parameters
 - add what other stuff that guy asked for
+- the 'x' to remove components is not obvious. A user asked about it but then deleted the question.

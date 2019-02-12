@@ -1,0 +1,26 @@
+- Add knobs
+- Add trigger function
+- send data at at least 2KHz, then will always get one data per ms
+
+#1 - add a status box. Node open. 
+#3 - Add a reset button so that all settings are reset to 0. Store the COM port in a cookie. Add a connect / diconnect from NODE button
+#4 - Program the arduino to send data at 3KHz
+#5a - Use node to pipe real arduino data to the browser
+#5b - status showing com open. etc.
+4 - Start plotting real data. Here is a good place to test the time scale knob
+5 - add different load resistors, or buy a potentiometer. Now can verify the offset and y-scale knobs. Vary from 1K to 100K or something
+6 - use the Gohm or Mohm resistors to characterise the lowest possible readings with my setup
+7 - Must develop a trigger methodology. First, create a test setup which somehow pulses the current (use PI GPIO?)
+8 - Write a trigger function
+9 - Add single-capture and freeze functions
+10 - display average current
+11 - When a knob goes below 0, set its value to 0
+
+
+When the basics are complete, do this:
+6 - Try opening the socket, if it fails then show it, give option to try again
+7 - place the knobs down the side
+
+Nice to have
+1-make the notifys not dissapear until clicked
+2-use cookies. Cannot do this if its only a file
