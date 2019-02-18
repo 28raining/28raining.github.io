@@ -4,7 +4,7 @@ var i_ma=0;
 var samples_per_grid = 10;
 var grids_per_graph = 10;
 var samples_per_data_point = 1;
-var time_unit = 1000e-6;
+var time_unit = 100000e-6;
 var grid_width = 10e-3;
 var fps = 10;
 var total_points = samples_per_grid * grids_per_graph;
@@ -25,6 +25,8 @@ var next_unplotted_array = [];
 var i=0;
 var result_time=0;
 var result_data=0;
+var result_high=0;
+var result_low=0;
 
 var connections = "";          // list of connections to the server
 
@@ -94,11 +96,31 @@ function select_com(com_id) {
   socket.send("COM,"+com_id);
 }
 
+function auto_range() {
+  $('#knob_time_scale').val(6).trigger('change');
+  var range = Math.max(result_high - result_low,200);
+  var y_min = Math.max(0,result_low-(range/2));
+
+  // !! TO DO //
+  // In the future the scale and offset should just be triggering knob changes, so that the knobs capture the correct 
+  // values and code is not repeated
+  var y_scale = 2 * range;
+  charts.forEach(function(chart) {
+    chart.options.scales.yAxes=
+    [{
+      ticks: {
+        max: y_min+ (5*range),
+        min: y_min
+      }
+    }];
+  });
+}
+
 function showData(result) {
   // when the server returns, show the result in the div:
   //console.log(result.data);
   split_results=result.data.split(',');
- // console.log("Sensor reading:" + split_results);
+  console.log("Sensor reading:" + split_results);
   if (split_results[0]=="COM"){
     if (split_results[1]=="OPEN") {
       document.getElementById("com_status").innerHTML="COM OPEN a";
@@ -478,6 +500,20 @@ function check_dec(val) {
   } else {
     console.log("Your number is below 0")
     return val+10;
+  }
+}
+
+function change_r() {
+  var radios = document.getElementsByName('chose_r');
+  if (socket.readyState === WebSocket.OPEN)  {
+    for (var i = 0, length = radios.length; i < length; i++) {
+      if (radios[i].checked) {
+        var value = radios[i].value;
+        break;
+      }
+    }
+    console.log("changing resistor setting to " + value);
+    socket.send("res," + value);
   }
 
 }

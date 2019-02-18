@@ -20,7 +20,7 @@ function showPortOpen() {
 	broadcast("COM","COM,OPEN")
 }
 function readSerialData(data) {
-	//console.log(data);
+	console.log(data);
 	//console.log(data.toString('hex'));
 	if (connections.length > 0) {
 		broadcast("raw",data);
@@ -76,8 +76,17 @@ function msg_from_html(data) {
 			console.log(port_list);
 			broadcast("COM",port_list)
 		});
+	} else if (rx[0]=='res') {
+		//send this resistor setting to the arduino
+		var buffer = Buffer.alloc(1);
+		if 			(rx[1]==0) buffer[0] = 0x00;
+		else if 	(rx[1]==1) buffer[0] = 0x01;
+		else if 	(rx[1]==2) buffer[0] = 0x02;
+		else if 	(rx[1]==3) buffer[0] = 0x03;
+		myPort.write(buffer);
+		console.log("Chose resistor " + rx[1]);
 	} else if (rx[0]=="COM") {
-		console.log("Connecting to port " + rx[1])
+		console.log("Connecting to port " + rx[1]);
 		try {
 			myPort = new SerialPort(rx[1], {
 				baudRate: 115200

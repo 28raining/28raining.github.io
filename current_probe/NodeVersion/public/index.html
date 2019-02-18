@@ -24,6 +24,7 @@
       <div class="pricing-plan">
         <button onclick="connect_to_node()">Connect to Node</button>
         <button onclick="refresh_npm()">Refresh</button>
+        <button onclick="auto_range()">Auto Range</button>
       </div>
       
       <div class="pricing-plan">
@@ -42,9 +43,14 @@
         <!-- START OF RADIO BUTTON, find it here: https://freefrontend.com/css-radio-buttons/ https://codepen.io/dsenneff/pen/ZoLVZW -->
         <fieldset>
           <div class="toggle">
-            <input type="radio" name="sizeBy" id="res_auto" checked="checked" /><label for="res_auto">Auto-Range</label>
-            <input type="radio" name="sizeBy" id="res_100m" /><label for="res_100m">10uA <-> 100mA</label>
-            <input type="radio" name="sizeBy" id="res_100u" /><label for="res_100u">10nA <-> 100uA</label>
+            <input type="radio" name="auto_ranging" id="res_auto" checked="checked" /><label for="res_auto">Auto-Range</label>
+          </div>
+        </fieldset>
+        <fieldset onchange="change_r()">
+          <div class="toggle">
+            <input type="radio" name="chose_r" id="res_1" value=0 checked="checked" /><label for="res_1">0 Ohm</label>
+            <input type="radio" name="chose_r" id="res_2" value=1 /><label for="res_2">1 Ohm</label>
+            <input type="radio" name="chose_r" id="res_3" value=2 /><label for="res_3">1k Ohm</label>
           </div>
         </fieldset>
         <!-- End of radio button -->
