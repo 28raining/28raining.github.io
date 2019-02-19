@@ -209,11 +209,11 @@ function update_smith_chart() {
 	}
 	
 	var myNode = document.getElementById("schematic");
-	myNode.innerHTML = '<div class="schematic-title">Below is your system</div>';
-	/*var point_div = document.createElement("div");
+	myNode.innerHTML = '';
+	var point_div = document.createElement("div");
 	point_div.setAttribute('class', 'cell-picker-text');
-	point_div.innerHTML += "";
-	document.getElementById("schematic").appendChild(point_div);*/
+	point_div.innerHTML += "<b class=\"star-light arrow fa-1x\"></b><b>Your system</b><b class=\"star-light arrow fa-1x\"></b>";
+	document.getElementById("schematic").appendChild(point_div);
 	var real_old = 0.0;
   var imag_old = 0.0;
   
@@ -405,9 +405,6 @@ function draw_schematic(i) {
     var div = document.createElement("div");
     unit=[];
     div.setAttribute('class', 'cell');
-    //Add a close button, but can't remove black boxes...
-    if (schematic[i].type!='bb') div.innerHTML += "<div class=\"rem\" onclick=\"schematic.splice("+i+",1); update_smith_chart()\"><div class=\"dp_txt\">DP"+i+"</div><div class=\"close-button\"></div></div>";
-    else div.innerHTML += "<div class=\"rem\">DP"+i+"</div>";
         
     switch(schematic[i].type) {
         case ("bb") :
@@ -492,10 +489,12 @@ function draw_schematic(i) {
     //div.innerHTML = "<p>"+sch_label+"</p>";
     div.innerHTML += "<img src=\"icons/"+sch_icon+".png\" alt="+sch_label+">";
     //if (sch_abs) {
-        var dropdown_menu = "<div class=\"abs_box\"><input type=\"number\" value="+schematic[i].abs+" onchange=\"update_schem_abs("+i+",this,'abs')\"></input>";
+        var dropdown_menu = "<div class=\"abs_box\"><div class=\"spacer\"></div><input type=\"number\" value="+schematic[i].abs+" onchange=\"update_schem_abs("+i+",this,'abs')\"></input>";
+        dropdown_menu += "<div class=\"spacer\"></div>";
         if (schematic[i].type=='bb') {
             var divclass = 'complex_box';
-            dropdown_menu += "<input type=\"number\" value="+schematic[i].abs_bb_i+" onchange=\"update_schem_abs("+i+",this,'abs_bb_i')\"></input>j";
+            dropdown_menu += "<input type=\"number\" value="+schematic[i].abs_bb_i+" onchange=\"update_schem_abs("+i+",this,'abs_bb_i')\"></input>";
+            dropdown_menu += "<div class=\"spacer\">j</div>";
         } else {
             var divclass = 'complex_box_wide';
             //Add units selector
@@ -508,10 +507,10 @@ function draw_schematic(i) {
         div.innerHTML +=dropdown_menu + "</div>";
     //}
     //} else if (schematic[i].type=='bb') {
-        if (sch_real || sch_imag) var complex_box = "<div class=\"trans\">";
+        if (sch_real || sch_imag) var complex_box = "<div class=\"trans\"><div class=\"spacer\"></div>";
         
         if (sch_real) {
-            complex_box += "<div class=\""+divclass+"\">" + Number((schematic[i].real*zo).toPrecision(precision)) + "</div>";
+            complex_box += "<div class=\""+divclass+"\">" + Number((schematic[i].real*zo).toPrecision(precision)) + "</div><div class=\"spacer\"></div>";
         }
         if (sch_imag) {
             if (schematic[i].imaginary>=0) {
@@ -522,8 +521,8 @@ function draw_schematic(i) {
                 var imag_val = Number((schematic[i].imaginary*-1*zo).toPrecision(precision));
                // if ((Math.abs(imag_val) < 0.1) && (imag_val != 0)) imag_val = Number(imag_val).toExponential();
             }
-            complex_box += sign;
-            complex_box += "<div class=\""+divclass+"\">" + imag_val + "</div>j";
+            complex_box += "<div class=\"spacer\">"+sign+"</div><div class=\"spacer\"></div>";
+            complex_box += "<div class=\""+divclass+"\">" + imag_val + "</div><div class=\"spacer\">j</div>";
         }
         if (sch_real || sch_imag) complex_box += "</div>";
         if (sch_real || sch_imag) div.innerHTML += complex_box;
@@ -533,6 +532,10 @@ function draw_schematic(i) {
           //  div.innerHTML +=  "<div class=\"global_inputs\"><div class=\"trans\"><p>e<sub>r</sub>=</p><input class=\"trans\" type=\"text\" value="+schematic[i].er+" onchange=\"update_schem_abs("+i+",this,'er')\"></input></div>";
         }
 
+    //can't remove black boxes...
+    if (schematic[i].type!='bb') div.innerHTML += "<div class=\"rem\" onclick=\"schematic.splice("+i+",1); update_smith_chart()\">DP"+i+"&nbsp &nbsp &nbsp X</div>";
+    else div.innerHTML += "<div class=\"rem\">DP"+i+"&nbsp &nbsp &nbsp &nbsp</div>";
+    //else  div.innerHTML += "<p>&nbsp</p>";
     document.getElementById("schematic").appendChild(div);
 
 
@@ -1183,13 +1186,9 @@ function resize_fn(x) {
     layout.width = 200;
     layout.height = 200;
     fontsize = 7;
-  } else if (window.matchMedia("(max-width: 350px)").matches) { 
+  } else if (window.matchMedia("(max-width: 400px)").matches) { 
     layout.width = 290;
     layout.height = 290;
-    fontsize = 8;
-  } else if (window.matchMedia("(max-width: 400px)").matches) { 
-    layout.width = 340;
-    layout.height = 340;
     fontsize = 8;
   } else if (window.matchMedia("(max-width: 600px)").matches) { 
     layout.width = 390;
@@ -1215,13 +1214,11 @@ function resize_fn(x) {
 var size_lt_800 = window.matchMedia("(max-width: 800px)");
 var size_lt_600 = window.matchMedia("(max-width: 600px)");
 var size_lt_400 = window.matchMedia("(max-width: 400px)");
-var size_lt_350 = window.matchMedia("(max-width: 350px)");
 var size_lt_300 = window.matchMedia("(max-width: 300px)");
 resize_fn(size_lt_800) // Call listener function at run time
 size_lt_800.addListener(resize_fn); // Attach listener function on state changes
 size_lt_600.addListener(resize_fn); // Attach listener function on state changes
 size_lt_400.addListener(resize_fn);
-size_lt_350.addListener(resize_fn);
 size_lt_300.addListener(resize_fn);
 
 update_smith_chart();
