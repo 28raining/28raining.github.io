@@ -1,3 +1,11 @@
+.schematic-title {
+	font-weight:bold;
+	border:2px;
+	padding:1px;
+	text-align: center;
+	border-bottom-style: solid;
+	border-color: #2C3E50;
+}
 
 .cell-picker-text {
 	display: inline-block;
@@ -6,9 +14,14 @@
 	vertical-align:top;
 }
 
+.dp_txt {
+	position: absolute;
+	left:10px;
+}
+
 .cell {
 	display: inline-block;
-	width: 10%;
+	width: 11%;
 	border-right-style: solid;
 	border-bottom-style: dashed;
 	border-width:1px;
@@ -17,8 +30,8 @@
 }
 #schematic-picker {
 	position:relative;
-	border:3px;
-	padding:5px;
+	border-top:3px;
+	/*padding-bottom:5px;*/
 	border-top-style: solid;
 	border-bottom-style: solid;
 	border-color: #2C3E50;
@@ -31,16 +44,17 @@
 }
 
 #schematic .cell {
-	height:210px;
+	/*height:210px;*/
 	position:relative;
 }
 
 #schematic .cell .rem {
-	top:0px;
-	right:10px;
-	position:absolute;
+	/*top:0px;
+	right:0px;
+	position:absolute;*/
 	height:13px;
 	font-size:0.8em;
+	width:100%;
 }
 
 #schematic .cell .rem:hover {
@@ -132,6 +146,7 @@ input, .complex_box, .complex_box_wide {
 
 .abs_box input {
 	max-width:35%;
+	margin-left: 2px;
 }
 
 .complex_box_wide {
@@ -153,9 +168,6 @@ input, .complex_box, .complex_box_wide {
 	width:100%;
 }
 
-.trans {
-	height:1rem;
-}
 
 .trans input {
 	width:50%;
@@ -341,7 +353,13 @@ hr.star-dark:after {
 	display: none !important;
 }
 
-@media only screen and (max-width: 800px) {
+@media only screen and (max-width: 1150px) {
+	.cell {
+        width:15%;
+	}
+}
+
+@media only screen and (max-width: 850px) {
     .global_inputs {
         width:95%;
 	}
@@ -358,9 +376,23 @@ hr.star-dark:after {
 	.cell p {
 		font-size: 0.75rem;
 	}
-	b.star-light:after, b.star-dark:after {
-		font-size: 1.5rem;
+}
+
+@media only screen and (max-width: 620px) {
+	.cell {
+        width:25%;
 	}
 }
-	
+
+@media only screen and (max-width: 500px) {
+	.cell {
+        width:33%;
+	}
+}
+
+@media only screen and (max-width: 400px) {
+	.cell {
+        width:50%;
+	}
+}
 
