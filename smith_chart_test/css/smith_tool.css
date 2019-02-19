@@ -126,6 +126,7 @@ b {
 .global_inputs input {
 	width:50%;
 	display:inline-block;
+	padding-left:2px;
 }
 
 
@@ -147,6 +148,7 @@ input, .complex_box, .complex_box_wide {
 .abs_box input {
 	max-width:35%;
 	margin-left: 2px;
+	padding-left:2px;
 }
 
 .complex_box_wide {
