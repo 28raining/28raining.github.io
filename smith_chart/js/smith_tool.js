@@ -209,7 +209,7 @@ function update_smith_chart() {
 	}
 	
 	var myNode = document.getElementById("schematic");
-	myNode.innerHTML = '<div class="schematic-title">Below is your system</div>';
+	myNode.innerHTML = '<div class="schematic-title">Below is your system. Impedance is looking towards the BLACK BOX</div>';
 	/*var point_div = document.createElement("div");
 	point_div.setAttribute('class', 'cell-picker-text');
 	point_div.innerHTML += "";
