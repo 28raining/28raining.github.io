@@ -141,7 +141,7 @@ b {
 
 input, .complex_box, .complex_box_wide {
 	display:inline-block;
-	line-height:28px;
+	/*line-height:28px;*/
 	height:32px;
 }
 
