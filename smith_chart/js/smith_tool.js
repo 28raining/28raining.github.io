@@ -2,7 +2,6 @@
 document.getElementById('file').addEventListener('change', readFile, false);
 
 function expo(x, f) {
-  console.log(x,f);
   return Number.parseFloat(x).toExponential(f);
 }
 
@@ -310,9 +309,12 @@ function update_smith_chart() {
         draw_schematic(i);
 	}
 	
-	var temp_array = []
+  var temp_array = []
+  //If only the black box exists...
 	if (schematic.length == 2) {
-		temp_array = find_smith_coord(schematic[1].real,schematic[1].imaginary,false);
+    temp_array = find_smith_coord(schematic[1].real,schematic[1].imaginary,false);
+    real_old = schematic[1].real;
+    imag_old = schematic[1].imaginary;
 		end_x_coord=temp_array[0];
 		end_y_coord=temp_array[1];
   }
@@ -323,7 +325,7 @@ function update_smith_chart() {
 	layout_shapes.push({type: "rectangle", x0:Number(end_x_coord)-0.01,y0:Number(end_y_coord)-0.01,x1:Number(end_x_coord)+0.01,y1:Number(end_y_coord)+0.01});
 	textbox_trace.push({x:[Number(end_x_coord)+0.04],y:[Number(end_y_coord)-0.03],text:["DP"+(i-1)],mode:'text'});
 
-	//Update the impedance box
+  //Update the impedance box
 	document.getElementById("current_impedance").innerHTML = "<div class=\"text_box\">"+(real_old*zo).toPrecision(3)+"</div>";
 	if (imag_old < 0) document.getElementById("current_impedance").innerHTML += "<div class=\"text_box\">-</div>";
 	else document.getElementById("current_impedance").innerHTML += "<div class=\"text_box\">+</div>";
@@ -341,22 +343,24 @@ function update_smith_chart() {
 	
 	//Calculate the reflection coefficient -current_admittance (zo-zimp) / (zo+zimp)
 	var bot_real,bot_imag;
-	temp_array = one_over_complex(zo + real_old*zo,imag_old*zo);
+  temp_array = one_over_complex(real_old*zo + zo,imag_old*zo);
 	bot_real= temp_array[0];
 	bot_imag = temp_array[1];
 
-	var reflectio_coeff_real = ((zo - real_old*zo) * bot_real) + ((imag_old*zo)*bot_imag);
-	var reflectio_coeff_imag = ((imag_old*zo) * bot_real) + ((zo - real_old*zo) * bot_imag);
+	var reflectio_coeff_real = ((real_old*zo - zo) * bot_real) - ((imag_old*zo)*bot_imag);
+	var reflectio_coeff_imag = ((imag_old*zo) * bot_real) + ((real_old*zo - zo) * bot_imag);
 	document.getElementById("current_reflection").innerHTML = "<div class=\"text_box\">"+(reflectio_coeff_real).toPrecision(3)+"</div>";
-	if (imag_old < 0) document.getElementById("current_reflection").innerHTML += "<div class=\"text_box\">-</div>";
+	if (reflectio_coeff_imag < 0) document.getElementById("current_reflection").innerHTML += "<div class=\"text_box\">-</div>";
 	else document.getElementById("current_reflection").innerHTML += "<div class=\"text_box\">+</div>";
 	document.getElementById("current_reflection").innerHTML += "<div class=\"text_box\">"+Math.abs(reflectio_coeff_imag).toPrecision(3) + "j</div>";
 	
 	//plot reflection coefficient magnitude
-
+  console.log(reflectio_coeff_imag,reflectio_coeff_real);
 	document.getElementById("current_reflection_mag").innerHTML = "<div class=\"text_box\">"+Math.sqrt((reflectio_coeff_real*reflectio_coeff_real)+(reflectio_coeff_imag*reflectio_coeff_imag)).toPrecision(3)+"</div>";
-	document.getElementById("current_reflection_mag").innerHTML += "<div class=\"text_box\">&ang;</div>";
-	document.getElementById("current_reflection_mag").innerHTML += "<div class=\"text_box\">"+(360*Math.atan(reflectio_coeff_real/reflectio_coeff_imag)/(2*Math.PI)).toPrecision(3) + "&deg; </div>";
+  document.getElementById("current_reflection_mag").innerHTML += "<div class=\"text_box\">&ang;</div>";
+  var arc_tan_refl = 360*Math.atan(reflectio_coeff_imag/reflectio_coeff_real)/(2*Math.PI);
+  if (reflectio_coeff_real < 0) arc_tan_refl += 180;
+	document.getElementById("current_reflection_mag").innerHTML += "<div class=\"text_box\">"+(arc_tan_refl).toPrecision(3) + "&deg; </div>";
 	
 	//redefine the labels in case zo has changed
 	define_labels();
