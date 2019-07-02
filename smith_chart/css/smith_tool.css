@@ -192,11 +192,19 @@ input, .complex_box, .complex_box_wide {
 }
 
 
-#smith_chart {
+#smith_chart, #smith_polar{
   width:650px;
   height:650px;
   position: relative;
   margin:0 auto;
+}
+
+#PolarPlot {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .hollow_holder,
@@ -353,6 +361,11 @@ hr.star-dark:after {
 
 .modebar{
 	display: none !important;
+}
+
+h3 {
+	text-align: center;
+	margin-top:60px;
 }
 
 @media only screen and (max-width: 1150px) {

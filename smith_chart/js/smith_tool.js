@@ -355,52 +355,106 @@ function update_smith_chart() {
 	document.getElementById("current_reflection").innerHTML += "<div class=\"text_box\">"+Math.abs(reflectio_coeff_imag).toPrecision(3) + "j</div>";
 	
 	//plot reflection coefficient magnitude
-  console.log(reflectio_coeff_imag,reflectio_coeff_real);
-	document.getElementById("current_reflection_mag").innerHTML = "<div class=\"text_box\">"+Math.sqrt((reflectio_coeff_real*reflectio_coeff_real)+(reflectio_coeff_imag*reflectio_coeff_imag)).toPrecision(3)+"</div>";
+  //console.log(reflectio_coeff_imag,reflectio_coeff_real);
+  var reflection_mag = Math.sqrt((reflectio_coeff_real*reflectio_coeff_real)+(reflectio_coeff_imag*reflectio_coeff_imag)).toPrecision(3);
+	document.getElementById("current_reflection_mag").innerHTML = "<div class=\"text_box\">"+reflection_mag+"</div>";
   document.getElementById("current_reflection_mag").innerHTML += "<div class=\"text_box\">&ang;</div>";
-  var arc_tan_refl = 360*Math.atan(reflectio_coeff_imag/reflectio_coeff_real)/(2*Math.PI);
-  if (reflectio_coeff_real < 0) arc_tan_refl += 180;
-	document.getElementById("current_reflection_mag").innerHTML += "<div class=\"text_box\">"+(arc_tan_refl).toPrecision(3) + "&deg; </div>";
+  if (reflectio_coeff_real == 0)  var reflection_phase = 0;
+  else  var reflection_phase = 360*Math.atan(reflectio_coeff_imag/reflectio_coeff_real)/(2*Math.PI);
+  if (reflectio_coeff_real < 0) reflection_phase += 180;
+	document.getElementById("current_reflection_mag").innerHTML += "<div class=\"text_box\">"+(reflection_phase).toPrecision(3) + "&deg; </div>";
 	
 	//redefine the labels in case zo has changed
 	define_labels();
 
-    //draw span curve
-    var sp_coord_x=[],sp_coord_y=[];
-    for (i=0; i<span_impedance_re.length;i++) {
-        sp_coord = find_smith_coord(span_impedance_re[i],span_impedance_im[i],false);
-        sp_coord_x.push(sp_coord[0]);
-        sp_coord_y.push(sp_coord[1]);
-    }
-    span_trace = {
-        x: sp_coord_x,
-        y: sp_coord_y,
-        line: {
-            color: 'rgb(200, 0, 0)',
-            width: 4
-        },
-        mode: 'lines',
-        type: 'scatter'
-    };
-    if (span_impedance_re.length > 1) {
-        if (Number(sp_coord_y[0]) < Number(sp_coord_y[1])) y_off = 0.04;
-        else y_off = -0.04;
-        if (Number(sp_coord_x[0]) < Number(sp_coord_x[1])) x_off = 0.03;
-        else x_off = -0.03;
-        //draw a data box at each end of the span curve
-        layout_shapes.push({type: "rectangle", x0:Number(sp_coord_x[0])-0.01,y0:Number(sp_coord_y[0])-0.01,x1:Number(sp_coord_x[0])+0.01,y1:Number(sp_coord_y[0])+0.01});
-        textbox_trace.push({x:[Number(sp_coord_x[0])-x_off],y:[Number(sp_coord_y[0])-y_off],text:["F-span"],mode:'text'});
+  //draw span curve
+  var sp_coord_x=[],sp_coord_y=[];
+  var refl_mag=[], refl_phase=[];
+  var temp_refl_re, temp_refl_im, temp_refl_ph;
+  for (i=0; i<span_impedance_re.length;i++) {
+      sp_coord = find_smith_coord(span_impedance_re[i],span_impedance_im[i],false);
+      sp_coord_x.push(sp_coord[0]);
+      sp_coord_y.push(sp_coord[1]);
 
-        layout_shapes.push({type: "rectangle", x0:Number(sp_coord_x[span_impedance_re.length-1])-0.01,y0:Number(sp_coord_y[span_impedance_re.length-1])-0.01,x1:Number(sp_coord_x[span_impedance_re.length-1])+0.01,y1:Number(sp_coord_y[span_impedance_re.length-1])+0.01});
-        textbox_trace.push({x:[Number(sp_coord_x[span_impedance_re.length-1])+x_off],y:[Number(sp_coord_y[span_impedance_re.length-1])+y_off],text:["F+span"],mode:'text'});
-    }
-    //console.log(span_impedance_re,span_impedance_im,span_trace)
+      temp_array = one_over_complex(span_impedance_re[i]*zo + zo,span_impedance_im[i]*zo);
+      bot_real= temp_array[0];
+      bot_imag = temp_array[1];
+      temp_refl_re = ((span_impedance_re[i]*zo - zo) * bot_real) - ((span_impedance_im[i]*zo)*bot_imag);
+      temp_refl_im = ((span_impedance_im[i]*zo) * bot_real) + ((span_impedance_re[i]*zo - zo) * bot_imag);
+      refl_mag.push(Number(Math.sqrt((temp_refl_re*temp_refl_re)+(temp_refl_im*temp_refl_im))));
+      if (temp_refl_re == 0)  var temp_refl_ph = 0;
+      else  var temp_refl_ph = 360*Math.atan(temp_refl_im/temp_refl_re)/(2*Math.PI);
+      if (temp_refl_re < 0) temp_refl_ph += 180;
+      refl_phase.push(temp_refl_ph);
+
+  }
+  span_trace = {
+      x: sp_coord_x,
+      y: sp_coord_y,
+      line: {
+          color: 'rgb(200, 0, 0)',
+          width: 4
+      },
+      mode: 'lines',
+      type: 'scatter'
+  };
+  if (span_impedance_re.length > 1) {
+      if (Number(sp_coord_y[0]) < Number(sp_coord_y[1])) y_off = 0.04;
+      else y_off = -0.04;
+      if (Number(sp_coord_x[0]) < Number(sp_coord_x[1])) x_off = 0.03;
+      else x_off = -0.03;
+      //draw a data box at each end of the span curve
+      layout_shapes.push({type: "rectangle", x0:Number(sp_coord_x[0])-0.01,y0:Number(sp_coord_y[0])-0.01,x1:Number(sp_coord_x[0])+0.01,y1:Number(sp_coord_y[0])+0.01});
+      textbox_trace.push({x:[Number(sp_coord_x[0])-x_off],y:[Number(sp_coord_y[0])-y_off],text:["F-span"],mode:'text'});
+
+      layout_shapes.push({type: "rectangle", x0:Number(sp_coord_x[span_impedance_re.length-1])-0.01,y0:Number(sp_coord_y[span_impedance_re.length-1])-0.01,x1:Number(sp_coord_x[span_impedance_re.length-1])+0.01,y1:Number(sp_coord_y[span_impedance_re.length-1])+0.01});
+      textbox_trace.push({x:[Number(sp_coord_x[span_impedance_re.length-1])+x_off],y:[Number(sp_coord_y[span_impedance_re.length-1])+y_off],text:["F+span"],mode:'text'});
+  }
+  //console.log(span_impedance_re,span_impedance_im,span_trace)
 	
 	var data = trace.concat(textbox_trace,trace_im_neg,trace_im_pos,trace_real,trace_adm,trace_sus_pos,trace_sus_neg,span_trace);
 
 	//console.log(data, layout, layout_shapes);
 	Plotly.newPlot('myDiv', data, {paper_bgcolor: 'rgba(255,255,255,0.2)', plot_bgcolor: 'rgba(255,255,255,0.0)', showlegend: false,margin:layout.margin, height:layout.height,width:layout.width,hovermode:layout.hovermode,xaxis:layout.xaxis,yaxis:layout.yaxis,shapes:layout.shapes.concat(layout_shapes)});	
-	
+  
+
+
+
+  var data_polar = [
+    {
+      type: "scatterpolargl",
+      r: [Number(reflection_mag)],
+      theta: [reflection_phase],
+      marker: {
+        color: "black",
+        symbol: "square",
+        size: 8
+      },
+      subplot: "polar"
+    }
+  ]
+
+  for(i=0;i<refl_mag.length;i++){
+    data_polar.push(
+      {
+        type: "scatterpolargl",
+        r: [refl_mag[i]],
+        theta: [refl_phase[i]],
+        marker: {
+          color: 'rgb(200, 0, 0)',
+          symbol: "circle",
+          size: 4
+        },
+        subplot: "polar"
+      }
+    )
+  }
+
+  Plotly.newPlot('PolarPlot', data_polar, layout_polar, {staticPlot: true})
+  
+
+
+
 }
 
 function draw_schematic(i) {
@@ -1182,35 +1236,76 @@ var layout = {
   ]
 };
 
+var layout_polar = {
+  showlegend: false,
+  width: 650,
+  height: 650,
+  paper_bgcolor: 'rgba(0,0,0,0)',
+  plot_bgcolor: 'rgba(0,0,0,0)',
+  polar: {
+    radialaxis: {
+      tickfont: {
+        size: 12
+      },
+      range: [0, 1],
+      gridcolor: "rgba(145, 145, 145, 0.75)",
+      dtick:'0.2'
+    },
+    angularaxis: {
+      tickfont: {
+        size: 12
+      },
+      gridcolor: "rgba(145, 145, 145, 0.75)",
+      dtick:'15'
+    },
+    bgcolor:'rgba(255,255,255,0.2)',
+  }
+};
+
 function resize_fn(x) {
   if (window.matchMedia("(max-width: 300px)").matches) { // If media query matches
     layout.width = 200;
     layout.height = 200;
+    layout_polar.width = 200;
+    layout_polar.height = 200;
     fontsize = 7;
   } else if (window.matchMedia("(max-width: 350px)").matches) { 
     layout.width = 290;
     layout.height = 290;
+    layout_polar.width = 290;
+    layout_polar.height = 290;
     fontsize = 8;
   } else if (window.matchMedia("(max-width: 400px)").matches) { 
     layout.width = 340;
     layout.height = 340;
+    layout_polar.width = 340;
+    layout_polar.height = 340;
     fontsize = 8;
   } else if (window.matchMedia("(max-width: 600px)").matches) { 
     layout.width = 390;
     layout.height = 390;
+    layout_polar.width = 390;
+    layout_polar.height = 390;
     fontsize = 10;
   } else if (window.matchMedia("(max-width: 800px)").matches) { 
     layout.width = 525;
     layout.height = 525;
+    layout_polar.width = 525;
+    layout_polar.height = 525;
     fontsize = 12;
   } else {
     layout.width = 650;
     layout.height = 650;
+    layout_polar.width = 650;
+    layout_polar.height = 650;
     fontsize = 12;
   }
   var smith_holder = document.getElementById("smith_chart");
   smith_holder.style.width = layout.width + "px";
   smith_holder.style.height = layout.height + "px";
+  var cartesian_holder = document.getElementById("smith_polar");
+  cartesian_holder.style.width = layout.width + "px";
+  cartesian_holder.style.height = layout.height + "px";
   update_smith_chart();
  // console.log("executing a resize");
 }
