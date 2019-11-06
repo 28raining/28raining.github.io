@@ -550,10 +550,10 @@ function draw_schematic(i) {
     //div.innerHTML = "<p>"+sch_label+"</p>";
     div.innerHTML += "<img src=\"icons/"+sch_icon+".png\" alt="+sch_label+">";
     //if (sch_abs) {
-        var dropdown_menu = "<div class=\"abs_box\"><input type=\"number\" value="+schematic[i].abs+" onchange=\"update_schem_abs("+i+",this,'abs')\"></input>";
+        var dropdown_menu = "<div class=\"abs_box\"><input type=\"text\" value="+schematic[i].abs+" onchange=\"update_schem_abs("+i+",this,'abs')\"></input>";
         if (schematic[i].type=='bb') {
             var divclass = 'complex_box';
-            dropdown_menu += "<input type=\"number\" value="+schematic[i].abs_bb_i+" onchange=\"update_schem_abs("+i+",this,'abs_bb_i')\"></input>j";
+            dropdown_menu += "<input type=\"text\" value="+schematic[i].abs_bb_i+" onchange=\"update_schem_abs("+i+",this,'abs_bb_i')\"></input>j";
         } else {
             var divclass = 'complex_box_wide';
             //Add units selector
