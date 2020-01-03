@@ -1,0 +1,4 @@
+1 - Add dots to the google map. Make sure they can be clicked
+2 - crawl craigslist to get all the geolocations of the listings
+3 - Draw a polygon on the gmap somehow.
+3 - filter the geolocations by some predefined polygon
