@@ -97,7 +97,7 @@
 			</div>
 			<div class="global_inputs">
 				<span>Characteristic Impedance</span>
-				<span><input type="number" value="50" id="zo" onchange="zo=this.value; schematic[0].zo=this.value; update_smith_chart();"><div class="ohms">Ω</div></span>
+				<span><input type="number" value="50" id="zo" onchange="zo=Number(this.value); schematic[0].zo=Number(this.value); update_smith_chart();"><div class="ohms">Ω</div></span>
 			</div>
 			<div class="global_inputs">
 				<span>Permitivity e<sub>eff (note all λ=C/f&radic;e<sub>eff</sub>)</span>

@@ -359,7 +359,6 @@ function update_smith_chart() {
   temp_array = one_over_complex(real_old*zo + zo,imag_old*zo);
 	bot_real= temp_array[0];
 	bot_imag = temp_array[1];
-
 	var reflectio_coeff_real = ((real_old*zo - zo) * bot_real) - ((imag_old*zo)*bot_imag);
 	var reflectio_coeff_imag = ((imag_old*zo) * bot_real) + ((real_old*zo - zo) * bot_imag);
 	document.getElementById("current_reflection").innerHTML = "<div class=\"text_box\">"+(reflectio_coeff_real).toPrecision(3)+"</div>";
