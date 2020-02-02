@@ -5,6 +5,19 @@ function expo(x, f) {
   return Number.parseFloat(x).toExponential(f);
 }
 
+function toggle_color_scheme(){
+  console.log(document.getElementsByTagName('section')[0].style["background-color"])
+  if (document.getElementsByTagName('section')[0].style["background-color"] == "white"){
+    document.getElementsByTagName('section')[0].style["background-color"] = "rgb(24, 188, 156)";
+    document.getElementsByTagName('section')[0].style.color = "white";
+    document.getElementById('hollowed_circle').style["boxShadow"] = "0px 0px 0px 2000px rgb(24, 188, 156)";
+  } else {
+    document.getElementsByTagName('section')[0].style["background-color"] = "white";
+    document.getElementsByTagName('section')[0].style.color = "black";
+    document.getElementById('hollowed_circle').style["boxShadow"] = "0px 0px 0px 2000px white";
+  }
+}
+
 function readFile (evt) {
 	var files = evt.target.files;
 	var file = files[0];           

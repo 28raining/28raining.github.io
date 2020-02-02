@@ -156,16 +156,24 @@
 		
 	<div id="schematic"></div>
 	<div id="smith_chart">
-		<div class="hollow_holder">
-			<div class="hollowed_circle"></div>
-		</div>
 		<div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
+		<div class="hollow_holder">
+			<div id="hollowed_circle"></div>
+		</div>
 	</div>
 
 	<h3>Reflection Coefficient plotted on a polar axes:</h3>
 
 	<div id="smith_polar">
 				<div id="PolarPlot"><!-- Plotly chart will be drawn inside this DIV --></div>
+	</div>
+
+	<div id="color_scheme">
+		<p>Chose your color scheme </p>
+		<label class="switch">
+			<input type="checkbox" checked onchange=toggle_color_scheme()>
+			<span class="slider round"></span>
+		</label>
 	</div>
 
 		<div id="feedback_title">Please leave some feedback!</div>
