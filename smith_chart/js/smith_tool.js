@@ -894,9 +894,9 @@ function configure_layout_shapes() {
     color_admittance_imaginary = 'rgba(0, 0, 255,0.3)'; 
   } else {
     color_resistance_real = 'rgba(150, 0, 0, 0.2)';
-    color_resistance_imaginary = 'rgba(252, 114, 2,0.4)';
+    color_resistance_imaginary = 'rgba(252, 114, 2,0.3)';
     color_admittance_real  = 'rgba(255, 0, 250,0.2)';
-    color_admittance_imaginary = 'rgba(0, 10, 163,0.4)'; 
+    color_admittance_imaginary = 'rgba(0, 10, 163,0.3)'; 
   }  
   
   var shapes = [
