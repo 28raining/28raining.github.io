@@ -31,10 +31,9 @@ nav {
 }
 
 section {
-	background-color: #18BC9C !important;
+	background-color: #18BC9C;
     color: #fff;
     margin-bottom: 0;
-    background-color: #007bff;
     display: block;
     width: 100%;
     padding-right: 15px;

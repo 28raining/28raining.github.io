@@ -5,6 +5,26 @@ function expo(x, f) {
   return Number.parseFloat(x).toExponential(f);
 }
 
+function toggle_color_scheme(){
+  if (document.getElementsByTagName('section')[0].style["background-color"] == "white"){
+    document.getElementsByTagName('section')[0].style["background-color"] = "rgb(24, 188, 156)";
+    document.getElementsByTagName('section')[0].style.color = "white";
+    document.getElementById('hollowed_circle').style["boxShadow"] = "0px 0px 0px 2000px rgb(24, 188, 156)";
+  } else {
+    document.getElementsByTagName('section')[0].style["background-color"] = "white";
+    document.getElementsByTagName('section')[0].style.color = "black";
+    document.getElementById('hollowed_circle').style["boxShadow"] = "0px 0px 0px 2000px white";
+  }
+
+  if (color_of_smith_curves == 'bland') {
+    color_of_smith_curves = 'colorful';
+  } else {
+    color_of_smith_curves = 'bland'; 
+  }
+
+  update_smith_chart();
+}
+
 function readFile (evt) {
 	var files = evt.target.files;
 	var file = files[0];           
@@ -58,6 +78,7 @@ function updatespan(this_id,this_val,element) {
 	var resolution = 100;
   var span_resolution = 10;
   var fontsize=12;
+  var color_of_smith_curves = "colorful";
   
   schematic.push({type:'raw', zo : 50, freq:2440, er : 1, freq_unit:{unit:'MHz',multiplier:1e6}, span:0.0, span_unit:{unit:'MHz',multiplier:1e6}});
   schematic.push({type:'bb',real:1,imaginary:0,abs:50,abs_bb_i:0,unit:'null'});
@@ -179,6 +200,8 @@ function update_schem_component(freq_here,save_impedance,sch_index) {
 }
 
 function update_smith_chart() {
+  //Update the layout variable
+  layout.shapes = configure_layout_shapes();
   //Calculate and verify freqeuencies...
   freq = schematic[0].freq * schematic[0].freq_unit.multiplier;
   span_freq = schematic[0].span * schematic[0].span_unit.multiplier;
@@ -598,6 +621,20 @@ function draw_schematic(i) {
 var trace_im_neg,trace_real,trace_adm,trace_sus_pos,trace_sus_neg = {};
 
 function define_labels () {
+
+  // console.log(color_of_smith_curves);
+  if (color_of_smith_curves == 'bland') {
+    color_im =   'rgba(0, 0, 0,0.5)';
+    color_real = 'rgba(0, 0, 0,0.5)';
+    color_adm =  'rgba(0, 0, 0,0.3)';
+    color_sus =  'rgba(0, 0, 0,0.3)';
+  } else {
+    color_im = 'rgba(252, 114, 2,0.5)';
+    color_real = 'rgba(150, 0, 0,0.5)';
+    color_adm = 'rgba(0, 10, 163,0.3)';
+    color_sus = 'rgba(255, 0, 250,0.3)';
+  }
+
  
 	trace_im_pos = {
 	  x: [0.95,0.9,0.63,0.05,-0.54,-0.86],
@@ -605,7 +642,7 @@ function define_labels () {
 	  text: ["<b>"+10*zo+"</b>","<b>"+5*zo+"</b>","<b>"+2*zo+"</b>","<b>"+1*zo+"</b>","<b>"+0.5*zo+"</b>","<b>"+0.2*zo+"</b>"],
 	  mode: 'text',
 	  textfont: {
-      color: 'rgba(252, 114, 2,0.5)',
+      color: color_im,
       size:fontsize
 	  }
 	};
@@ -616,7 +653,7 @@ function define_labels () {
 	  text: ["<b>"+10*zo+"</b>","<b>"+5*zo+"</b>","<b>"+2*zo+"</b>","<b>"+1*zo+"</b>","<b>"+0.5*zo+"</b>","<b>"+0.2*zo+"</b>"],
 	  mode: 'text',
 	  textfont: {
-      color: 'rgba(252, 114, 2,0.5)',
+      color: color_im,
       size:fontsize
 	  }
 	};
@@ -627,7 +664,7 @@ function define_labels () {
 	  text: ["<b>∞</b>","<b>"+10*zo+"</b>","<b>"+4*zo+"</b>","<b>"+2*zo+"</b>","<b>"+1*zo+"</b>","<b>"+0.5*zo+"</b>","<b>"+0.2*zo+"</b>","<b>0</b>"],
 	  mode: 'text',
 	  textfont: {
-      color: 'rgba(150, 0, 0,0.5)',
+      color: color_real,
       size:fontsize
 	  }
 	};
@@ -638,7 +675,7 @@ function define_labels () {
 	  text: ["<b>"+(1000/5/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
 	  mode: 'text',
 	  textfont: {
-      color: 'rgba(0, 10, 163,0.3)',
+      color: color_adm,
       size:fontsize
 	  }
 	};
@@ -649,7 +686,7 @@ function define_labels () {
 	  text: ["<b>"+(1000/5/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
 	  mode: 'text',
 	  textfont: {
-      color: 'rgba(255, 0, 250,0.3)',
+      color: color_sus,
       size:fontsize
 	  }
 	};
@@ -660,7 +697,7 @@ function define_labels () {
 	  text: ["<b>"+(1000/5/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
 	  mode: 'text',
 	  textfont: {
-      color: 'rgba(255, 0, 250,0.3)',
+      color: color_sus,
       size:fontsize
 	  }
 	};
@@ -826,414 +863,431 @@ function download_state() {
 }
 
 var layout = {
-  title: 'Circles',
-  hovermode: false,
-  xaxis: {
-    range: [-1, 1],
-    zeroline: false,
-	showgrid: false
-  },
-  yaxis: {
-    range: [-1, 1],
-	showgrid:false
-  },
-  width: 650,
-  height: 650,
-  showgrid:false,
-  margin: {
-    l: 0,
-    r: 0,
-    b: 0,
-    t: 0
-  },
-  shapes: [
+    title: 'Circles',
+    hovermode: false,
+    xaxis: {
+      range: [-1, 1],
+      zeroline: false,
+    showgrid: false
+    },
+    yaxis: {
+      range: [-1, 1],
+    showgrid:false
+    },
+    width: 650,
+    height: 650,
+    showgrid:false,
+    margin: {
+      l: 0,
+      r: 0,
+      b: 0,
+      t: 0
+    }
+}
+
+function configure_layout_shapes() {
+  console.log(color_of_smith_curves);
+  if (color_of_smith_curves == 'bland') {
+    color_resistance_real = 'rgba(255, 0, 0, 0.2)';
+    color_resistance_imaginary = 'rgba(255, 0, 0,0.3)';
+    color_admittance_real  = 'rgba(0, 0, 255,0.2)';
+    color_admittance_imaginary = 'rgba(0, 0, 255,0.3)'; 
+  } else {
+    color_resistance_real = 'rgba(150, 0, 0, 0.2)';
+    color_resistance_imaginary = 'rgba(252, 114, 2,0.3)';
+    color_admittance_real  = 'rgba(255, 0, 250,0.2)';
+    color_admittance_imaginary = 'rgba(0, 10, 163,0.3)'; 
+  }  
   
-	///RESISTANCE CIRCLES
+  var shapes = [
+    
+    ///RESISTANCE CIRCLES
+      {
+        type: 'circle',
+        x0: -1,
+        y0: -1,
+        x1: 1,
+        y1: 1,
+        line: {
+          color: color_resistance_real
+        }
+      },
     {
-      type: 'circle',
-      x0: -1,
-      y0: -1,
-      x1: 1,
-      y1: 1,
-      line: {
-        color: 'rgba(150, 0, 0, 0.4)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: -0.666,
-      y0: -0.833,
-      x1: 1,
-      y1: 0.833,
-      line: {
-        color: 'rgba(150, 0, 0, 0.4)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: -0.333,
-      y0: -0.666,
-      x1: 1,
-      y1: 0.666,
-      line: {
-        color: 'rgba(150, 0, 0, 0.4)'
-      }
-    },
+        type: 'circle',
+        x0: -0.666,
+        y0: -0.833,
+        x1: 1,
+        y1: 0.833,
+        line: {
+          color: color_resistance_real
+        }
+      },
     {
-      type: 'circle',
-      x0: 0,
-      y0: -0.5,
-      x1: 1,
-      y1: 0.5,
-      line: {
-        color: 'rgba(150, 0, 0, 0.4)'
-      }
-    },
+        type: 'circle',
+        x0: -0.333,
+        y0: -0.666,
+        x1: 1,
+        y1: 0.666,
+        line: {
+          color: color_resistance_real
+        }
+      },
+      {
+        type: 'circle',
+        x0: 0,
+        y0: -0.5,
+        x1: 1,
+        y1: 0.5,
+        line: {
+          color: color_resistance_real
+        }
+      },
+      {
+        type: 'circle',
+        x0: 0.333,
+        y0: -0.333,
+        x1: 1,
+        y1: 0.333,
+        line: {
+          color: color_resistance_real
+        }
+      },
     {
-      type: 'circle',
-      x0: 0.333,
-      y0: -0.333,
-      x1: 1,
-      y1: 0.333,
-      line: {
-        color: 'rgba(150, 0, 0, 0.4)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: 0.6,
-      y0: -0.2,
-      x1: 1,
-      y1: 0.2,
-      line: {
-        color: 'rgba(150, 0, 0, 0.4)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: 0.818,
-      y0: -0.0909,
-      x1: 1,
-      y1: 0.0909,
-      line: {
-        color: 'rgba(150, 0, 0, 0.4)'
-      }
-    },
-	
-	
-	///ADMITTANCE CIRCLES
-	{
-      type: 'circle',
-      x0: 0.6,
-      y0: -0.8,
-      x1: -1,
-      y1: 0.8,
-      line: {
-        color: 'rgba(0, 10, 163,0.2)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: 0.333,
-      y0: -0.666,
-      x1: -1,
-      y1: 0.666,
-      line: {
-        color: 'rgba(0, 10, 163,0.2)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: -1,
-      y0: -0.5,
-      x1: 0,
-      y1: 0.5,
-      line: {
-        color: 'rgba(0, 10, 163,0.2)'
-      }
-    },
+        type: 'circle',
+        x0: 0.6,
+        y0: -0.2,
+        x1: 1,
+        y1: 0.2,
+        line: {
+          color: color_resistance_real
+        }
+      },
     {
-      type: 'circle',
-      x0: -1,
-      y0: -0.333,
-      x1: -0.333,
-      y1: 0.333,
-      line: {
-        color: 'rgba(0, 10, 163,0.2)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: -1,
-      y0: -0.166,
-      x1: -0.666,
-      y1: 0.166,
-      line: {
-        color: 'rgba(0, 10, 163,0.2)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: -1,
-      y0: -0.0909,
-      x1: -0.818,
-      y1: 0.0909,
-      line: {
-        color: 'rgba(0, 10, 163,0.2)'
-      }
-    },
-	
-	///REACTANCE CIRCLES
+        type: 'circle',
+        x0: 0.818,
+        y0: -0.0909,
+        x1: 1,
+        y1: 0.0909,
+        line: {
+          color: color_resistance_real
+        }
+      },
+    
+    
+    ///ADMITTANCE CIRCLES
     {
-      type: 'circle',
-      x0: 0.9,
-      y0: 0,
-      x1: 1.1,
-      y1: 0.2,
-      line: {
-        color: 'rgba(252, 114, 2,0.4)'
-      }
-    },
+        type: 'circle',
+        x0: 0.6,
+        y0: -0.8,
+        x1: -1,
+        y1: 0.8,
+        line: {
+          color: color_admittance_real
+        }
+      },
     {
-      type: 'circle',
-      x0: 0.8,
-      y0: 0,
-      x1: 1.2,
-      y1: 0.4,
-      line: {
-        color: 'rgba(252, 114, 2,0.4)'
-      }
-    },
+        type: 'circle',
+        x0: 0.333,
+        y0: -0.666,
+        x1: -1,
+        y1: 0.666,
+        line: {
+          color: color_admittance_real
+        }
+      },
     {
-      type: 'circle',
-      x0: 0.5,
-      y0: 0,
-      x1: 1.5,
-      y1: 1,
-      line: {
-        color: 'rgba(252, 114, 2,0.4)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: 0,
-      y0: 0,
-      x1: 2,
-      y1: 2,
-      line: {
-        color: 'rgba(252, 114, 2,0.4)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: -1,
-      y0: 0,
-      x1: 3,
-      y1: 4,
-      line: {
-        color: 'rgba(252, 114, 2,0.4)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: -4,
-      y0: 0,
-      x1: 6,
-      y1: 10,
-      line: {
-        color: 'rgba(252, 114, 2,0.4)'
-      }
-    },
-	
-	//imaginary
-	    {
-      type: 'circle',
-      x0: 0.9,
-      y0: 0,
-      x1: 1.1,
-      y1: -0.2,
-      line: {
-        color: 'rgba(252, 114, 2,0.4)'
-      }
-    },
+        type: 'circle',
+        x0: -1,
+        y0: -0.5,
+        x1: 0,
+        y1: 0.5,
+        line: {
+          color: color_admittance_real
+        }
+      },
+      {
+        type: 'circle',
+        x0: -1,
+        y0: -0.333,
+        x1: -0.333,
+        y1: 0.333,
+        line: {
+          color: color_admittance_real
+        }
+      },
     {
-      type: 'circle',
-      x0: 0.8,
-      y0: 0,
-      x1: 1.2,
-      y1: -0.4,
-      line: {
-        color: 'rgba(252, 114, 2,0.4)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: 0.5,
-      y0: 0,
-      x1: 1.5,
-      y1: -1,
-      line: {
-        color: 'rgba(252, 114, 2,0.4)'
-      }
-    },
+        type: 'circle',
+        x0: -1,
+        y0: -0.166,
+        x1: -0.666,
+        y1: 0.166,
+        line: {
+          color: color_admittance_real
+        }
+      },
     {
-      type: 'circle',
-      x0: 0,
-      y0: 0,
-      x1: 2,
-      y1: -2,
-      line: {
-        color: 'rgba(252, 114, 2,0.4)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: -1,
-      y0: 0,
-      x1: 3,
-      y1: -4,
-      line: {
-        color: 'rgba(252, 114, 2,0.4)'
-      }
-    },
-		{
-      type: 'circle',
-      x0: -4,
-      y0: 0,
-      x1: 6,
-      y1: -10,
-      line: {
-        color: 'rgba(252, 114, 2,0.4)'
-      }
-    },
-	
-	
-	///SUSCEPTANCE CIRCLES
-	
-	{
-      type: 'circle',
-      x0: -1.1,
-      y0: 0,
-      x1: -0.9,
-      y1: 0.2,
-      line: {
-        color: 'rgba(255, 0, 250,0.2)'
-      }
-    },
+        type: 'circle',
+        x0: -1,
+        y0: -0.0909,
+        x1: -0.818,
+        y1: 0.0909,
+        line: {
+          color: color_admittance_real
+        }
+      },
+    
+    ///REACTANCE CIRCLES
+      {
+        type: 'circle',
+        x0: 0.9,
+        y0: 0,
+        x1: 1.1,
+        y1: 0.2,
+        line: {
+          color: color_resistance_imaginary
+        }
+      },
+      {
+        type: 'circle',
+        x0: 0.8,
+        y0: 0,
+        x1: 1.2,
+        y1: 0.4,
+        line: {
+          color: color_resistance_imaginary
+        }
+      },
+      {
+        type: 'circle',
+        x0: 0.5,
+        y0: 0,
+        x1: 1.5,
+        y1: 1,
+        line: {
+          color: color_resistance_imaginary
+        }
+      },
     {
-      type: 'circle',
-      x0: -1.2,
-      y0: 0,
-      x1: -0.8,
-      y1: 0.4,
-      line: {
-        color: 'rgba(255, 0, 250,0.2)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: -1.5,
-      y0: 0,
-      x1: -0.5,
-      y1: 1,
-      line: {
-        color: 'rgba(255, 0, 250,0.2)'
-      }
-    },
+        type: 'circle',
+        x0: 0,
+        y0: 0,
+        x1: 2,
+        y1: 2,
+        line: {
+          color: color_resistance_imaginary
+        }
+      },
     {
-      type: 'circle',
-      x0: -2,
-      y0: 0,
-      x1: -0,
-      y1: 2,
-      line: {
-        color: 'rgba(255, 0, 250,0.2)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: -3,
-      y0: 0,
-      x1: 1,
-      y1: 4,
-      line: {
-        color: 'rgba(255, 0, 250,0.2)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: -6,
-      y0: 0,
-      x1: 4,
-      y1: 10,
-      line: {
-        color: 'rgba(255, 0, 250,0.2)'
-      }
-    },
-	//negative
-	{
-      type: 'circle',
-      x0: -1.1,
-      y0: 0,
-      x1: -0.9,
-      y1: -0.2,
-      line: {
-        color: 'rgba(255, 0, 250,0.2)'
-      }
-    },
+        type: 'circle',
+        x0: -1,
+        y0: 0,
+        x1: 3,
+        y1: 4,
+        line: {
+          color: color_resistance_imaginary
+        }
+      },
     {
-      type: 'circle',
-      x0: -1.2,
-      y0: 0,
-      x1: -0.8,
-      y1: -0.4,
-      line: {
-        color: 'rgba(255, 0, 250,0.2)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: -1.5,
-      y0: 0,
-      x1: -0.5,
-      y1: -1,
-      line: {
-        color: 'rgba(255, 0, 250,0.2)'
-      }
-    },
+        type: 'circle',
+        x0: -4,
+        y0: 0,
+        x1: 6,
+        y1: 10,
+        line: {
+          color: color_resistance_imaginary
+        }
+      },
+    
+    //imaginary
+        {
+        type: 'circle',
+        x0: 0.9,
+        y0: 0,
+        x1: 1.1,
+        y1: -0.2,
+        line: {
+          color: color_resistance_imaginary
+        }
+      },
+      {
+        type: 'circle',
+        x0: 0.8,
+        y0: 0,
+        x1: 1.2,
+        y1: -0.4,
+        line: {
+          color: color_resistance_imaginary
+        }
+      },
     {
-      type: 'circle',
-      x0: -2,
-      y0: 0,
-      x1: -0,
-      y1: -2,
-      line: {
-        color: 'rgba(255, 0, 250,0.2)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: -3,
-      y0: 0,
-      x1: 1,
-      y1: -4,
-      line: {
-        color: 'rgba(255, 0, 250,0.2)'
-      }
-    },
-	{
-      type: 'circle',
-      x0: -6,
-      y0: 0,
-      x1: 4,
-      y1: -10,
-      line: {
-        color: 'rgba(255, 0, 250,0.2)'
-      }
-    },
-	 
-  ]
-};
+        type: 'circle',
+        x0: 0.5,
+        y0: 0,
+        x1: 1.5,
+        y1: -1,
+        line: {
+          color: color_resistance_imaginary
+        }
+      },
+      {
+        type: 'circle',
+        x0: 0,
+        y0: 0,
+        x1: 2,
+        y1: -2,
+        line: {
+          color: color_resistance_imaginary
+        }
+      },
+    {
+        type: 'circle',
+        x0: -1,
+        y0: 0,
+        x1: 3,
+        y1: -4,
+        line: {
+          color: color_resistance_imaginary
+        }
+      },
+      {
+        type: 'circle',
+        x0: -4,
+        y0: 0,
+        x1: 6,
+        y1: -10,
+        line: {
+          color: color_resistance_imaginary
+        }
+      },
+    
+    
+    ///SUSCEPTANCE CIRCLES
+    
+    {
+        type: 'circle',
+        x0: -1.1,
+        y0: 0,
+        x1: -0.9,
+        y1: 0.2,
+        line: {
+          color: color_admittance_imaginary
+        }
+      },
+      {
+        type: 'circle',
+        x0: -1.2,
+        y0: 0,
+        x1: -0.8,
+        y1: 0.4,
+        line: {
+          color: color_admittance_imaginary
+        }
+      },
+    {
+        type: 'circle',
+        x0: -1.5,
+        y0: 0,
+        x1: -0.5,
+        y1: 1,
+        line: {
+          color: color_admittance_imaginary
+        }
+      },
+      {
+        type: 'circle',
+        x0: -2,
+        y0: 0,
+        x1: -0,
+        y1: 2,
+        line: {
+          color: color_admittance_imaginary
+        }
+      },
+    {
+        type: 'circle',
+        x0: -3,
+        y0: 0,
+        x1: 1,
+        y1: 4,
+        line: {
+          color: color_admittance_imaginary
+        }
+      },
+    {
+        type: 'circle',
+        x0: -6,
+        y0: 0,
+        x1: 4,
+        y1: 10,
+        line: {
+          color: color_admittance_imaginary
+        }
+      },
+    //negative
+    {
+        type: 'circle',
+        x0: -1.1,
+        y0: 0,
+        x1: -0.9,
+        y1: -0.2,
+        line: {
+          color: color_admittance_imaginary
+        }
+      },
+      {
+        type: 'circle',
+        x0: -1.2,
+        y0: 0,
+        x1: -0.8,
+        y1: -0.4,
+        line: {
+          color: color_admittance_imaginary
+        }
+      },
+    {
+        type: 'circle',
+        x0: -1.5,
+        y0: 0,
+        x1: -0.5,
+        y1: -1,
+        line: {
+          color: color_admittance_imaginary
+        }
+      },
+      {
+        type: 'circle',
+        x0: -2,
+        y0: 0,
+        x1: -0,
+        y1: -2,
+        line: {
+          color: color_admittance_imaginary
+        }
+      },
+    {
+        type: 'circle',
+        x0: -3,
+        y0: 0,
+        x1: 1,
+        y1: -4,
+        line: {
+          color: color_admittance_imaginary
+        }
+      },
+    {
+        type: 'circle',
+        x0: -6,
+        y0: 0,
+        x1: 4,
+        y1: -10,
+        line: {
+          color: color_admittance_imaginary
+        }
+      },
+    
+    ]
+  return shapes;
+}
 
 var layout_polar = {
   showlegend: false,
@@ -1309,6 +1363,11 @@ function resize_fn(x) {
  // console.log("executing a resize");
 }
 
+///------ Items below are run at power up
+
+
+// var layout = configure_layout_shapes('colorful');
+
 //var size_gt_800 = window.matchMedia("(min-width: 800px)");
 var size_lt_800 = window.matchMedia("(max-width: 800px)");
 var size_lt_600 = window.matchMedia("(max-width: 600px)");
@@ -1321,5 +1380,6 @@ size_lt_600.addListener(resize_fn); // Attach listener function on state changes
 size_lt_400.addListener(resize_fn);
 size_lt_350.addListener(resize_fn);
 size_lt_300.addListener(resize_fn);
+
 
 update_smith_chart();
