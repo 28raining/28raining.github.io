@@ -1,0 +1,6 @@
+--- WILL ---
+
+# 1 - Create a plane
+# 2 - Create a board on the plane
+# 3 - Don't let the user rotate the whole way around.
+# 4 - GitHub and add Vlad

@@ -1,0 +1,129 @@
+<html>
+    <meta name='viewport' content='width=device-width'/>
+	<head>
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+			canvas { display: block; }
+		</style>
+	</head>
+	<body>
+        <div id="demo"></div>
+        <script src="js/three.js"></script>
+        <script src="js/OrbitControls.js"></script>
+		<script>
+			// SCENE
+            var scene = new THREE.Scene();
+ 
+// CAMERA
+var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+camera.position.set(6, 6, 2);
+camera.lookAt(0, 0, 0);
+
+scene_objects = [];
+// Materials
+var board_material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+var board_edge_material = new THREE.MeshBasicMaterial( {color: 0x1fff00, side: THREE.DoubleSide} );
+var ground_material = new THREE.MeshBasicMaterial( {color: 0x546800, side: THREE.DoubleSide} );
+
+// Create the board
+var board_top = new THREE.Geometry();
+//top surface
+board_top.vertices[0] = new THREE.Vector3(3, 0.2, -3); //br
+board_top.vertices[1] = new THREE.Vector3(-3, 0.2, -3); //bl
+board_top.vertices[2] = new THREE.Vector3(-3, 0.2, 3); //tl
+board_top.vertices[3] = new THREE.Vector3(3, 0.2, 3); //tr
+board_top.faces.push(
+    new THREE.Face3(0, 1, 2),
+    new THREE.Face3(2, 3, 0)
+)
+scene_objects.push(new THREE.Mesh( board_top, board_material ))
+
+var board_edges = new THREE.Geometry();
+//edges
+board_edges.vertices[0] = new THREE.Vector3(3, 0.2, -3); //br
+board_edges.vertices[1] = new THREE.Vector3(-3, 0.2, -3); //bl
+board_edges.vertices[2] = new THREE.Vector3(-3, 0.2, 3); //tl
+board_edges.vertices[3] = new THREE.Vector3(3, 0.2, 3); //tr
+board_edges.vertices[4] = new THREE.Vector3(3, 0.0, -3); //br
+board_edges.vertices[5] = new THREE.Vector3(-3, 0.0, -3); //bl
+board_edges.vertices[6] = new THREE.Vector3(-3, 0.0, 3); //tl
+board_edges.vertices[7] = new THREE.Vector3(3, 0.0, 3); //tr
+board_edges.faces.push(
+
+    new THREE.Face3(4, 0, 1),
+    new THREE.Face3(1, 5, 4),
+    new THREE.Face3(6, 2, 3),
+    new THREE.Face3(3, 7, 6),      
+    
+    new THREE.Face3(5, 1, 2),
+    new THREE.Face3(2, 6, 5),     
+    
+    new THREE.Face3(7, 3, 0),
+    new THREE.Face3(0, 4, 7),    
+
+)
+scene_objects.push(new THREE.Mesh( board_edges, board_edge_material ))
+
+// Create the ground plane on y=0
+var gnd = new THREE.Geometry();
+gnd.vertices[0] = new THREE.Vector3(10, 0, -10);
+gnd.vertices[1] = new THREE.Vector3(-10, 0, -10);
+gnd.vertices[2] = new THREE.Vector3(10, 0, 10);
+gnd.vertices[3] = new THREE.Vector3(-10, 0, 10);
+gnd.faces.push(
+    new THREE.Face3(0, 1, 2),
+    new THREE.Face3(3, 1, 2)
+)
+scene_objects.push(new THREE.Mesh( gnd, ground_material ))
+
+ 
+
+//Add everything to the scene
+for (i=0; i<scene_objects.length; i++) scene.add(scene_objects[i]);
+
+
+//Draw the axes to help speed up dev
+var axesHelper = new THREE.AxesHelper( 5 );
+scene.add( axesHelper );
+
+
+ // RENDER
+ var renderer = new THREE.WebGLRenderer();
+ renderer.setPixelRatio( window.devicePixelRatio );
+ renderer.setSize( window.innerWidth, window.innerHeight );
+ controls = new THREE.OrbitControls( camera, renderer.domElement );
+//  controls.maxZoom=0.5;
+ controls.minDistance=4.0;
+ controls.maxDistance=50.0;
+ controls.maxPolarAngle=4.0 * Math.PI / 10.0;
+ controls.minPolarAngle=1.0 * Math.PI / 10.0;
+ controls.update();
+ document.getElementById('demo').appendChild(renderer.domElement);
+//  renderer.render(scene, camera);
+
+controls.addEventListener( 'change', render );
+
+function render() {
+
+    renderer.render( scene, camera );
+
+}
+
+renderer.render( scene, camera );
+
+
+
+			// var animate = function () {
+			// 	requestAnimationFrame( animate );
+
+			// 	// cube.rotation.x += 0.01;
+			// 	// cube.rotation.y += 0.01;
+
+			// 	renderer.render( scene, camera );
+			// };
+
+			// animate();
+		</script>
+	</body>
+</html>
