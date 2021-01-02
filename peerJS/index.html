@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<script src="peerjs.min.js"></script>
+
+<body>
+  Welcome to homepage
+  <button onclick="doitconn()">Connect to other guy</button>
+  <input type="text" id="otherguysadd">
+</body>
+
+<script>
+  var peer = new Peer();
+  var listOfCons = [];
+
+  //Setting up the connections
+  function doitconn() {
+    var conn = peer.connect(document.getElementById('otherguysadd').value);
+    //Sending data too and thro
+    conn.on('open', function() {
+      // Receive messages
+      conn.on('data', function(data) {
+        console.log('Received', data);
+      });
+
+      // Send messages
+      conn.send('Hello!');
+    });
+  }
+
+  peer.on('open', function(id) {
+    console.log('My peer ID is: ' + id);
+  });
+
+  //I am the server...
+  peer.on('connection', function(conn) {
+      listOfCons.push(conn);
+      console.log(listOfCons);
+      //Sending data too and thro
+      conn.on('open', function() {
+        // Receive messages
+        conn.on('data', function(data) {
+          console.log('Received', data);
+        });
+
+        // Send messages
+        conn.send('Hello!');
+      });
+    console.log("somebody's tickling me!");
+  });
+
+</script>
+</html>
+
+
