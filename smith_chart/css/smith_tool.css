@@ -97,7 +97,6 @@ b {
 	margin: 0px;
 	display: block;
 	width:50%;
-	vertical-align: middle;
 	/* background-color: white; */
 }
 
@@ -284,7 +283,7 @@ h {
 }
 
 #feedback_title {
-	font-size: 1.8rem;
+	font-size: 1.6rem;
     line-height: 2rem;
     font-weight: 700;
     font-family: Montserrat;
@@ -424,6 +423,7 @@ input:checked + .slider:before {
 }
 #color_scheme {
 	height:34px;
+	margin-top: 35px;
 }
 #color_scheme p {
 	display:inline-block;

@@ -181,6 +181,25 @@ section {
     max-height: 400px;
 }
 
+table {
+    text-align: left;
+    margin:10px;
+    border: 1px solid;
+    border-color: #2C3E50;
+    border-collapse: collapse;
+    width:100%;
+}
+
+td, th {
+    border: 1px solid;
+    border-color: #2C3E50;
+    border-collapse: collapse;
+    padding:5px;
+}
+table button{
+    height:100%;
+    width:100%;
+}
 @media only screen and (max-width: 800px) {
 	section {
 		padding-left: 5px;

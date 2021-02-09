@@ -25,6 +25,41 @@ function toggle_color_scheme(){
   update_smith_chart();
 }
 
+function addCustomMarker() {
+  var real = document.getElementById('customMarkerRe').value;
+  var imaginary = document.getElementById('customMarkerIm').value;
+  if (real) {
+    real = Number(real);
+  } else real = 0;
+
+  if (imaginary) {
+    imaginary = Number(imaginary);
+  } else imaginary = 0;
+
+  customMarkers.push({re:real, im:imaginary});
+
+  update_smith_chart();
+
+  drawMakerTable();
+}
+
+function delCustomMarker(i) {
+  customMarkers.splice(i, 1);
+  update_smith_chart();
+  drawMakerTable();
+}
+
+function drawMakerTable() {
+  var table = document.getElementById("customMarkerTable");
+  inner = "<table><tr><th>Real</th><th>Imaginary</th><th width='100px'>Name</th><th width='100px'>add/remove</th></tr>"
+  inner += "<tr><td><input type='text' id='customMarkerRe'></td><td><input type='text' id='customMarkerIm'></td><td></td><td><button onclick=addCustomMarker()>add</button></td></tr>"
+  var i=0;
+  for (i=0; i<customMarkers.length; i++) {
+    inner += "<tr><td>"+ customMarkers[i].re +"</td><td>"+customMarkers[i].im+"</td><td>MP"+i+"</td><td><button onClick='delCustomMarker("+i+")')>Remove</button></td></tr>"
+  }
+  table.innerHTML = inner + "</table>";
+}
+
 function readFile (evt) {
 	var files = evt.target.files;
 	var file = files[0];           
@@ -79,6 +114,9 @@ function updatespan(this_id,this_val,element) {
   var span_resolution = 10;
   var fontsize=12;
   var color_of_smith_curves = "colorful";
+
+  //Add custom markers from the user, to help matching to exact impedances
+  var customMarkers = [];
   
   schematic.push({type:'raw', zo : 50, freq:2440, er : 1, freq_unit:{unit:'MHz',multiplier:1e6}, span:0.0, span_unit:{unit:'MHz',multiplier:1e6}});
   schematic.push({type:'bb',real:1,imaginary:0,abs:50,abs_bb_i:0,unit:'null'});
@@ -433,6 +471,17 @@ function update_smith_chart() {
       textbox_trace.push({x:[Number(sp_coord_x[span_impedance_re.length-1])+x_off],y:[Number(sp_coord_y[span_impedance_re.length-1])+y_off],text:["F+span"],mode:'text'});
   }
   //console.log(span_impedance_re,span_impedance_im,span_trace)
+
+  for (i=0; i<customMarkers.length; i++) {
+    sp_coord = find_smith_coord(customMarkers[i].re/zo,customMarkers[i].im/zo,false);
+    var x = Number(sp_coord[0]);
+    var y = Number(sp_coord[1]);
+    layout_shapes.push({type: "circle", line: {color: 'red'}, x0:x-0.01,y0:y-0.01,x1:x+0.01,y1:y+0.01});
+	  textbox_trace.push({x:[x+0.06],y:[y],text:["MP"+i],mode:'text'});
+  }
+  
+  // markers
+
 	
 	var data = trace.concat(textbox_trace,trace_im_neg,trace_im_pos,trace_real,trace_adm,trace_sus_pos,trace_sus_neg,span_trace);
 
@@ -886,7 +935,7 @@ var layout = {
 }
 
 function configure_layout_shapes() {
-  console.log(color_of_smith_curves);
+  // console.log(color_of_smith_curves);
   if (color_of_smith_curves == 'bland') {
     color_resistance_real = 'rgba(255, 0, 0, 0.2)';
     color_resistance_imaginary = 'rgba(255, 0, 0,0.3)';
@@ -1383,3 +1432,4 @@ size_lt_300.addListener(resize_fn);
 
 
 update_smith_chart();
+drawMakerTable();
