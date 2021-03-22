@@ -40,22 +40,32 @@ function addCustomMarker() {
 
   update_smith_chart();
 
-  drawMakerTable();
 }
 
 function delCustomMarker(i) {
   customMarkers.splice(i, 1);
   update_smith_chart();
-  drawMakerTable();
 }
 
+//Draw a couple of tables in the HTML page
+//#1 - Custom impedances that the user has added
+//#2 - Impedance at each Data Point (DP)
 function drawMakerTable() {
   var table = document.getElementById("customMarkerTable");
-  inner = "<table><tr><th>Real</th><th>Imaginary</th><th width='100px'>Name</th><th width='100px'>add/remove</th></tr>"
+  var inner = "<table><tr><th>Real</th><th>Imaginary</th><th width='100px'>Name</th><th width='100px'>add/remove</th></tr>"
   inner += "<tr><td><input type='text' id='customMarkerRe'></td><td><input type='text' id='customMarkerIm'></td><td></td><td><button onclick=addCustomMarker()>add</button></td></tr>"
   var i=0;
   for (i=0; i<customMarkers.length; i++) {
     inner += "<tr><td>"+ customMarkers[i].re +"</td><td>"+customMarkers[i].im+"</td><td>MP"+i+"</td><td><button onClick='delCustomMarker("+i+")')>Remove</button></td></tr>"
+  }
+  table.innerHTML = inner + "</table>";
+
+
+  //#2nd table
+  table = document.getElementById("DPImpedance");
+  inner = "<table><tr><th>Data Point (DP)</th><th>Real</th><th>Imaginary</th></tr>"
+  for (i=0; i<dataPoints.length; i++) {
+    inner += "<tr><td>"+(i+1)+"</td><td>"+ dataPoints[i].re +"</td><td>"+dataPoints[i].im+"</td></tr>"
   }
   table.innerHTML = inner + "</table>";
 }
@@ -100,13 +110,15 @@ function updatespan(this_id,this_val,element) {
 }
 
   var schematic = [];
+  var dataPoints = [];
+  var vswr=0.0;
   var zo=50;
 	//var freq_multiplier=1e6;
 	//var span_multiplier=1e6;
   var is_active=[];
   var precision=3;
-  var start_x_coord=0;
-  var start_y_coord=0;
+  // var start_x_coord=0;
+  // var start_y_coord=0;
  //var end_x_coord=0.0;
  // var end_y_coord=0.0;
 //var real_old,imag_old=0.0;
@@ -276,6 +288,9 @@ function update_smith_chart() {
 	document.getElementById("schematic").appendChild(point_div);*/
 	var real_old = 0.0;
   var imag_old = 0.0;
+  var x;
+  var y;
+  var x0,x1,y0,y1;
   
   //update black box
   update_schem_component(freq,true,1)
@@ -285,7 +300,8 @@ function update_smith_chart() {
 		span_impedance_re[i] = Number(schematic[1].real);
 		span_impedance_im[i] = Number(schematic[1].imaginary);
   }    
-		
+	
+  dataPoints = [];
 	for (var i = 2; i < schematic.length; i++) {
 		//Add the arc to the smith chart
         for (sp = 0; sp <= 2*span_res; sp++) {
@@ -308,6 +324,8 @@ function update_smith_chart() {
 
             var temp_trace = {}
             var x_points, y_points;
+            var start=[];
+            var start_impedance=[];
 
             if ((schematic[i].type=='ss') || (schematic[i].type=='so')) {
               //if the stub is longer than 0.5 waves then there is a full circle. Trim to 1 wave so user can see if there are multiple loops
@@ -316,7 +334,9 @@ function update_smith_chart() {
               //for "ss" matching, can't assume that we start at 0 length
               if (ln_length<(0.5*wave_length)) var start_at_qtr_wl = wave_length/4;
               else start_at_qtr_wl = 0;
-              var start = one_over_complex(span_impedance_re[sp],span_impedance_im[sp]);
+              start_impedance[0]=span_impedance_re[sp];
+              start_impedance[1]=span_impedance_im[sp];
+              start = one_over_complex(span_impedance_re[sp],span_impedance_im[sp]);
               var temp_array = arc_smith_points(start[0],start[1],ln_length,schematic[i].line_zo,schematic[i].type,true,2*Math.PI*frequency_at_sp*Math.sqrt(schematic[0].er)/3e8,start_at_qtr_wl);
               var schem_inv = one_over_complex(temp_array[4],temp_array[5]);
               span_impedance_re[sp] = schem_inv[0];
@@ -324,7 +344,9 @@ function update_smith_chart() {
 
             } else if (schematic[i].type[0]=='p') {
               //For parallel elements plotted on rotated graph....
-              var start = one_over_complex(span_impedance_re[sp],span_impedance_im[sp]);
+              start_impedance[0]=span_impedance_re[sp];
+              start_impedance[1]=span_impedance_im[sp];
+              start = one_over_complex(span_impedance_re[sp],span_impedance_im[sp]);
               var schem_inv = one_over_complex(re,im);
               var temp_array = arc_smith_points(start[0],start[1],start[0]+schem_inv[0],start[1]+schem_inv[1],schematic[i].type,true);
               var schem_inv = one_over_complex(start[0]+schem_inv[0],start[1]+schem_inv[1]);
@@ -332,11 +354,15 @@ function update_smith_chart() {
               span_impedance_im[sp] = schem_inv[1];
             } else if ((schematic[i].type[0]=='s') || (schematic[i].type[0]=='b')) {
               //For series elements plotted on normal curves....
+              start_impedance[0] = span_impedance_re[sp];
+              start_impedance[1] = span_impedance_im[sp];
               var temp_array = arc_smith_points(span_impedance_re[sp],span_impedance_im[sp],re+span_impedance_re[sp],im+span_impedance_im[sp],"impedance",false);
               span_impedance_re[sp] = span_impedance_re[sp] + re;
               span_impedance_im[sp] = span_impedance_im[sp] + im;
             } else if (schematic[i].type=='tl') {
               //For transmission lines...
+              start_impedance[0] = span_impedance_re[sp];
+              start_impedance[1] = span_impedance_im[sp];
               var temp_array = arc_smith_points(span_impedance_re[sp],span_impedance_im[sp],ln_length,schematic[i].line_zo,"transmission_line",false,2*Math.PI*frequency_at_sp*Math.sqrt(schematic[0].er)/3e8);
               span_impedance_re[sp] = temp_array[4];
               span_impedance_im[sp] = temp_array[5];
@@ -349,7 +375,9 @@ function update_smith_chart() {
                 end_x_coord=temp_array[2];
                 end_y_coord=temp_array[3];
                 real_old = span_impedance_re[sp];
-                imag_old = span_impedance_im[sp]
+                imag_old = span_impedance_im[sp];
+                var start_x_coord = temp_array[6];
+                var start_y_coord = temp_array[7];
                 temp_trace = {
                     x: x_points,
                     y: y_points,
@@ -363,6 +391,7 @@ function update_smith_chart() {
                 trace[i-2]=temp_trace;
             
                 //add a data point rectangle to the smith chart
+                dataPoints.push({'re': (zo*Number(start_impedance[0])).toPrecision(3), 'im': (zo*Number(start_impedance[1])).toPrecision(3)});
                 layout_shapes.push({type: "rectangle", x0:Number(start_x_coord)-0.01,y0:Number(start_y_coord)-0.01,x1:Number(start_x_coord)+0.01,y1:Number(start_y_coord)+0.01});
                 textbox_trace.push({x:[Number(start_x_coord)+0.04],y:[Number(start_y_coord)-0.03],text:["DP"+(i-1)],mode:'text'});
             }
@@ -370,9 +399,9 @@ function update_smith_chart() {
         draw_schematic(i);
 	}
 	
-  var temp_array = []
   //If only the black box exists...
 	if (schematic.length == 2) {
+    temp_array = []
     temp_array = find_smith_coord(schematic[1].real,schematic[1].imaginary,false);
     real_old = schematic[1].real;
     imag_old = schematic[1].imaginary;
@@ -383,6 +412,7 @@ function update_smith_chart() {
 
   
     //Create rectangles indicating end data points
+  dataPoints.push({'re': (zo*Number(real_old)).toPrecision(3), 'im': (zo*Number(imag_old)).toPrecision(3)});
 	layout_shapes.push({type: "rectangle", x0:Number(end_x_coord)-0.01,y0:Number(end_y_coord)-0.01,x1:Number(end_x_coord)+0.01,y1:Number(end_y_coord)+0.01});
 	textbox_trace.push({x:[Number(end_x_coord)+0.04],y:[Number(end_y_coord)-0.03],text:["DP"+(i-1)],mode:'text'});
 
@@ -472,16 +502,29 @@ function update_smith_chart() {
   }
   //console.log(span_impedance_re,span_impedance_im,span_trace)
 
+  //Add custom markers so user can specify specific impedances which they could aim for
   for (i=0; i<customMarkers.length; i++) {
     sp_coord = find_smith_coord(customMarkers[i].re/zo,customMarkers[i].im/zo,false);
-    var x = Number(sp_coord[0]);
-    var y = Number(sp_coord[1]);
+    x = Number(sp_coord[0]);
+    y = Number(sp_coord[1]);
     layout_shapes.push({type: "circle", line: {color: 'red'}, x0:x-0.01,y0:y-0.01,x1:x+0.01,y1:y+0.01});
 	  textbox_trace.push({x:[x+0.06],y:[y],text:["MP"+i],mode:'text'});
   }
   
-  // markers
-
+  //Add a VSWR circle, which is a new circle centered in the middle of the Smith Chart, with radius defined by VSWR
+  if (vswr != 0.0) {
+    //get coord of middle of smith chart (could search in the code but I'm lazy)
+    center_coord = find_smith_coord(1,0,false);
+    //get the radius of the VSWR 
+    vswr_rad = find_smith_coord(vswr,0,false);
+    x0 = 2*Number(center_coord[0]) - Number(vswr_rad[0]);
+    x1 = Number(vswr_rad[0]);
+    y0 = Number(vswr_rad[0]);
+    y1 = 2*Number(center_coord[1])-Number(vswr_rad[0]);
+    if (color_of_smith_curves == 'colorful') var vswr_color = 'lime'
+    else var vswr_color = 'green';
+    layout_shapes.push({type: "circle", line: {color: vswr_color}, x0:x0,y0:y0,x1:x1,y1:y1});
+  }
 	
 	var data = trace.concat(textbox_trace,trace_im_neg,trace_im_pos,trace_real,trace_adm,trace_sus_pos,trace_sus_neg,span_trace);
 
@@ -524,6 +567,8 @@ function update_smith_chart() {
   Plotly.newPlot('PolarPlot', data_polar, layout_polar, {staticPlot: true})
   
 
+  //update the HTML tables
+  drawMakerTable();
 
 
 }
@@ -721,7 +766,7 @@ function define_labels () {
 	trace_adm = {
 	  x: [0.53,0.26,-0.07,-0.4,-0.74,-0.88],
 	  y: [-0.03,-0.03,-0.03,-0.03,-0.03,-0.03,-0.03],
-	  text: ["<b>"+(1000/5/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
+	  text: ["<b>"+(1000/4/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
 	  mode: 'text',
 	  textfont: {
       color: color_adm,
@@ -753,6 +798,7 @@ function define_labels () {
 }
 
 //function intersectTwoCircles(x1,y1,r1, x2,y2,r2) {
+// Finds the intersection between two circles, one with magnitude 'real', the other with 'imaginary'
 function find_smith_coord(real,imaginary,rotate) {
 
   //to prevent divide by zero errors...
@@ -818,7 +864,7 @@ function find_smith_coord(real,imaginary,rotate) {
 
   return [ix, iy];
 }
-
+//plots an arc with 'resolution' points between previous impedance x1,y1 and next impedance x2,y2
 function arc_smith_points(x1,y1,x2,y2,type,rotate,beta,start_at_qtr_wl) {
 	
 	var x_coord=[];
@@ -827,8 +873,8 @@ function arc_smith_points(x1,y1,x2,y2,type,rotate,beta,start_at_qtr_wl) {
   var end_y_coord = 0;
 	var temp_array=[];
 	temp_array=find_smith_coord(x1, y1,rotate);
-	start_x_coord=temp_array[0];
-  start_y_coord=temp_array[1];
+	var start_x_coord=temp_array[0];
+  var start_y_coord=temp_array[1];
   var real_old = 0;
   var imag_old = 0;
   var tan_beta=0;
@@ -891,7 +937,7 @@ function arc_smith_points(x1,y1,x2,y2,type,rotate,beta,start_at_qtr_wl) {
   end_x_coord=temp_array[0];
   end_y_coord=temp_array[1];
 	
-	return [x_coord,y_coord,end_x_coord,end_y_coord,real_old,imag_old];
+	return [x_coord,y_coord,end_x_coord,end_y_coord,real_old,imag_old,start_x_coord,start_y_coord,x1,y1,x2,y2];
 }
 
 function download_state() {
