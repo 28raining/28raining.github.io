@@ -28,6 +28,8 @@ function toggle_color_scheme(){
 var show_labels_DP=true;
 var show_labels_adm=true;
 var show_labels_res=true;
+var show_circles_adm=true;
+var show_circles_res=true;
 
 function toggle_labels_DP() {
   show_labels_DP = !show_labels_DP;
@@ -41,6 +43,16 @@ function toggle_labels_imag() {
 
 function toggle_labels_real() {
   show_labels_res = !show_labels_res;
+  update_smith_chart();
+}
+
+function toggle_circles_adm() {
+  show_circles_adm = !show_circles_adm;
+  update_smith_chart();
+}
+
+function toggle_circles_res() {
+  show_circles_res = !show_circles_res;
   update_smith_chart();
 }
 
@@ -1039,7 +1051,7 @@ function configure_layout_shapes() {
     color_admittance_imaginary = 'rgba(0, 10, 163,0.3)'; 
   }  
   
-  var shapes = [
+  var shapes_res = [
     
     ///RESISTANCE CIRCLES
       {
@@ -1052,7 +1064,7 @@ function configure_layout_shapes() {
           color: color_resistance_real
         }
       },
-    {
+      {
         type: 'circle',
         x0: -0.666,
         y0: -0.833,
@@ -1062,7 +1074,7 @@ function configure_layout_shapes() {
           color: color_resistance_real
         }
       },
-    {
+      {
         type: 'circle',
         x0: -0.333,
         y0: -0.666,
@@ -1092,7 +1104,7 @@ function configure_layout_shapes() {
           color: color_resistance_real
         }
       },
-    {
+      {
         type: 'circle',
         x0: 0.6,
         y0: -0.2,
@@ -1102,7 +1114,7 @@ function configure_layout_shapes() {
           color: color_resistance_real
         }
       },
-    {
+      {
         type: 'circle',
         x0: 0.818,
         y0: -0.0909,
@@ -1111,11 +1123,13 @@ function configure_layout_shapes() {
         line: {
           color: color_resistance_real
         }
-      },
+      }
+    ];
     
     
     ///ADMITTANCE CIRCLES
-    {
+    var shapes_adm = [
+      {
         type: 'circle',
         x0: 0.6,
         y0: -0.8,
@@ -1125,7 +1139,7 @@ function configure_layout_shapes() {
           color: color_admittance_real
         }
       },
-    {
+      {
         type: 'circle',
         x0: 0.333,
         y0: -0.666,
@@ -1135,7 +1149,7 @@ function configure_layout_shapes() {
           color: color_admittance_real
         }
       },
-    {
+      {
         type: 'circle',
         x0: -1,
         y0: -0.5,
@@ -1155,7 +1169,7 @@ function configure_layout_shapes() {
           color: color_admittance_real
         }
       },
-    {
+      {
         type: 'circle',
         x0: -1,
         y0: -0.166,
@@ -1165,7 +1179,7 @@ function configure_layout_shapes() {
           color: color_admittance_real
         }
       },
-    {
+      {
         type: 'circle',
         x0: -1,
         y0: -0.0909,
@@ -1175,8 +1189,10 @@ function configure_layout_shapes() {
           color: color_admittance_real
         }
       },
+    ];
     
     ///REACTANCE CIRCLES
+    var shapes_rea = [
       {
         type: 'circle',
         x0: 0.9,
@@ -1207,7 +1223,7 @@ function configure_layout_shapes() {
           color: color_resistance_imaginary
         }
       },
-    {
+      {
         type: 'circle',
         x0: 0,
         y0: 0,
@@ -1217,7 +1233,7 @@ function configure_layout_shapes() {
           color: color_resistance_imaginary
         }
       },
-    {
+      {
         type: 'circle',
         x0: -1,
         y0: 0,
@@ -1227,7 +1243,7 @@ function configure_layout_shapes() {
           color: color_resistance_imaginary
         }
       },
-    {
+      {
         type: 'circle',
         x0: -4,
         y0: 0,
@@ -1239,7 +1255,7 @@ function configure_layout_shapes() {
       },
     
     //imaginary
-        {
+      {
         type: 'circle',
         x0: 0.9,
         y0: 0,
@@ -1259,7 +1275,7 @@ function configure_layout_shapes() {
           color: color_resistance_imaginary
         }
       },
-    {
+      {
         type: 'circle',
         x0: 0.5,
         y0: 0,
@@ -1279,7 +1295,7 @@ function configure_layout_shapes() {
           color: color_resistance_imaginary
         }
       },
-    {
+      {
         type: 'circle',
         x0: -1,
         y0: 0,
@@ -1298,12 +1314,14 @@ function configure_layout_shapes() {
         line: {
           color: color_resistance_imaginary
         }
-      },
+      }
+    ];
+      
     
     
     ///SUSCEPTANCE CIRCLES
-    
-    {
+    var shapes_sus = [
+      {
         type: 'circle',
         x0: -1.1,
         y0: 0,
@@ -1323,7 +1341,7 @@ function configure_layout_shapes() {
           color: color_admittance_imaginary
         }
       },
-    {
+      {
         type: 'circle',
         x0: -1.5,
         y0: 0,
@@ -1343,7 +1361,7 @@ function configure_layout_shapes() {
           color: color_admittance_imaginary
         }
       },
-    {
+      {
         type: 'circle',
         x0: -3,
         y0: 0,
@@ -1353,7 +1371,7 @@ function configure_layout_shapes() {
           color: color_admittance_imaginary
         }
       },
-    {
+      {
         type: 'circle',
         x0: -6,
         y0: 0,
@@ -1364,7 +1382,7 @@ function configure_layout_shapes() {
         }
       },
     //negative
-    {
+      {
         type: 'circle',
         x0: -1.1,
         y0: 0,
@@ -1384,7 +1402,7 @@ function configure_layout_shapes() {
           color: color_admittance_imaginary
         }
       },
-    {
+      {
         type: 'circle',
         x0: -1.5,
         y0: 0,
@@ -1404,7 +1422,7 @@ function configure_layout_shapes() {
           color: color_admittance_imaginary
         }
       },
-    {
+      {
         type: 'circle',
         x0: -3,
         y0: 0,
@@ -1414,7 +1432,7 @@ function configure_layout_shapes() {
           color: color_admittance_imaginary
         }
       },
-    {
+      {
         type: 'circle',
         x0: -6,
         y0: 0,
@@ -1425,7 +1443,13 @@ function configure_layout_shapes() {
         }
       },
     
-    ]
+    ];
+  if (!show_circles_adm) shapes_adm = []
+  if (!show_circles_adm) shapes_sus = []
+  if (!show_circles_res) shapes_res = []
+  if (!show_circles_res) shapes_rea = []
+
+  var shapes = [].concat(shapes_res, shapes_sus, shapes_rea, shapes_adm);
   return shapes;
 }
 
