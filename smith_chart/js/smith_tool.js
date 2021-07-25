@@ -1051,19 +1051,22 @@ function configure_layout_shapes() {
     color_admittance_imaginary = 'rgba(0, 10, 163,0.3)'; 
   }  
   
+  var shapes_omni = [
+    {
+      type: 'circle',
+      x0: -1,
+      y0: -1,
+      x1: 1,
+      y1: 1,
+      line: {
+        color: color_resistance_real
+      }
+    },
+  ];
+
   var shapes_res = [
     
     ///RESISTANCE CIRCLES
-      {
-        type: 'circle',
-        x0: -1,
-        y0: -1,
-        x1: 1,
-        y1: 1,
-        line: {
-          color: color_resistance_real
-        }
-      },
       {
         type: 'circle',
         x0: -0.666,
@@ -1449,7 +1452,7 @@ function configure_layout_shapes() {
   if (!show_circles_res) shapes_res = []
   if (!show_circles_res) shapes_rea = []
 
-  var shapes = [].concat(shapes_res, shapes_sus, shapes_rea, shapes_adm);
+  var shapes = [].concat(shapes_res, shapes_sus, shapes_rea, shapes_adm, shapes_omni);
   return shapes;
 }
 
