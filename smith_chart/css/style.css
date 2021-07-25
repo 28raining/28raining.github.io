@@ -21,7 +21,7 @@ nav {
 
     font-weight: 700;
     font-family: 'Montserrat';
-	background-color: #2C3E50;
+	background-color: rgb(37, 50, 64);
     text-transform: uppercase;
 	color: #fff;
 	
@@ -31,8 +31,10 @@ nav {
 }
 
 section {
-	background-color: #18BC9C;
-    color: #fff;
+	/*OLD background-color: #18BC9C;
+    color: #fff; */
+	background-color: rgb(184, 255, 241);
+    color: rgb(37, 50, 64);
     margin-bottom: 0;
     display: block;
     width: 100%;

@@ -127,10 +127,14 @@
 				<span>Reflection Coefficient:</span>
 				<span id="current_reflection_mag"></span>
 			</div>
+			<div class="global_inputs">
+				<span>VSWR:</span>
+				<span id="vswr_live"></span>
+			</div>
 
 
 	<div id="schematic-picker">
-			<div class="schematic-title">Click below to add</div>
+			<div class="schematic-title">Click below to add a component to your system</div>
 			<!--<div class="cell-picker-text">
 				<b class="star-light arrow fa-1x"></b><b>Click to add</b><b class="star-light arrow fa-1x"></b>
 			</div>--><div class="cell cell_w_hover" onclick="clicked_cell('sc')">
@@ -160,6 +164,15 @@
 		<div class="hollow_holder">
 			<div id="hollowed_circle"></div>
 		</div>
+	</div>
+
+	<div id="hide_labels_DP">
+		<label>Show label: DP</label>
+		<input type="checkbox" class="label_checkbox" checked onchange=toggle_labels_DP()>
+		<label>Show label: adm</label>
+		<input type="checkbox" class="label_checkbox" checked onchange=toggle_labels_imag()>
+		<label>Show label: res</label>
+		<input type="checkbox" class="label_checkbox" checked onchange=toggle_labels_real()>
 	</div>
 
 	<h3>Reflection Coefficient plotted on a polar axes:</h3>
@@ -193,7 +206,7 @@
 		</label>
 	</div>
 
-		<div id="feedback_title">Please leave some feedback!</div>
+		<div id="feedback_title">Let me know of any issues or requests!</div>
 
 		<div id="disqus_thread"></div>
 		<script>
@@ -220,7 +233,7 @@
 	
     
       <div class="container"><div class="copyright">
-        Copyright &copy; Will Kelsey 2021. www.will-kelsey.com/smith_chart
+        Copyright &copy; Will Kelsey 2021. www.will-kelsey.com/smith_chart. Hosted by GitHub pages here -> https://github.com/28raining/28raining.github.io/tree/master/smith_chart
         
       </div>
     </div>

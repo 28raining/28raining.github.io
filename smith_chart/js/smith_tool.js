@@ -7,9 +7,9 @@ function expo(x, f) {
 
 function toggle_color_scheme(){
   if (document.getElementsByTagName('section')[0].style["background-color"] == "white"){
-    document.getElementsByTagName('section')[0].style["background-color"] = "rgb(24, 188, 156)";
-    document.getElementsByTagName('section')[0].style.color = "white";
-    document.getElementById('hollowed_circle').style["boxShadow"] = "0px 0px 0px 2000px rgb(24, 188, 156)";
+    document.getElementsByTagName('section')[0].style["background-color"] = "rgb(184, 255, 241)";  
+    document.getElementsByTagName('section')[0].style.color = "rgb(37, 50, 64)";
+    document.getElementById('hollowed_circle').style["boxShadow"] = "0px 0px 0px 2000px rgb(184, 255, 241)";
   } else {
     document.getElementsByTagName('section')[0].style["background-color"] = "white";
     document.getElementsByTagName('section')[0].style.color = "black";
@@ -22,6 +22,25 @@ function toggle_color_scheme(){
     color_of_smith_curves = 'bland'; 
   }
 
+  update_smith_chart();
+}
+
+var show_labels_DP=true;
+var show_labels_adm=true;
+var show_labels_res=true;
+
+function toggle_labels_DP() {
+  show_labels_DP = !show_labels_DP;
+  update_smith_chart();
+}
+
+function toggle_labels_imag() {
+  show_labels_adm = !show_labels_adm;
+  update_smith_chart();
+}
+
+function toggle_labels_real() {
+  show_labels_res = !show_labels_res;
   update_smith_chart();
 }
 
@@ -392,8 +411,10 @@ function update_smith_chart() {
             
                 //add a data point rectangle to the smith chart
                 dataPoints.push({'re': (zo*Number(start_impedance[0])).toPrecision(3), 'im': (zo*Number(start_impedance[1])).toPrecision(3)});
-                layout_shapes.push({type: "rectangle", x0:Number(start_x_coord)-0.01,y0:Number(start_y_coord)-0.01,x1:Number(start_x_coord)+0.01,y1:Number(start_y_coord)+0.01});
-                textbox_trace.push({x:[Number(start_x_coord)+0.04],y:[Number(start_y_coord)-0.03],text:["DP"+(i-1)],mode:'text'});
+                if (show_labels_DP) {
+                  layout_shapes.push({type: "rectangle", x0:Number(start_x_coord)-0.01,y0:Number(start_y_coord)-0.01,x1:Number(start_x_coord)+0.01,y1:Number(start_y_coord)+0.01});
+                  textbox_trace.push({x:[Number(start_x_coord)+0.04],y:[Number(start_y_coord)-0.03],text:["DP"+(i-1)],mode:'text'});
+                }
             }
         }
         draw_schematic(i);
@@ -413,8 +434,10 @@ function update_smith_chart() {
   
     //Create rectangles indicating end data points
   dataPoints.push({'re': (zo*Number(real_old)).toPrecision(3), 'im': (zo*Number(imag_old)).toPrecision(3)});
-	layout_shapes.push({type: "rectangle", x0:Number(end_x_coord)-0.01,y0:Number(end_y_coord)-0.01,x1:Number(end_x_coord)+0.01,y1:Number(end_y_coord)+0.01});
-	textbox_trace.push({x:[Number(end_x_coord)+0.04],y:[Number(end_y_coord)-0.03],text:["DP"+(i-1)],mode:'text'});
+  if (show_labels_DP) {
+    layout_shapes.push({type: "rectangle", x0:Number(end_x_coord)-0.01,y0:Number(end_y_coord)-0.01,x1:Number(end_x_coord)+0.01,y1:Number(end_y_coord)+0.01});
+    textbox_trace.push({x:[Number(end_x_coord)+0.04],y:[Number(end_y_coord)-0.03],text:["DP"+(i-1)],mode:'text'});
+  }
 
   //Update the impedance box
 	document.getElementById("current_impedance").innerHTML = "<div class=\"text_box\">"+(real_old*zo).toPrecision(3)+"</div>";
@@ -446,14 +469,21 @@ function update_smith_chart() {
 	
 	//plot reflection coefficient magnitude
   //console.log(reflectio_coeff_imag,reflectio_coeff_real);
-  var reflection_mag = Math.sqrt((reflectio_coeff_real*reflectio_coeff_real)+(reflectio_coeff_imag*reflectio_coeff_imag)).toPrecision(3);
-	document.getElementById("current_reflection_mag").innerHTML = "<div class=\"text_box\">"+reflection_mag+"</div>";
+  var reflection_mag = Math.sqrt(reflectio_coeff_real*reflectio_coeff_real)+(reflectio_coeff_imag*reflectio_coeff_imag)
+	document.getElementById("current_reflection_mag").innerHTML = "<div class=\"text_box\">"+reflection_mag.toPrecision(3)+"</div>";
   document.getElementById("current_reflection_mag").innerHTML += "<div class=\"text_box\">&ang;</div>";
   if (reflectio_coeff_real == 0)  var reflection_phase = 0;
   else  var reflection_phase = 360*Math.atan(reflectio_coeff_imag/reflectio_coeff_real)/(2*Math.PI);
   if (reflectio_coeff_real < 0) reflection_phase += 180;
 	document.getElementById("current_reflection_mag").innerHTML += "<div class=\"text_box\">"+(reflection_phase).toPrecision(3) + "&deg; </div>";
 	
+  //calculate VSWR (1+r) / (1-r)
+  console.log(reflection_mag);
+  var vswr_live = (1+reflection_mag)/(1-reflection_mag);
+  console.log(vswr_live);
+  document.getElementById("vswr_live").innerHTML = "<div class=\"text_box\">"+vswr_live.toPrecision(3)+"</div>"; 
+
+
 	//redefine the labels in case zo has changed
 	define_labels();
 
@@ -494,11 +524,12 @@ function update_smith_chart() {
       if (Number(sp_coord_x[0]) < Number(sp_coord_x[1])) x_off = 0.03;
       else x_off = -0.03;
       //draw a data box at each end of the span curve
-      layout_shapes.push({type: "rectangle", x0:Number(sp_coord_x[0])-0.01,y0:Number(sp_coord_y[0])-0.01,x1:Number(sp_coord_x[0])+0.01,y1:Number(sp_coord_y[0])+0.01});
-      textbox_trace.push({x:[Number(sp_coord_x[0])-x_off],y:[Number(sp_coord_y[0])-y_off],text:["F-span"],mode:'text'});
 
-      layout_shapes.push({type: "rectangle", x0:Number(sp_coord_x[span_impedance_re.length-1])-0.01,y0:Number(sp_coord_y[span_impedance_re.length-1])-0.01,x1:Number(sp_coord_x[span_impedance_re.length-1])+0.01,y1:Number(sp_coord_y[span_impedance_re.length-1])+0.01});
-      textbox_trace.push({x:[Number(sp_coord_x[span_impedance_re.length-1])+x_off],y:[Number(sp_coord_y[span_impedance_re.length-1])+y_off],text:["F+span"],mode:'text'});
+        layout_shapes.push({type: "rectangle", x0:Number(sp_coord_x[0])-0.01,y0:Number(sp_coord_y[0])-0.01,x1:Number(sp_coord_x[0])+0.01,y1:Number(sp_coord_y[0])+0.01});
+        textbox_trace.push({x:[Number(sp_coord_x[0])-x_off],y:[Number(sp_coord_y[0])-y_off],text:["F-span"],mode:'text'});
+  
+        layout_shapes.push({type: "rectangle", x0:Number(sp_coord_x[span_impedance_re.length-1])-0.01,y0:Number(sp_coord_y[span_impedance_re.length-1])-0.01,x1:Number(sp_coord_x[span_impedance_re.length-1])+0.01,y1:Number(sp_coord_y[span_impedance_re.length-1])+0.01});
+        textbox_trace.push({x:[Number(sp_coord_x[span_impedance_re.length-1])+x_off],y:[Number(sp_coord_y[span_impedance_re.length-1])+y_off],text:["F+span"],mode:'text'});  
   }
   //console.log(span_impedance_re,span_impedance_im,span_trace)
 
@@ -669,7 +700,7 @@ function draw_schematic(i) {
         var dropdown_menu = "<div class=\"abs_box\"><input type=\"text\" value="+schematic[i].abs+" onchange=\"update_schem_abs("+i+",this,'abs')\"></input>";
         if (schematic[i].type=='bb') {
             var divclass = 'complex_box';
-            dropdown_menu += "<input type=\"text\" value="+schematic[i].abs_bb_i+" onchange=\"update_schem_abs("+i+",this,'abs_bb_i')\"></input>j";
+            dropdown_menu += "<input type=\"text\" value="+schematic[i].abs_bb_i+" onchange=\"update_schem_abs("+i+",this,'abs_bb_i')\"></input> j";
         } else {
             var divclass = 'complex_box_wide';
             //Add units selector
@@ -712,9 +743,16 @@ function draw_schematic(i) {
 
 }
 
-var trace_im_neg,trace_real,trace_adm,trace_sus_pos,trace_sus_neg = {};
+var trace_im_neg,trace_im_pos,trace_real,trace_adm,trace_sus_pos,trace_sus_neg = {};
 
 function define_labels () {
+
+  trace_im_neg = {};
+  trace_im_pos ={};
+  trace_real={}; 
+  trace_adm ={}; 
+  trace_sus_pos={};
+  trace_sus_neg = {};
 
   // console.log(color_of_smith_curves);
   if (color_of_smith_curves == 'bland') {
@@ -729,72 +767,79 @@ function define_labels () {
     color_sus = 'rgba(255, 0, 250,0.3)';
   }
 
- 
-	trace_im_pos = {
-	  x: [0.95,0.9,0.63,0.05,-0.54,-0.86],
-	  y: [0.14,0.33,0.73,0.95,0.8,0.4],
-	  text: ["<b>"+10*zo+"</b>","<b>"+5*zo+"</b>","<b>"+2*zo+"</b>","<b>"+1*zo+"</b>","<b>"+0.5*zo+"</b>","<b>"+0.2*zo+"</b>"],
-	  mode: 'text',
-	  textfont: {
-      color: color_im,
-      size:fontsize
-	  }
-	};
+  if (show_labels_res) {
+    trace_im_pos = {
+      x: [0.95,0.9,0.63,0.05,-0.54,-0.86],
+      y: [0.14,0.33,0.73,0.95,0.8,0.4],
+      text: ["<b>"+10*zo+"</b>","<b>"+5*zo+"</b>","<b>"+2*zo+"</b>","<b>"+1*zo+"</b>","<b>"+0.5*zo+"</b>","<b>"+0.2*zo+"</b>"],
+      mode: 'text',
+      textfont: {
+        color: color_im,
+        size:fontsize
+      }
+    };
 
-	trace_im_neg = {
-	  x: [0.95,0.9,0.63,0.05,-0.54,-0.86],
-	  y: [-0.14,-0.33,-0.73,-0.95,-0.8,-0.4],
-	  text: ["<b>"+10*zo+"</b>","<b>"+5*zo+"</b>","<b>"+2*zo+"</b>","<b>"+1*zo+"</b>","<b>"+0.5*zo+"</b>","<b>"+0.2*zo+"</b>"],
-	  mode: 'text',
-	  textfont: {
-      color: color_im,
-      size:fontsize
-	  }
-	};
+    trace_im_neg = {
+      x: [0.95,0.9,0.63,0.05,-0.54,-0.86],
+      y: [-0.14,-0.33,-0.73,-0.95,-0.8,-0.4],
+      text: ["<b>"+10*zo+"</b>","<b>"+5*zo+"</b>","<b>"+2*zo+"</b>","<b>"+1*zo+"</b>","<b>"+0.5*zo+"</b>","<b>"+0.2*zo+"</b>"],
+      mode: 'text',
+      textfont: {
+        color: color_im,
+        size:fontsize
+      }
+    };
+  }
 
-	trace_real = {
-	  x: [0.96,0.88,0.66,0.38,0.05,-0.29,-0.62,-0.98],
-	  y: [0.03,0.03,0.03,0.03,0.03,0.03,0.03,0.03,0.03],
-	  text: ["<b>∞</b>","<b>"+10*zo+"</b>","<b>"+4*zo+"</b>","<b>"+2*zo+"</b>","<b>"+1*zo+"</b>","<b>"+0.5*zo+"</b>","<b>"+0.2*zo+"</b>","<b>0</b>"],
-	  mode: 'text',
-	  textfont: {
-      color: color_real,
-      size:fontsize
-	  }
-	};
+  if (show_labels_res) {
 
-	trace_adm = {
-	  x: [0.53,0.26,-0.07,-0.4,-0.74,-0.88],
-	  y: [-0.03,-0.03,-0.03,-0.03,-0.03,-0.03,-0.03],
-	  text: ["<b>"+(1000/4/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
-	  mode: 'text',
-	  textfont: {
-      color: color_adm,
-      size:fontsize
-	  }
-	};
+    trace_real = {
+      x: [0.96,0.88,0.66,0.38,0.05,-0.29,-0.62,-0.98],
+      y: [0.03,0.03,0.03,0.03,0.03,0.03,0.03,0.03,0.03],
+      text: ["<b>∞</b>","<b>"+10*zo+"</b>","<b>"+4*zo+"</b>","<b>"+2*zo+"</b>","<b>"+1*zo+"</b>","<b>"+0.5*zo+"</b>","<b>"+0.2*zo+"</b>","<b>0</b>"],
+      mode: 'text',
+      textfont: {
+        color: color_real,
+        size:fontsize
+      }
+    };
+  }
+  if (show_labels_adm) {
+    trace_adm = {
+      x: [0.53,0.26,-0.07,-0.4,-0.74,-0.88],
+      y: [-0.03,-0.03,-0.03,-0.03,-0.03,-0.03,-0.03],
+      text: ["<b>"+(1000/4/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
+      mode: 'text',
+      textfont: {
+        color: color_adm,
+        size:fontsize
+      }
+    };
+  }
 
-	trace_sus_pos = {
-	  x: [0.86,0.53,-0.07,-0.62,-0.89,-0.92],
-	  y: [0.4,0.79,0.97,0.72,0.31,0.15],
-	  text: ["<b>"+(1000/5/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
-	  mode: 'text',
-	  textfont: {
-      color: color_sus,
-      size:fontsize
-	  }
-	};
+  if (show_labels_adm) {
+    trace_sus_pos = {
+      x: [0.86,0.53,-0.07,-0.62,-0.89,-0.92],
+      y: [0.4,0.79,0.97,0.72,0.31,0.15],
+      text: ["<b>"+(1000/5/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
+      mode: 'text',
+      textfont: {
+        color: color_sus,
+        size:fontsize
+      }
+    };
 
-	trace_sus_neg = {
-	  x: [0.86,0.53,-0.07,-0.62,-0.89,-0.92],
-	  y: [-0.4,-0.79,-0.97,-0.72,-0.31,-0.15],
-	  text: ["<b>"+(1000/5/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
-	  mode: 'text',
-	  textfont: {
-      color: color_sus,
-      size:fontsize
-	  }
-	};
+    trace_sus_neg = {
+      x: [0.86,0.53,-0.07,-0.62,-0.89,-0.92],
+      y: [-0.4,-0.79,-0.97,-0.72,-0.31,-0.15],
+      text: ["<b>"+(1000/5/zo).toPrecision(3)+"</b>m","<b>"+(1000/2/zo).toPrecision(3)+"</b>m","<b>"+(1000/zo).toPrecision(3)+"</b>m","<b>"+(1000*2/zo).toPrecision(3)+"</b>m","<b>"+(1000*5/zo).toPrecision(3)+"</b>m","<b>"+(1000*10/zo).toPrecision(3)+"</b>m"],
+      mode: 'text',
+      textfont: {
+        color: color_sus,
+        size:fontsize
+      }
+    };
+  }
 }
 
 //function intersectTwoCircles(x1,y1,r1, x2,y2,r2) {
@@ -1476,6 +1521,6 @@ size_lt_400.addListener(resize_fn);
 size_lt_350.addListener(resize_fn);
 size_lt_300.addListener(resize_fn);
 
-
+//functions that are run at startup
 update_smith_chart();
 drawMakerTable();

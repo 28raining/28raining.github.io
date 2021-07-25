@@ -1,3 +1,8 @@
+.label_checkbox {
+	height:12px;
+	margin-right: 10px;
+}
+
 .schematic-title {
 	font-weight:bold;
 	border:2px;
@@ -30,17 +35,18 @@
 }
 #schematic-picker {
 	position:relative;
-	border-top:3px;
+	/*border-top:3px;*/
 	/*padding-bottom:5px;*/
-	border-top-style: solid;
+	/*border-top-style: solid;*/
 	border-bottom-style: solid;
 	border-color: #2C3E50;
+	margin-top: 20px;
 }
 
 #schematic {
 	position: relative;
 	padding:5px;
-	
+	margin-top: 10px;
 }
 
 #schematic .cell {
@@ -225,7 +231,7 @@ input, .complex_box, .complex_box_wide {
     left:0px; top:0px;
     border-radius:100%;
     width:100%; height:100%;
-		box-shadow: 0px 0px 0px 2000px #18BC9C;
+		box-shadow: 0px 0px 0px 2000px rgb(184, 255, 241);
 		margin:0 auto;
     overflow:hidden;
 }
@@ -283,7 +289,7 @@ h {
 }
 
 #feedback_title {
-	font-size: 1.6rem;
+	font-size: 1.3rem;
     line-height: 2rem;
     font-weight: 700;
     font-family: Montserrat;
