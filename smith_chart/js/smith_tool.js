@@ -481,7 +481,7 @@ function update_smith_chart() {
 	
 	//plot reflection coefficient magnitude
   //console.log(reflectio_coeff_imag,reflectio_coeff_real);
-  var reflection_mag = Math.sqrt(reflectio_coeff_real*reflectio_coeff_real)+(reflectio_coeff_imag*reflectio_coeff_imag)
+  var reflection_mag = Math.sqrt((reflectio_coeff_real*reflectio_coeff_real)+(reflectio_coeff_imag*reflectio_coeff_imag));
 	document.getElementById("current_reflection_mag").innerHTML = "<div class=\"text_box\">"+reflection_mag.toPrecision(3)+"</div>";
   document.getElementById("current_reflection_mag").innerHTML += "<div class=\"text_box\">&ang;</div>";
   if (reflectio_coeff_real == 0)  var reflection_phase = 0;
