@@ -861,7 +861,7 @@ function draw_schematic(i) {
     }
     //div.innerHTML = "<p>"+sch_label+"</p>";
     // div.innerHTML += "<img src=\"icons/"+sch_icon+".png\" alt="+sch_label+">";
-    innerText += '<div class="row"><svg viewBox="'+sch_svg+' 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt='+sch_label+' /></svg></div>';
+    innerText += '<div class="row"><svg viewBox="'+sch_svg+' 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="'+sch_label+'" /></svg></div>';
 
     var cntR, cntC, ittUnit, boxType, varSelect, unitIndex;
     var absCounter = 0;
