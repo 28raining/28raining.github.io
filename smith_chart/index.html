@@ -82,8 +82,8 @@
 					<p> This free online interactive Smith chart tool is a calculator which can help you design matching networks and obtain maximum power transfer between your source and load. This tool is javascript so it works on Windows, Mac, IOS, Android... or any device with a web browser </p>
 				</div>
 				<div class="row">
-					<div class="col">
-						<div class="input-group flex-nowrap mb-2">
+					<div class="col-lg">
+						<div class="input-group mb-2">
 							<span class="input-group-text inputGroupmw">Operational Frequency</span>
 							<input type="number"  class="form-control" value="2440" id="freq" onchange="updateFromDom();">
 							<select class="form-select" id="freq_sel" onchange="updateFromDom()">
@@ -95,8 +95,8 @@
 							</select>
 						</div>
 					</div>
-					<div class="col">
-						<div class="input-group flex-nowrap mb-2">
+					<div class="col-lg">
+						<div class="input-group mb-2">
 							<span class="input-group-text inputGroupmw">Frequency span (&#8723)</span>
 							<input type="number" value="0" id="span" class="form-control" onchange="updateFromDom();">
 							<select class="form-select" id="span_sel" onchange="updateFromDom()">
@@ -110,105 +110,103 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col">
-						<div class="input-group flex-nowrap mb-2">
+					<div class="col-lg">
+						<div class="input-group mb-2">
 							<span class="input-group-text inputGroupmw">Characteristic Impedance</span>
 							<input type="number" value="50" id="zo" class="form-control" onchange="updateFromDom();">
 							<span class="input-group-text">Ω</span>
 						</div>
 					</div>
-					<div class="col">
-						<div class="input-group flex-nowrap mb-2">
+					<div class="col-lg">
+						<div class="input-group mb-2">
 							<span class="input-group-text inputGroupmw">Permitivity e<small>eff (note all λ=C/f&radic;e<small>eff</small></small>)</span>
 							<input type="number" value="1" id="er" class="form-control" onchange="updateFromDom();">
 						</div>
 					</div>
 				</div>
 				<div class="row mt-3">
-					<div class="col">
-						<div class="input-group flex-nowrap mb-2">
+					<div class="col-lg">
+						<div class="input-group mb-2">
 							<span class="input-group-text inputGroupmw">Impedance</span>
 							<output  id="current_impedance" class="form-control bg-navy text-white">
 						</div>
 					</div>
-					<div class="col">
-						<div class="input-group flex-nowrap mb-2">
+					<div class="col-lg">
+						<div class="input-group mb-2">
 							<span class="input-group-text inputGroupmw">Admittance</span>
 							<output  id="current_admittance" class="form-control bg-navy text-white">
 						</div>
 					</div>
 				</div>
 				<div class="row">
-					<div class="col">
-						<div class="input-group flex-nowrap mb-2">
+					<div class="col-lg">
+						<div class="input-group mb-2">
 							<span class="input-group-text inputGroupmw">Reflection Coefficient</span>
 							<output  id="current_reflection" class="form-control bg-navy text-white">
 						</div>
 					</div>
-					<div class="col">
-						<div class="input-group flex-nowrap mb-2">
+					<div class="col-lg">
+						<div class="input-group mb-2">
 							<span class="input-group-text inputGroupmw">Reflection Coefficient</span>
 							<output  id="current_reflection_mag" class="form-control bg-navy text-white">
 						</div>
 					</div>
 				</div>
 				<div class="row">
-					<div class="col">
-						<div class="input-group flex-nowrap mb-2 ">
+					<div class="col-lg-6">
+						<div class="input-group mb-2 ">
 							<span class="input-group-text inputGroupmw">VSWR</span>
 							<output  id="vswr_live" class="form-control bg-navy text-white">
 						</div>
 					</div>
-					<div class="col">
-					</div>
 				</div>
 				<div class="row text-center mt-3"><strong>Click below to add a component to your system</strong></div>
 				<div class="row g-0">
-					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('sc')">
+					<div class="col-6 col-lg-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('sc')">
 						<p class="m-0">Series Capacitor</p>
 						<svg viewBox="1000 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Series Capacitor" /></svg>
 					</div>
-					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('pc')">
+					<div class="col-6 col-lg-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('pc')">
 						<p class="m-0">Parallel Capacitor</p>
 						<svg viewBox="500 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Parallel Capacitor" /></svg>
 					</div>
-					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('si')">
+					<div class="col-6 col-lg-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('si')">
 						<p class="m-0">Series Inductor</p>
 						<svg viewBox="2000 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Series Inductor" /></svg>
 					</div>
-					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('pi')">
+					<div class="col-6 col-lg-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('pi')">
 						<p class="m-0">Parallel Inductor</p>
 						<svg viewBox="1500 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Parallel Inductor" /></svg>
 					</div>
-					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('sr')">
+					<div class="col-6 col-lg-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('sr')">
 						<p class="m-0">Series Resistor</p>
 						<svg viewBox="3000 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Series Resistor" /></svg>
 					</div>
-					<div class="col-2 schemHover text-center border-top border-bottom border-dark" onclick="clicked_cell('pr')">
+					<div class="col-6 col-lg-2 schemHover text-center border-top border-bottom border-dark" onclick="clicked_cell('pr')">
 						<p class="m-0">Parallel Resistor</p>
 						<svg viewBox="2500 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Parallel Resistor" /></svg>
 					</div>
-					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('tl')">
+					<div class="col-6 col-lg-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('tl')">
 						<p class="m-0">Transmission Line</p>
 						<svg viewBox="3500 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Transmission Line" /></svg>
 					</div>
-					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('so')">
+					<div class="col-6 col-lg-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('so')">
 						<p class="m-0">Open Stub</p>
 						<svg viewBox="4000 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Open Stub" /></svg>
 					</div>
-					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('ss')">
+					<div class="col-6 col-lg-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('ss')">
 						<p class="m-0">Shorted Stub</p>
 						<svg viewBox="4500 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Open Stub" /></svg>
 					</div>
-					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('rc')">
+					<div class="col-6 col-lg-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('rc')">
 						<p class="m-0">Capacitor w/ ESR</p>
 						<svg viewBox="5000 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Capacitor w/ESR" /></svg>
 					</div>
-					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('rl')">
+					<div class="col-6 col-lg-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('rl')">
 						<p class="m-0">Inductor w/ ESR</p>
 						<svg viewBox="5500 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Inductor w/ESR" /></svg>
 					</div>
-					<div class="col-2 schemHover text-center border-top border-bottom border-dark" onclick="clicked_cell('rlc')">
+					<div class="col-6 col-lg-2 schemHover text-center border-top border-bottom border-dark" onclick="clicked_cell('rlc')">
 						<p class="m-0">RLC</p>
 						<svg viewBox="6000 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="RLC" /></svg>
 					</div>
@@ -223,15 +221,15 @@
 
 				<div id="schematic" class="row"></div>
 
-				<div class="row mt-2">
-					<div class="col-2"></div>
-					<div class="col p-0" id="smith_chart">
+				<div class="row mt-2 justify-content-center">
+					<!-- <div class="col-2"></div> -->
+					<div class="col-lg-8 p-0" id="smith_chart">
 							<div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
 							<div class="hollow_holder">
 								<div id="hollowed_circle"></div>
 							</div>
 						</div>
-					<div class="col-2"></div>
+					<!-- <div class="col-2"></div> -->
 				</div>
 
 
@@ -270,7 +268,7 @@
 				</div>
 
 				<div class="row mt-4">
-					<div class="col-6">
+					<div class="col-lg-6">
 						<div class="row text-center"><h4 class="mb-0">Reflection Coefficient plotted on a polar axes</h4></div>
 						<div class="row">
 							<div id="smith_polar">
@@ -279,7 +277,7 @@
 						</div>
 					</div>
 
-					<div class="col-6">
+					<div class="col-lg-6">
 						<div class="row text-center"><h4 class="mb-0"><small>VSWR (coming soon)</small></h4></div>
 					</div>
 

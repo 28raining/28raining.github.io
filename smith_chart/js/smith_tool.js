@@ -651,7 +651,10 @@ function update_smith_chart() {
     yaxis:layout.yaxis,
     shapes:layout.shapes.concat(layout_shapes)
   };
-	Plotly.react('myDiv', data, PlLayout);	
+  var config = {
+    displayModeBar: false, // this is the line that hides the bar.
+  };
+	Plotly.react('myDiv', data, PlLayout, config);	
   
 
 
@@ -689,7 +692,7 @@ function update_smith_chart() {
   var polarWidth = document.getElementById("smith_polar").offsetWidth
   layout_polar.width = polarWidth;
   layout_polar.height = polarWidth;
-  Plotly.react('PolarPlot', data_polar, layout_polar)
+  Plotly.react('PolarPlot', data_polar, layout_polar, config)
   
 
   //update the HTML tables
@@ -717,7 +720,7 @@ function draw_schematic(i) {
     //Add the element to the schematic view
     var div = document.createElement("div");
     unit=[];
-    div.setAttribute('class', 'col-2 g-0');
+    div.setAttribute('class', 'col-6 col-lg-2 g-0');
     //Add a close button, but can't remove black boxes...
     var innerText = ""
     // if (schematic[i].type!='bb') div.innerHTML += "<div class=\"rem\" onclick=\"schematic.splice("+i+",1); update_smith_chart()\"><div class=\"dp_txt\">DP"+i+"</div><div class=\"close-button\"></div></div>";

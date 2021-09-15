@@ -12,10 +12,6 @@
   cursor: pointer;
 }
 
-.inputGroupmw {
-  min-width:270px
-}
-
 .hollow_holder,
 .myDiv {
   width: 100%;
@@ -43,4 +39,14 @@
 #smith_chart{
   position: relative;
   margin:0 auto;
+}
+
+.inputGroupmw {
+  min-width:270px
+}
+
+@media only screen and (max-width: 992px) {
+    .inputGroupmw {
+      min-width:0px
+    }
 }
