@@ -1,0 +1,22 @@
+<svg width="122px" height="125px" viewBox="0 0 122 125" xmlns="http://www.w3.org/2000/svg">
+   <g>
+<line x1="60" y1="0" x2="0" y2="0" stroke="black" stroke-linecap="round" />
+<line x1="0" y1="44" x2="120" y2="44" stroke="black" stroke-linecap="round" />
+<line x1="56" y1="56" x2="56" y2="44" stroke="black" stroke-linecap="round" />
+<line x1="72" y1="58" x2="56" y2="56" stroke="black" stroke-linecap="round" />
+<line x1="40" y1="62" x2="72" y2="58" stroke="black" stroke-linecap="round" />
+<line x1="72" y1="66" x2="40" y2="62" stroke="black" stroke-linecap="round" />
+<line x1="40" y1="70" x2="72" y2="66" stroke="black" stroke-linecap="round" />
+<line x1="72" y1="74" x2="40" y2="70" stroke="black" stroke-linecap="round" />
+<line x1="40" y1="78" x2="72" y2="74" stroke="black" stroke-linecap="round" />
+<line x1="72" y1="82" x2="40" y2="78" stroke="black" stroke-linecap="round" />
+<line x1="72" y1="82" x2="56" y2="84" stroke="black" stroke-linecap="round" />
+<line x1="56" y1="92" x2="56" y2="84" stroke="black" stroke-linecap="round" />
+<line x1="24" y1="92" x2="88" y2="92" stroke="black" stroke-linecap="round" />
+<line x1="24" y1="98" x2="88" y2="98" stroke="black" stroke-linecap="round" />
+<line x1="56" y1="110" x2="56" y2="98" stroke="black" stroke-linecap="round" />
+<line x1="44" y1="110" x2="68" y2="110" stroke="black" stroke-linecap="round" />
+<line x1="48" y1="112" x2="64" y2="112" stroke="black" stroke-linecap="round" />
+<line x1="52" y1="114" x2="60" y2="114" stroke="black" stroke-linecap="round" />
+   </g>
+</svg>

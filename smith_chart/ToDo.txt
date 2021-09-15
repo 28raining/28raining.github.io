@@ -1,0 +1,17 @@
+1 - Add R-C, R-L and L-C shunt
+  1a - draw a nice looking R-C. Use 100x100 SVG grid. stroke-withd 3, stroke-linecap="round"
+  1b - Switch to Bootstrap 5 because the selects are horrendous. Use row and column layout...
+  1c - Update to new ploty and use react instead of newplot
+2 - Add VSWR graph
+3 - Auto-T matching
+4 - fix download, don't use that complex file
+4a - Output text boxes to have a gray background
+5 - If cap is 0, don't crash, or at least do a toast
+6 - test input labels same width
+7 - redraw smith chart after resize
+
+- Plants
+- Plant pot redesign and reprint
+- swim?
+
+-- make rc have 3 unit scalers. Create the imaginary and real val

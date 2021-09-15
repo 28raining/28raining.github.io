@@ -26,7 +26,7 @@
 
 .cell {
 	display: inline-block;
-	width: 11%;
+	width: 16.666%;
 	border-right-style: solid;
 	border-bottom-style: dashed;
 	border-width:1px;
@@ -438,6 +438,11 @@ input:checked + .slider:before {
 	margin-top:9px;
 	margin-right:10px;
 }
+
+#hide_labels_DP {
+	padding-top: 1rem;
+}
+
 
 @media only screen and (max-width: 1150px) {
 	.cell {

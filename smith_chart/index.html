@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
   <head>
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -25,229 +24,372 @@
 
 
     <!-- Custom fonts for this template -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css"> -->
 
     <!-- Custom styles for this template -->
-    <link href="css/freelancer.css" rel="stylesheet">
+    <!-- <link href="css/freelancer.css" rel="stylesheet">
     <link href="css/smith_tool.css" rel="stylesheet">
 		<link href="css/style.css" rel="stylesheet">
-		<link href="css/css_close_button.css" rel="stylesheet">
+		<link href="css/css_close_button.css" rel="stylesheet"> -->
 
-	<script>if(typeof window.Int16Array !== 'function')document.write("<scri"+"pt src='extras/typedarray.min.js'></scr"+"ipt>");</script>
-	<script>document.write("<scri"+"pt src='extras/request_animation_frame.js'></scr"+"ipt>");</script>
+	<!-- <script>if(typeof window.Int16Array !== 'function')document.write("<scri"+"pt src='extras/typedarray.min.js'></scr"+"ipt>");</script>
+	<script>document.write("<scri"+"pt src='extras/request_animation_frame.js'></scr"+"ipt>");</script> -->
   <script src="download-master/download.min.js"></script>
-	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-	<!--<script src="js/plotly.min.js"></script>-->
+	<script src="https://cdn.plot.ly/plotly-2.4.2.min.js"></script>
+	<!-- <script src="js/plotly-2.4.2.min.js"></script> -->
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.26.29/dist/sweetalert2.all.min.js"></script>
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+	<link href="css/newStyle.css" rel="stylesheet">
 
   </head>
 
   <body id="page-top">
 
-    <!-- Navigation -->
-    <nav>
-      <div class="container">
-	    	<div class="wdk_container">
-        	Online Smith Chart Tool
-				</div>
+    <!-- Navigation -->     
+
+		<div class="w-100 p-3 bg-navy text-white">
+			<div class="container-xl">
+				<div class="row">
+					<div class="col-10">
+	    			<h4 class="mb-0"><strong>ONLINE SMITH CHART TOOL</strong></h4>
+					</div>
+					<div class="col-1">
+						<!-- Download BUTTON -->
+						<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16" onclick="download_state()" style="cursor: pointer;">
+							<path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+							<path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+						</svg>
+						</div>
+						<div class="col-1">
+							<!-- UPLOAD BUTTON -->
+						<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16"  data-bs-toggle="modal" data-bs-target="#uploadModal" style="cursor: pointer;">
+							<path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+							<path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+						</svg>
+      		</div>
+      	</div>
       </div>
-    </nav>
+    </div>
 
     <!-- About Section -->
-    <section>
-			<div class="wdk_container">
-			<div class="trans"></div>
-			<!-- <h2 class="text-center text-uppercase text-white">About</h2> -->
-			<p> This free online interactive Smith chart tool is a calculator which can help you design matching networks and obtain maximum power transfer between your source and load. This tool is javascript so it works on Windows, Mac, IOS, Android... or any device with a web browser </p>
-	
-			<div class="trans"></div>
-			<div class="global_inputs">
-				<span>Operational Frequency</span>
-				<span>
-					<input type="number" value="2440" id="freq" onchange="schematic[0].freq=Number(this.value); update_smith_chart();">
-					<div id="freq_sel" class="wrapper-dropdown-5" tabindex="1" onclick="change_class(this.id)">
-						<div>MHz</div>
-						<ul class="dropdown">
-							<li onclick="updatespan(parentElement.parentElement.id,'Hz','freq_unit')"><a href="#">Hz</a></li>
-							<li onclick="updatespan(parentElement.parentElement.id,'KHz','freq_unit')"><a href="#">KHz</a></li>
-							<li onclick="updatespan(parentElement.parentElement.id,'MHz','freq_unit')"><a href="#">MHz</a></li>
-							<li onclick="updatespan(parentElement.parentElement.id,'GHz','freq_unit')"><a href="#">GHz</a></li>
-							<li onclick="updatespan(parentElement.parentElement.id,'THz','freq_unit')"><a href="#">THz</a></li>
-						</ul>
+		<div class="w-100 p-3 bg-green" id="mainSection">
+			<div class="container-xl">
+				<div class="row">
+					<p> This free online interactive Smith chart tool is a calculator which can help you design matching networks and obtain maximum power transfer between your source and load. This tool is javascript so it works on Windows, Mac, IOS, Android... or any device with a web browser </p>
+				</div>
+				<div class="row">
+					<div class="col">
+						<div class="input-group flex-nowrap mb-2">
+							<span class="input-group-text inputGroupmw">Operational Frequency</span>
+							<input type="number"  class="form-control" value="2440" id="freq" onchange="updateFromDom();">
+							<select class="form-select" id="freq_sel" onchange="updateFromDom()">
+								<option value='Hz'>Hz</option>
+								<option value='KHz'>KHz</option>
+								<option value='MHz' selected>MHz</option>
+								<option value='GHz'>GHz</option>
+								<option value='THz'>THz</option>
+							</select>
+						</div>
 					</div>
-				</span>
-			</div>
-			<div class="global_inputs">
-				<span>Frequency span (&#8723)</span>
-				<span>
-					<input type="number" value="0" id="span" onchange="schematic[0].span=Number(this.value); update_smith_chart();">
-					<div id="span_sel" class="wrapper-dropdown-5" tabindex="1" onclick="change_class(this.id)">
-						<div>MHz</div>
-						<ul class="dropdown">
-							<li onclick="updatespan(parentElement.parentElement.id,'Hz','span_unit')"><a href="#">Hz</a></li>
-							<li onclick="updatespan(parentElement.parentElement.id,'KHz','span_unit')"><a href="#">KHz</a></li>
-							<li onclick="updatespan(parentElement.parentElement.id,'MHz','span_unit')"><a href="#">MHz</a></li>
-							<li onclick="updatespan(parentElement.parentElement.id,'GHz','span_unit')"><a href="#">GHz</a></li>
-							<li onclick="updatespan(parentElement.parentElement.id,'THz','span_unit')"><a href="#">THz</a></li>
-						</ul>
+					<div class="col">
+						<div class="input-group flex-nowrap mb-2">
+							<span class="input-group-text inputGroupmw">Frequency span (&#8723)</span>
+							<input type="number" value="0" id="span" class="form-control" onchange="updateFromDom();">
+							<select class="form-select" id="span_sel" onchange="updateFromDom()">
+								<option value='Hz'>Hz</option>
+								<option value='KHz'>KHz</option>
+								<option value='MHz' selected>MHz</option>
+								<option value='GHz'>GHz</option>
+								<option value='THz'>THz</option>
+							</select>
+						</div>
 					</div>
-				</span>
-			</div>
-			<div class="global_inputs">
-				<span>Characteristic Impedance</span>
-				<span><input type="number" value="50" id="zo" onchange="zo=Number(this.value); schematic[0].zo=Number(this.value); update_smith_chart();"><div class="ohms">Ω</div></span>
-			</div>
-			<div class="global_inputs">
-				<span>Permitivity e<sub>eff (note all λ=C/f&radic;e<sub>eff</sub>)</span>
-				<span><input type="number" value="1" id="er" onchange="schematic[0].er=Number(this.value); update_smith_chart();"></span>
-			</div>
-			<div class="global_inputs">
-				<span>Download this state</span>
-				<span><button class="button_block" onclick="download_state()">Download schematic</button></span>
-			</div>
-			<div class="global_inputs">
-				<span>Upload previous state</span>
-				<span><input class="button_block upload" type="file" id="file" name="file"/></span>
-			</div>
-			<div class="global_inputs">
-				<span>Impedance:</span>
-				<span id="current_impedance"></span>
-			</div>
-			<div class="global_inputs">
-					<span>Admittance:</span>
-					<span id="current_admittance"></span>
-			</div>
-			<div class="global_inputs">
-				<span>Reflection Coefficient:</span>
-				<span id="current_reflection"></span>
-			</div>
-			<div class="global_inputs">
-				<span>Reflection Coefficient:</span>
-				<span id="current_reflection_mag"></span>
-			</div>
-			<div class="global_inputs">
-				<span>VSWR:</span>
-				<span id="vswr_live"></span>
-			</div>
+				</div>
+				<div class="row">
+					<div class="col">
+						<div class="input-group flex-nowrap mb-2">
+							<span class="input-group-text inputGroupmw">Characteristic Impedance</span>
+							<input type="number" value="50" id="zo" class="form-control" onchange="updateFromDom();">
+							<span class="input-group-text">Ω</span>
+						</div>
+					</div>
+					<div class="col">
+						<div class="input-group flex-nowrap mb-2">
+							<span class="input-group-text inputGroupmw">Permitivity e<small>eff (note all λ=C/f&radic;e<small>eff</small></small>)</span>
+							<input type="number" value="1" id="er" class="form-control" onchange="updateFromDom();">
+						</div>
+					</div>
+				</div>
+				<div class="row mt-3">
+					<div class="col">
+						<div class="input-group flex-nowrap mb-2">
+							<span class="input-group-text inputGroupmw">Impedance</span>
+							<output  id="current_impedance" class="form-control bg-navy text-white">
+						</div>
+					</div>
+					<div class="col">
+						<div class="input-group flex-nowrap mb-2">
+							<span class="input-group-text inputGroupmw">Admittance</span>
+							<output  id="current_admittance" class="form-control bg-navy text-white">
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col">
+						<div class="input-group flex-nowrap mb-2">
+							<span class="input-group-text inputGroupmw">Reflection Coefficient</span>
+							<output  id="current_reflection" class="form-control bg-navy text-white">
+						</div>
+					</div>
+					<div class="col">
+						<div class="input-group flex-nowrap mb-2">
+							<span class="input-group-text inputGroupmw">Reflection Coefficient</span>
+							<output  id="current_reflection_mag" class="form-control bg-navy text-white">
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col">
+						<div class="input-group flex-nowrap mb-2 ">
+							<span class="input-group-text inputGroupmw">VSWR</span>
+							<output  id="vswr_live" class="form-control bg-navy text-white">
+						</div>
+					</div>
+					<div class="col">
+					</div>
+				</div>
+				<div class="row text-center mt-3"><strong>Click below to add a component to your system</strong></div>
+				<div class="row g-0">
+					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('sc')">
+						<p class="m-0">Series Capacitor</p>
+						<svg viewBox="1000 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Series Capacitor" /></svg>
+					</div>
+					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('pc')">
+						<p class="m-0">Parallel Capacitor</p>
+						<svg viewBox="500 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Parallel Capacitor" /></svg>
+					</div>
+					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('si')">
+						<p class="m-0">Series Inductor</p>
+						<svg viewBox="2000 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Series Inductor" /></svg>
+					</div>
+					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('pi')">
+						<p class="m-0">Parallel Inductor</p>
+						<svg viewBox="1500 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Parallel Inductor" /></svg>
+					</div>
+					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('sr')">
+						<p class="m-0">Series Resistor</p>
+						<svg viewBox="3000 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Series Resistor" /></svg>
+					</div>
+					<div class="col-2 schemHover text-center border-top border-bottom border-dark" onclick="clicked_cell('pr')">
+						<p class="m-0">Parallel Resistor</p>
+						<svg viewBox="2500 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Parallel Resistor" /></svg>
+					</div>
+					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('tl')">
+						<p class="m-0">Transmission Line</p>
+						<svg viewBox="3500 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Transmission Line" /></svg>
+					</div>
+					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('so')">
+						<p class="m-0">Open Stub</p>
+						<svg viewBox="4000 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Open Stub" /></svg>
+					</div>
+					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('ss')">
+						<p class="m-0">Shorted Stub</p>
+						<svg viewBox="4500 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Open Stub" /></svg>
+					</div>
+					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('rc')">
+						<p class="m-0">Capacitor w/ ESR</p>
+						<svg viewBox="5000 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Capacitor w/ESR" /></svg>
+					</div>
+					<div class="col-2 schemHover text-center border-top border-bottom border-end border-dark" onclick="clicked_cell('rl')">
+						<p class="m-0">Inductor w/ ESR</p>
+						<svg viewBox="5500 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="Inductor w/ESR" /></svg>
+					</div>
+					<div class="col-2 schemHover text-center border-top border-bottom border-dark" onclick="clicked_cell('rlc')">
+						<p class="m-0">RLC</p>
+						<svg viewBox="6000 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="RLC" /></svg>
+					</div>
+
+				</div>
+
+				<div class="row pt-3">
+					<div class="col text-center">
+						Below is your system, note impedance is looking towards the BLACK BOX
+					</div>
+				</div>
+
+				<div id="schematic" class="row"></div>
+
+				<div class="row mt-2">
+					<div class="col-2"></div>
+					<div class="col p-0" id="smith_chart">
+							<div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
+							<div class="hollow_holder">
+								<div id="hollowed_circle"></div>
+							</div>
+						</div>
+					<div class="col-2"></div>
+				</div>
 
 
-	<div id="schematic-picker">
-			<div class="schematic-title">Click below to add a component to your system</div>
-			<!--<div class="cell-picker-text">
-				<b class="star-light arrow fa-1x"></b><b>Click to add</b><b class="star-light arrow fa-1x"></b>
-			</div>--><div class="cell cell_w_hover" onclick="clicked_cell('sc')">
-				<p>Series Capacitor</p><img src="icons/capacitor_series.png" alt="Series Capacitor">
-			</div><div class="cell cell_w_hover" onclick="clicked_cell('pc')">
-				<p>Parallel Capacitor</p><img src="icons/capacitor_parallel.png" alt="Parallel Capacitor">
-			</div><div class="cell cell_w_hover" onclick="clicked_cell('si')">
-				<p>Series Inductor</p><img src="icons/inductor_series.png" alt="Series Inductor">
-			</div><div class="cell cell_w_hover" onclick="clicked_cell('pi')">
-				<p>Parallel Inductor</p><img src="icons/inductor_parallel.png" alt="Parallel Inductor">
-			</div><div class="cell cell_w_hover" onclick="clicked_cell('sr')">
-				<p>Series Resistor</p><img src="icons/resistor_series.png" alt="Series Resistor">
-			</div><div class="cell cell_w_hover" onclick="clicked_cell('pr')">
-				<p>Parallel Resistor</p><img src="icons/resistor_parallel.png" alt="Parallel Resistor">
-			</div><div class="cell cell_w_hover" onclick="clicked_cell('tl')">
-				<p>Transmission Line</p><img src="icons/transmission_line.png" alt="Transmission Line">
-			</div><div class="cell cell_w_hover" onclick="clicked_cell('so')">
-				<p>Open Stub</p><img src="icons/stub_open.png" alt="Transmission Line">
-			</div><div class="cell cell_w_hover" onclick="clicked_cell('ss')">
-				<p>Short Stub</p><img src="icons/stub_short.png" alt="Transmission Line">
-			</div>
-	  </div>
-		
-	<div id="schematic"></div>
-	<div id="smith_chart">
-		<div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
-		<div class="hollow_holder">
-			<div id="hollowed_circle"></div>
+
+				<div class="row mt-4">
+					<div class="col">
+						<div class="input-group">
+							<div class="input-group-text"><input class="form-check-input mt-0" type="checkbox" checked onchange="toggle_labels_DP()"></div>
+							<span class="input-group-text">Show label: DP</span>
+						</div>
+					</div>
+					<div class="col">
+						<div class="input-group">
+							<div class="input-group-text"><input class="form-check-input mt-0" type="checkbox" checked onchange="toggle_labels_imag()"></div>
+							<span class="input-group-text">Show label: adm</span>
+						</div>
+					</div>
+					<div class="col">
+						<div class="input-group">
+							<div class="input-group-text"><input class="form-check-input mt-0" type="checkbox" checked onchange="toggle_labels_real()"></div>
+							<span class="input-group-text">Show label: res</span>
+						</div>
+					</div>
+					<div class="col">
+						<div class="input-group">
+							<div class="input-group-text"><input class="form-check-input mt-0" type="checkbox" checked onchange="toggle_circles_adm()"></div>
+							<span class="input-group-text">Show circle: adm</span>
+						</div>
+					</div>
+					<div class="col">
+						<div class="input-group">
+							<div class="input-group-text"><input class="form-check-input mt-0" type="checkbox" checked onchange="toggle_circles_res()"></div>
+							<span class="input-group-text">Show circle: res</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="row mt-4">
+					<div class="col-6">
+						<div class="row text-center"><h4 class="mb-0">Reflection Coefficient plotted on a polar axes</h4></div>
+						<div class="row">
+							<div id="smith_polar">
+								<div id="PolarPlot"><!-- Plotly chart will be drawn inside this DIV --></div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-6">
+						<div class="row text-center"><h4 class="mb-0"><small>VSWR (coming soon)</small></h4></div>
+					</div>
+
+				</div>
+
+				<div class="row">
+					<div class="col">
+						<!-- <div id="impedance_marker"> -->
+							<h3>Add custom impedance markers</h3>
+							<div id="customMarkerTable">
+							</div>
+						<!-- </div> -->
+					</div>
+				</div>
+
+
+				<div class="row mt-5">
+					<div class="col">
+						<h3>Impedance at each DP</h3>
+						<div id="DPImpedance">
+						</div>
+					</div>
+				</div>
+
+				<div class="row mt-5">
+					<div class="col">
+						<h3>Add a VSWR circle<small> (set to 0 to remove it)</small></h3>
+						<div class="input-group mb-3">
+							<span class="input-group-text">VSWR:</span>
+							<input type="number" value="0" onchange="vswr=Number(this.value); update_smith_chart();" class="form-control">
+						</div>
+					</div>
+				</div>
+
+				<div class="row mt-5">
+					<div class="col">
+						<div class="form-check form-switch">
+							<label class="form-check-label" for="flexSwitchCheckDefault">Chose your color scheme</label>
+							<input class="form-check-input" type="checkbox" checked onclick="toggle_color_scheme()">
+						</div>
+					</div>
+				</div>
+
+				<div class="row mt-5">
+					<div class="col text-center">
+						<h4>Let me know of any issues or requests!</h4>
+					</div>
+				</div>
+
+				<div class="row mt-5">
+					<div class="col">
+						<div id="disqus_thread"></div>
+						<script>
+							(function() { // DON'T EDIT BELOW THIS LINE
+							var d = document, s = d.createElement('script');
+							s.src = 'https://will-kelsey-smith.disqus.com/embed.js';
+							s.setAttribute('data-timestamp', +new Date());
+							(d.head || d.body).appendChild(s); 
+							})();
+						</script>
+						<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+					</div>	
+				</div>
+
+			</div>	
 		</div>
-	</div>
-
-	<div id="hide_labels_DP">
-		<label>Show label: DP</label>
-		<input type="checkbox" class="label_checkbox" checked onchange=toggle_labels_DP()>
-		<label>Show label: adm</label>
-		<input type="checkbox" class="label_checkbox" checked onchange=toggle_labels_imag()>
-		<label>Show label: res</label>
-		<input type="checkbox" class="label_checkbox" checked onchange=toggle_labels_real()>
-		<label>Show circle: adm</label>
-		<input type="checkbox" class="label_checkbox" checked onchange=toggle_circles_adm()>
-		<label>Show circle: res</label>
-		<input type="checkbox" class="label_checkbox" checked onchange=toggle_circles_res()>
-	</div>
-
-	<h3>Reflection Coefficient plotted on a polar axes:</h3>
-
-	<div id="smith_polar">
-				<div id="PolarPlot"><!-- Plotly chart will be drawn inside this DIV --></div>
-	</div>
-
-	<div id="impedance_marker">
-		<h3>Add custom impedance markers</h3>
-		<div id="customMarkerTable">
-		</div>
-	</div>
-
-	<div id="dp_impedance">
-		<h3>Impedance at each DP</h3>
-		<div id="DPImpedance">
-		</div>
-	</div>
-
-	<div id="vswr_circle">
-		<h3>Add a VSWR circle (set to 0 to remove it)</h3>
-		<label>VSWR: </label><input type="number" value="0" onchange="vswr=Number(this.value); update_smith_chart();">
-	</div>
-
-	<div id="color_scheme">
-		<p>Chose your color scheme </p>
-		<label class="switch">
-			<input type="checkbox" checked onchange=toggle_color_scheme()>
-			<span class="slider round"></span>
-		</label>
-	</div>
-
-		<div id="feedback_title">Let me know of any issues or requests!</div>
-
-		<div id="disqus_thread"></div>
-		<script>
-		(function() { // DON'T EDIT BELOW THIS LINE
-		var d = document, s = d.createElement('script');
-		s.src = 'https://will-kelsey-smith.disqus.com/embed.js';
-		s.setAttribute('data-timestamp', +new Date());
-		(d.head || d.body).appendChild(s); 
-		})();
-		</script>
-		<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-
-<!-- Testing new commenting tool below...
-
-		<div id="commento"></div>
-		<script defer 
-			src="https://cdn.commento.io/js/commento.js"
-			data-css-override="https://www.will-kelsey.com/smith_chart/css/commento.css">
-		</script> -->
-									
-							
-      </div>
-    </section>
 	
-    
-      <div class="container"><div class="copyright">
-        <p>Copyright &copy; Will Kelsey 2021. www.will-kelsey.com/smith_chart. v1.0</p><p> Hosted by GitHub pages here -> https://github.com/28raining/28raining.github.io/tree/master/smith_chart</p>
-      </div>
-    </div>
+		<!-- Footer -->     
 
-    <!-- Scroll to Top Button (Only visible on small and extra-small screen sizes) -->
-    <div class="scroll-to-top d-lg-none position-fixed ">
-      <a class="js-scroll-trigger d-block text-center text-white rounded" href="#page-top">
-        <i class="fa fa-chevron-up"></i>
-      </a>
-    </div>
-	 <script src="js/smith_tool.js"></script>
+		<div class="w-100 p-3 bg-navy text-white text-center">
+			<div class="container-xl">
+				<div class="row mt-2">
+					<div class="col">
+						Copyright &copy; Will Kelsey 2021. www.will-kelsey.com/smith_chart
+					</div>
+				</div>
+				<div class="row mt-3">
+					<div class="col">
+						v2.0
+					</div>
+				</div>
+			</div>
+				<div class="row mt-3 mb-2">
+					<div class="col">
+						Hosted by GitHub pages here -> https://github.com/28raining/28raining.github.io/tree/master/smith_chart
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal -->
+		<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Chose previous data to upload</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<p>Upload previous state</p>
+						<input class="button_block upload" type="file" id="file" name="file"/>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="js/smith_tool.js"></script>
 	 
   </body>
 
