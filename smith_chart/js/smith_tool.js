@@ -89,7 +89,7 @@ function delCustomMarker(i) {
 //#2 - Impedance at each Data Point (DP)
 function drawMakerTable() {
   var table = document.getElementById("customMarkerTable");
-  var inner = "<table class='table table-striped'><tr><th>Real</th><th>Imaginary</th><th width='100px'>Name</th><th width='100px'>add/remove</th></tr>"
+  var inner = "<table class='table table-striped '><tr><th>Real</th><th>Imaginary</th><th>Name</th><th>add/remove</th></tr>"
   inner += "<tr><td><input type='text' id='customMarkerRe'></td><td><input type='text' id='customMarkerIm'></td><td></td><td><button onclick=addCustomMarker()>add</button></td></tr>"
   var i=0;
   for (i=0; i<customMarkers.length; i++) {
