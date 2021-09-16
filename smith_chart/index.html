@@ -36,7 +36,7 @@
 
 	<!-- <script>if(typeof window.Int16Array !== 'function')document.write("<scri"+"pt src='extras/typedarray.min.js'></scr"+"ipt>");</script>
 	<script>document.write("<scri"+"pt src='extras/request_animation_frame.js'></scr"+"ipt>");</script> -->
-  <script src="download-master/download.min.js"></script>
+  <!-- <script src="download-master/download.min.js"></script> -->
 	<script src="https://cdn.plot.ly/plotly-2.4.2.min.js"></script>
 	<!-- <script src="js/plotly-2.4.2.min.js"></script> -->
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.26.29/dist/sweetalert2.all.min.js"></script>
@@ -59,7 +59,7 @@
 					</div>
 					<div class="col-1">
 						<!-- Download BUTTON -->
-						<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16" onclick="download_state()" style="cursor: pointer;">
+						<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16" onclick="download2()" style="cursor: pointer;">
 							<path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
 							<path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
 						</svg>
@@ -381,6 +381,7 @@
 						<input class="button_block upload" type="file" id="file" name="file"/>
 					</div>
 					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="readFile()">Upload</button>
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 					</div>
 				</div>

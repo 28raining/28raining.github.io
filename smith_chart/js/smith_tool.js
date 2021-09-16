@@ -1,5 +1,5 @@
 
-document.getElementById('file').addEventListener('change', readFile, false);
+// document.getElementById('file').addEventListener('change', readFile, false);
 
 function expo(x, f) {
   return Number.parseFloat(x).toExponential(f);
@@ -107,30 +107,32 @@ function drawMakerTable() {
   table.innerHTML = inner + "</table>";
 }
 
-function readFile (evt) {
-	var files = evt.target.files;
-	var file = files[0];           
-	var reader = new FileReader();
-	reader.onload = function(event) {
-		schematic = JSON.parse(event.target.result);
-    document.getElementById('freq').value=Number(schematic[0].freq);
-    document.getElementById('span').value=Number(schematic[0].span);
-		zo=Number(schematic[0].zo);
-		document.getElementById('zo').value=zo;
-    updateFromDom();
-	}
-	reader.readAsText(file);
-}
-
-// function change_class(this_id) {
-// 	document.getElementById(this_id).classList.toggle("active");
-// }
-
+fileDom = document.getElementById('file');
 domFreq = document.getElementById('freq');
 domFreqSel = document.getElementById('freq_sel');
 domSpan = document.getElementById('span');
 domZo = document.getElementById('zo');
 domEr = document.getElementById('er');
+
+function readFile() {
+  console.log("here a");
+	var files = fileDom.files;
+	var file = files[0];           
+	var reader = new FileReader();
+	reader.onload = function(event) {
+    console.log("here b");
+
+		schematic = JSON.parse(event.target.result);
+    domFreq.value=Number(schematic[0].freq);
+    domSpan.value=Number(schematic[0].span);
+		zo=Number(schematic[0].zo);
+		domZo.value=zo;
+    updateFromDom();
+	}
+	reader.readAsText(file);
+}
+
+
 function updateFromDom () {
   schematic[0].freq=Number(domFreq.value);
   schematic[0].span=Number(domSpan.value)
@@ -1150,22 +1152,22 @@ function arc_smith_points(x1,y1,x2,y2,type,rotate,beta,start_at_qtr_wl) {
 	return [x_coord,y_coord,end_x_coord,end_y_coord,real_old,imag_old,start_x_coord,start_y_coord,x1,y1,x2,y2];
 }
 
-function download_state() {
-	var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(schematic, null, "\t"));
-	//var dlAnchorElem = document.getElementById('downloadAnchorElem');
-	//dlAnchorElem.setAttribute("href",     dataStr     );
-	var myDate = new Date();
-	var date = myDate.getDate();
-	var month = myDate.getMonth();
-	var year = myDate.getFullYear();
-	var hour = myDate.getHours();
-	var minutes = myDate.getMinutes();
-	var seconds = myDate.getSeconds();
+// function download_state() {
+// 	var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(schematic, null, "\t"));
+// 	//var dlAnchorElem = document.getElementById('downloadAnchorElem');
+// 	//dlAnchorElem.setAttribute("href",     dataStr     );
+// 	var myDate = new Date();
+// 	var date = myDate.getDate();
+// 	var month = myDate.getMonth();
+// 	var year = myDate.getFullYear();
+// 	var hour = myDate.getHours();
+// 	var minutes = myDate.getMinutes();
+// 	var seconds = myDate.getSeconds();
 
-	var ddmmyyyy = year + pad(month + 1) + pad(date) + pad(hour) + pad(minutes) + pad(seconds);
-	//dlAnchorElem.setAttribute("download", "online_smith_tool_"+ddmmyyyy+".json");
-	download(dataStr,"online_smith_tool_"+ddmmyyyy+".json","text/plain");
-}
+// 	var ddmmyyyy = year + pad(month + 1) + pad(date) + pad(hour) + pad(minutes) + pad(seconds);
+// 	//dlAnchorElem.setAttribute("download", "online_smith_tool_"+ddmmyyyy+".json");
+// 	download(dataStr,"online_smith_tool_"+ddmmyyyy+".json","text/plain");
+// }
 
 var layout = {
     title: 'Circles',
@@ -1635,53 +1637,53 @@ var layout_polar = {
 };
 
 
-function resize_fn(x) {
-  if (window.matchMedia("(max-width: 300px)").matches) { // If media query matches
-    // layout.width = 200;
-    // layout.height = 200;
-    // layout_polar.width = 200;
-    // layout_polar.height = 200;
-    fontsize = 7;
-  } else if (window.matchMedia("(max-width: 350px)").matches) { 
-    // layout.width = 290;
-    // layout.height = 290;
-    // layout_polar.width = 290;
-    // layout_polar.height = 290;
-    fontsize = 8;
-  } else if (window.matchMedia("(max-width: 400px)").matches) { 
-    // layout.width = 340;
-    // layout.height = 340;
-    // layout_polar.width = 340;
-    // layout_polar.height = 340;
-    fontsize = 8;
-  } else if (window.matchMedia("(max-width: 600px)").matches) { 
-    // layout.width = 390;
-    // layout.height = 390;
-    // layout_polar.width = 390;
-    // layout_polar.height = 390;
-    fontsize = 10;
-  } else if (window.matchMedia("(max-width: 800px)").matches) { 
-    // layout.width = 525;
-    // layout.height = 525;
-    // layout_polar.width = 525;
-    // layout_polar.height = 525;
-    fontsize = 12;
-  } else {
-    // layout.width = 650;
-    // layout.height = 650;
-    // layout_polar.width = 650;
-    // layout_polar.height = 650;
-    fontsize = 12;
-  }
-  var smith_holder = document.getElementById("smith_chart");
-  // smith_holder.style.width = layout.width + "px";
-  // smith_holder.style.height = layout.height + "px";
-  // var cartesian_holder = document.getElementById("smith_polar");
-  // cartesian_holder.style.width = layout.width + "px";
-  // cartesian_holder.style.height = layout.height + "px";
-  update_smith_chart();
- // console.log("executing a resize");
-}
+// function resize_fn(x) {
+//   if (window.matchMedia("(max-width: 300px)").matches) { // If media query matches
+//     // layout.width = 200;
+//     // layout.height = 200;
+//     // layout_polar.width = 200;
+//     // layout_polar.height = 200;
+//     fontsize = 7;
+//   } else if (window.matchMedia("(max-width: 350px)").matches) { 
+//     // layout.width = 290;
+//     // layout.height = 290;
+//     // layout_polar.width = 290;
+//     // layout_polar.height = 290;
+//     fontsize = 8;
+//   } else if (window.matchMedia("(max-width: 400px)").matches) { 
+//     // layout.width = 340;
+//     // layout.height = 340;
+//     // layout_polar.width = 340;
+//     // layout_polar.height = 340;
+//     fontsize = 8;
+//   } else if (window.matchMedia("(max-width: 600px)").matches) { 
+//     // layout.width = 390;
+//     // layout.height = 390;
+//     // layout_polar.width = 390;
+//     // layout_polar.height = 390;
+//     fontsize = 10;
+//   } else if (window.matchMedia("(max-width: 800px)").matches) { 
+//     // layout.width = 525;
+//     // layout.height = 525;
+//     // layout_polar.width = 525;
+//     // layout_polar.height = 525;
+//     fontsize = 12;
+//   } else {
+//     // layout.width = 650;
+//     // layout.height = 650;
+//     // layout_polar.width = 650;
+//     // layout_polar.height = 650;
+//     fontsize = 12;
+//   }
+//   var smith_holder = document.getElementById("smith_chart");
+//   // smith_holder.style.width = layout.width + "px";
+//   // smith_holder.style.height = layout.height + "px";
+//   // var cartesian_holder = document.getElementById("smith_polar");
+//   // cartesian_holder.style.width = layout.width + "px";
+//   // cartesian_holder.style.height = layout.height + "px";
+//   update_smith_chart();
+//  // console.log("executing a resize");
+// }
 
 ///------ Items below are run at power up
 
@@ -1689,17 +1691,52 @@ function resize_fn(x) {
 // var layout = configure_layout_shapes('colorful');
 
 //var size_gt_800 = window.matchMedia("(min-width: 800px)");
-var size_lt_800 = window.matchMedia("(max-width: 800px)");
-var size_lt_600 = window.matchMedia("(max-width: 600px)");
-var size_lt_400 = window.matchMedia("(max-width: 400px)");
-var size_lt_350 = window.matchMedia("(max-width: 350px)");
-var size_lt_300 = window.matchMedia("(max-width: 300px)");
-resize_fn(size_lt_800) // Call listener function at run time
-size_lt_800.addListener(resize_fn); // Attach listener function on state changes
-size_lt_600.addListener(resize_fn); // Attach listener function on state changes
-size_lt_400.addListener(resize_fn);
-size_lt_350.addListener(resize_fn);
-size_lt_300.addListener(resize_fn);
+// var size_lt_800 = window.matchMedia("(max-width: 800px)");
+// var size_lt_600 = window.matchMedia("(max-width: 600px)");
+// var size_lt_400 = window.matchMedia("(max-width: 400px)");
+// var size_lt_350 = window.matchMedia("(max-width: 350px)");
+// var size_lt_300 = window.matchMedia("(max-width: 300px)");
+// resize_fn(size_lt_800) // Call listener function at run time
+// size_lt_800.addListener(resize_fn); // Attach listener function on state changes
+// size_lt_600.addListener(resize_fn); // Attach listener function on state changes
+// size_lt_400.addListener(resize_fn);
+// size_lt_350.addListener(resize_fn);
+// size_lt_300.addListener(resize_fn);
+
+function download2() {
+  var myDate = new Date();
+	var date = myDate.getDate();
+	var month = myDate.getMonth();
+	var year = myDate.getFullYear();
+	var hour = myDate.getHours();
+	var minutes = myDate.getMinutes();
+	var seconds = myDate.getSeconds();
+
+	var ddmmyyyy = year + pad(month + 1) + pad(date) + pad(hour) + pad(minutes) + pad(seconds);
+
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(schematic, null, "\t")));
+  element.setAttribute('download', "online_smith_tool_"+ddmmyyyy+".json");
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
+
+
+//run when resize is finished
+function resizedw(){
+  update_smith_chart();
+}
+
+var doit;
+window.onresize = function(){
+  clearTimeout(doit);
+  doit = setTimeout(resizedw, 200);
+};
 
 //functions that are run at startup
 update_smith_chart();
