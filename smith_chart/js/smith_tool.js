@@ -1,5 +1,8 @@
 
 // document.getElementById('file').addEventListener('change', readFile, false);
+//get dom elements
+var vmin_distanceEl = document.getElementById('vmin_distance');
+var vmax_distanceEl = document.getElementById('vmax_distance');
 
 function expo(x, f) {
   return Number.parseFloat(x).toExponential(f);
@@ -115,12 +118,10 @@ domZo = document.getElementById('zo');
 domEr = document.getElementById('er');
 
 function readFile() {
-  console.log("here a");
 	var files = fileDom.files;
 	var file = files[0];           
 	var reader = new FileReader();
 	reader.onload = function(event) {
-    console.log("here b");
 
 		schematic = JSON.parse(event.target.result);
     domFreq.value=Number(schematic[0].freq);
@@ -277,7 +278,7 @@ function unitTextToNum (unit, freq_here) {
   else if (unit[0][0] == 'm') return 1e-3;	//tl can have unit of meters
   else if (unit[0][0] == 'K') return 1e3;
   else if (unit[0][0] == 'M') return 1e6;
-  else if (unit[0][0] == 'λ') return (3e8/freq_here);
+  else if (unit[0][0] == 'λ') return (3e8/(freq_here*Math.sqrt(schematic[0].er)));
   else                        return 1;
 }
 
@@ -555,12 +556,20 @@ function update_smith_chart() {
   if (reflectio_coeff_real == 0)  var reflection_phase = 0;
   else  var reflection_phase = 360*Math.atan(reflectio_coeff_imag/reflectio_coeff_real)/(2*Math.PI);
   if (reflectio_coeff_real < 0) reflection_phase += 180;
+  if (reflection_phase < 0) reflection_phase = 360 + reflection_phase;
 	txt += (reflection_phase).toPrecision(3) + "&deg; </div>";
 	document.getElementById("current_reflection_mag").innerHTML = txt;
 	
   //calculate VSWR (1+r) / (1-r)
   var vswr_live = (1+reflection_mag)/(1-reflection_mag);
   document.getElementById("vswr_live").innerHTML = "<div class=\"text_box\">"+vswr_live.toPrecision(3)+"</div>"; 
+
+  //populate vmin_distanceEl and vmax_distanceEl
+  vmax_distanceEl.value = (0.5 * reflection_phase / 360).toPrecision(precision);
+
+  if (reflection_phase > 180)  vmin_distanceEl.value = (0.5 * (reflection_phase-180) / 360).toPrecision(precision);
+  else vmin_distanceEl.value = (0.5 * (reflection_phase+180) / 360).toPrecision(precision);
+
 
 
 	//redefine the labels in case zo has changed
@@ -691,11 +700,185 @@ function update_smith_chart() {
     )
   }
 
+  
+var layout_polar = {
+  hovermode: false,
+  showlegend: false,
+  paper_bgcolor: 'rgba(0,0,0,0)',
+  plot_bgcolor: 'rgba(0,0,0,0)',
+  polar: {
+    radialaxis: {
+      tickfont: {
+        size: 12
+      },
+      range: [0, 1],
+      gridcolor: "rgba(145, 145, 145, 0.75)",
+      dtick:'0.2'
+    },
+    angularaxis: {
+      tickfont: {
+        size: 12
+      },
+      gridcolor: "rgba(145, 145, 145, 0.75)",
+      dtick:'15'
+    },
+    bgcolor:'rgba(255,255,255,0.2)',
+  }
+};
+
   var polarWidth = document.getElementById("smith_polar").offsetWidth
   layout_polar.width = polarWidth;
   layout_polar.height = polarWidth;
   Plotly.react('PolarPlot', data_polar, layout_polar, config)
-  
+
+
+  //Create the plots for distance to Vmax and Vmin
+  var markX, markY;
+  [markX, markY] = find_smith_coord(real_old,imag_old,false)
+
+  //Create 2 arcs, one to Vmax and one to Vmin
+  var arcRad = 1.1;
+  var arcStartAng = reflection_phase * Math.PI / 180;
+  var arcStartX = Math.cos(arcStartAng) * arcRad;
+  var arcStartY = Math.sin(arcStartAng) * arcRad;
+  var pathMax="M " + arcStartX + " " + arcStartY;
+  var arcAng;
+  for (i=100; i>=0; i--) {
+    arcAng = arcStartAng * i / 100;
+    arcStartX = Math.cos(arcAng) * arcRad;
+    arcStartY = Math.sin(arcAng) * arcRad;
+    pathMax += " L " + arcStartX + " " + arcStartY;
+  }
+  pathMax += " L " + (arcRad + 0.05) + " 0.05";
+  pathMax += " M " + arcRad + " 0";
+  pathMax += " L " + (arcRad - 0.05) + " 0.05";
+
+
+
+  arcRad = 1.2;
+  if (arcStartAng < Math.PI) arcStartAng = arcStartAng+2*Math.PI;
+  arcStartX = Math.cos(arcStartAng) * arcRad;
+  arcStartY = Math.sin(arcStartAng) * arcRad;
+  var pathMin="M " + arcStartX + " " + arcStartY;
+  for (i=0; i<101; i++) {
+    arcAng = arcStartAng - (arcStartAng - Math.PI) * i / 100;
+    arcStartX = Math.cos(arcAng) * arcRad;
+    arcStartY = Math.sin(arcAng) * arcRad;
+    pathMin += " L " + arcStartX + " " + arcStartY;
+  }
+  pathMin += " L " + (-arcRad - 0.05) + " -0.05";
+  pathMin += " M " + -arcRad + " 0";
+  pathMin += " L " + (-arcRad + 0.05) + " -0.05";
+  // console.log(pathMax);
+
+
+
+  var layout_lambda = {
+    autosize: true,
+    margin: {
+      l: 20,
+      r: 20,
+      b: 20,
+      t: 20
+    },
+    hovermode: false,
+    showlegend: false,
+    paper_bgcolor: 'rgba(0,0,0,0)',
+    plot_bgcolor: 'rgba(0,0,0,0)',
+    xaxis: {
+      range: [-1.3, 1.3],
+      zeroline: false,
+      showgrid: false,
+      visible: false
+    },
+    yaxis: {
+      range: [-1.3, 1.3],
+      zeroline: false,
+      showgrid: false,
+      visible: false
+    },
+    shapes: [
+      //draw the perimiter
+      {
+        type: 'circle',
+        xref: 'x',
+        yref: 'y',
+        x0: -1,
+        y0: -1,
+        x1: 1,
+        y1: 1,
+        line: {
+          color: 'black'
+        }
+      },
+      //draw an arc
+      {
+        type: 'path',
+        path: pathMax,
+        line: {
+          color: 'rgb(93, 164, 214)'
+        }
+      },
+      {
+        type: 'path',
+        path: pathMin,
+        line: {
+          color: 'rgb(93, 164, 214)'
+        }
+      }
+    ]
+  }
+
+    
+  var data_lambda = [
+    //show the data marker
+    {
+      x: [0],
+      y: [0],
+      mode: 'markers',
+      marker : {
+        size:20,
+      },
+    },
+    {
+      x: [markX],
+      y: [markY],
+      mode: 'markers',
+      marker : {
+        size:20,
+        symbol: 'x',
+        color: 'rgb(37, 50, 64)'
+      },
+    },
+    //dashed line from 0,0, thru point, to rotation
+    {
+      x: [0,Math.cos(arcStartAng) * arcRad],
+      y: [0,Math.sin(arcStartAng) * arcRad],
+      line: {
+          dash: 'dot',
+          width: 1,
+          color: 'black'
+      },
+      mode: 'lines',
+      type: 'scatter'
+    },
+    //Vmin and Vmax labels
+    {
+      x: [0.9,-0.9],
+      y: [0,0],
+      text: ["Vmax","Vmin"],
+      mode: 'text',
+      textfont: {
+        size:fontsize
+      }
+    }
+  ]  ;
+
+
+    var smith_lambda = document.getElementById("smith_lambda").offsetWidth;
+    layout_lambda.width = smith_lambda;
+    layout_lambda.height = smith_lambda;
+    Plotly.react('LambdaPlot', data_lambda, layout_lambda, config);
 
   //update the HTML tables
   drawMakerTable();
@@ -1611,97 +1794,6 @@ function configure_layout_shapes() {
   return shapes;
 }
 
-var layout_polar = {
-  hovermode: false,
-  showlegend: false,
-  paper_bgcolor: 'rgba(0,0,0,0)',
-  plot_bgcolor: 'rgba(0,0,0,0)',
-  polar: {
-    radialaxis: {
-      tickfont: {
-        size: 12
-      },
-      range: [0, 1],
-      gridcolor: "rgba(145, 145, 145, 0.75)",
-      dtick:'0.2'
-    },
-    angularaxis: {
-      tickfont: {
-        size: 12
-      },
-      gridcolor: "rgba(145, 145, 145, 0.75)",
-      dtick:'15'
-    },
-    bgcolor:'rgba(255,255,255,0.2)',
-  }
-};
-
-
-// function resize_fn(x) {
-//   if (window.matchMedia("(max-width: 300px)").matches) { // If media query matches
-//     // layout.width = 200;
-//     // layout.height = 200;
-//     // layout_polar.width = 200;
-//     // layout_polar.height = 200;
-//     fontsize = 7;
-//   } else if (window.matchMedia("(max-width: 350px)").matches) { 
-//     // layout.width = 290;
-//     // layout.height = 290;
-//     // layout_polar.width = 290;
-//     // layout_polar.height = 290;
-//     fontsize = 8;
-//   } else if (window.matchMedia("(max-width: 400px)").matches) { 
-//     // layout.width = 340;
-//     // layout.height = 340;
-//     // layout_polar.width = 340;
-//     // layout_polar.height = 340;
-//     fontsize = 8;
-//   } else if (window.matchMedia("(max-width: 600px)").matches) { 
-//     // layout.width = 390;
-//     // layout.height = 390;
-//     // layout_polar.width = 390;
-//     // layout_polar.height = 390;
-//     fontsize = 10;
-//   } else if (window.matchMedia("(max-width: 800px)").matches) { 
-//     // layout.width = 525;
-//     // layout.height = 525;
-//     // layout_polar.width = 525;
-//     // layout_polar.height = 525;
-//     fontsize = 12;
-//   } else {
-//     // layout.width = 650;
-//     // layout.height = 650;
-//     // layout_polar.width = 650;
-//     // layout_polar.height = 650;
-//     fontsize = 12;
-//   }
-//   var smith_holder = document.getElementById("smith_chart");
-//   // smith_holder.style.width = layout.width + "px";
-//   // smith_holder.style.height = layout.height + "px";
-//   // var cartesian_holder = document.getElementById("smith_polar");
-//   // cartesian_holder.style.width = layout.width + "px";
-//   // cartesian_holder.style.height = layout.height + "px";
-//   update_smith_chart();
-//  // console.log("executing a resize");
-// }
-
-///------ Items below are run at power up
-
-
-// var layout = configure_layout_shapes('colorful');
-
-//var size_gt_800 = window.matchMedia("(min-width: 800px)");
-// var size_lt_800 = window.matchMedia("(max-width: 800px)");
-// var size_lt_600 = window.matchMedia("(max-width: 600px)");
-// var size_lt_400 = window.matchMedia("(max-width: 400px)");
-// var size_lt_350 = window.matchMedia("(max-width: 350px)");
-// var size_lt_300 = window.matchMedia("(max-width: 300px)");
-// resize_fn(size_lt_800) // Call listener function at run time
-// size_lt_800.addListener(resize_fn); // Attach listener function on state changes
-// size_lt_600.addListener(resize_fn); // Attach listener function on state changes
-// size_lt_400.addListener(resize_fn);
-// size_lt_350.addListener(resize_fn);
-// size_lt_300.addListener(resize_fn);
 
 function download2() {
   var myDate = new Date();

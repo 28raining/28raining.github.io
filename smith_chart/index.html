@@ -119,8 +119,8 @@
 					</div>
 					<div class="col-lg">
 						<div class="input-group mb-2">
-							<span class="input-group-text inputGroupmw">Permitivity e<small>eff (note all λ=C/f&radic;e<small>eff</small></small>)</span>
-							<input type="number" value="1" id="er" class="form-control" onchange="updateFromDom();">
+							<span class="input-group-text inputGroupmw">Permittivity e<small>eff (note all λ=C/f&radic;e<small>eff</small></small>)</span>
+							<input type="number" value="1" id="er" class="form-control"   data-bs-toggle="modal" data-bs-target="#permModal" onchange="updateFromDom();">
 						</div>
 					</div>
 				</div>
@@ -128,13 +128,13 @@
 					<div class="col-lg">
 						<div class="input-group mb-2">
 							<span class="input-group-text inputGroupmw">Impedance</span>
-							<output  id="current_impedance" class="form-control bg-navy text-white">
+							<output  id="current_impedance" class="form-control bg-navy text-white"></output>
 						</div>
 					</div>
 					<div class="col-lg">
 						<div class="input-group mb-2">
 							<span class="input-group-text inputGroupmw">Admittance</span>
-							<output  id="current_admittance" class="form-control bg-navy text-white">
+							<output  id="current_admittance" class="form-control bg-navy text-white"></output>
 						</div>
 					</div>
 				</div>
@@ -142,13 +142,13 @@
 					<div class="col-lg">
 						<div class="input-group mb-2">
 							<span class="input-group-text inputGroupmw">Reflection Coefficient</span>
-							<output  id="current_reflection" class="form-control bg-navy text-white">
+							<output  id="current_reflection" class="form-control bg-navy text-white"></output>
 						</div>
 					</div>
 					<div class="col-lg">
 						<div class="input-group mb-2">
 							<span class="input-group-text inputGroupmw">Reflection Coefficient</span>
-							<output  id="current_reflection_mag" class="form-control bg-navy text-white">
+							<output  id="current_reflection_mag" class="form-control bg-navy text-white"></output>
 						</div>
 					</div>
 				</div>
@@ -156,7 +156,7 @@
 					<div class="col-lg-6">
 						<div class="input-group mb-2 ">
 							<span class="input-group-text inputGroupmw">VSWR</span>
-							<output  id="vswr_live" class="form-control bg-navy text-white">
+							<output  id="vswr_live" class="form-control bg-navy text-white"></output>
 						</div>
 					</div>
 				</div>
@@ -270,15 +270,38 @@
 				<div class="row mt-4">
 					<div class="col-lg-6">
 						<div class="row text-center"><h4 class="mb-0">Reflection Coefficient plotted on a polar axes</h4></div>
-						<div class="row">
-							<div id="smith_polar">
+						<div class="row" id="smith_polar">
+							<div>
 								<div id="PolarPlot"><!-- Plotly chart will be drawn inside this DIV --></div>
 							</div>
 						</div>
 					</div>
 
 					<div class="col-lg-6">
-						<div class="row text-center"><h4 class="mb-0"><small>VSWR (coming soon)</small></h4></div>
+						<div class="row text-center"><h4 class="mb-0"><small>Distance to Vmax and Vmin</small></h4></div>
+						<div class="row" id="smith_lambda">
+							<div>
+								<div id="LambdaPlot"><!-- Plotly chart will be drawn inside this DIV --></div>
+							</div>
+						</div>
+						<div class="row pt-1">
+							<div class="col-lg">
+								<div class="input-group mb-2">
+									<span class="input-group-text inputGroupmw">Distance to Vmax</span>
+									<output  id="vmax_distance" class="form-control bg-navy text-white"></output>
+									<span class="input-group-text">λ</span>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-lg">
+								<div class="input-group mb-2">
+									<span class="input-group-text inputGroupmw">Distance to Vmin</span>
+									<output  id="vmin_distance" class="form-control bg-navy text-white"></output>
+									<span class="input-group-text">λ</span>
+								</div>
+							</div>
+						</div>
 					</div>
 
 				</div>
@@ -342,8 +365,10 @@
 					</div>	
 				</div>
 
+
 			</div>	
 		</div>
+
 	
 		<!-- Footer -->     
 
@@ -387,6 +412,24 @@
 				</div>
 			</div>
 		</div>
+
+		<div class="modal fade" id="permModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Changing permittivity</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<p>Permittivity note - if you add a tx line or a stub and chose unit λ, λ=C/f√eeff. Not λ/f!</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 
 		<script src="js/smith_tool.js"></script>
 	 
