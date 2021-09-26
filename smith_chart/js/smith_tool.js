@@ -113,6 +113,7 @@ function drawMakerTable() {
 fileDom = document.getElementById('file');
 domFreq = document.getElementById('freq');
 domFreqSel = document.getElementById('freq_sel');
+domSpanSel = document.getElementById('span_sel');
 domSpan = document.getElementById('span');
 domZo = document.getElementById('zo');
 domEr = document.getElementById('er');
@@ -121,13 +122,43 @@ function readFile() {
 	var files = fileDom.files;
 	var file = files[0];           
 	var reader = new FileReader();
+  var i;
 	reader.onload = function(event) {
 
 		schematic = JSON.parse(event.target.result);
+    //check for old version of file
+    for (i=1;i<schematic.length;i++){
+      if (!(Array.isArray(schematic[i].abs))) {
+        schematic[i].abs = [schematic[i].abs];
+      }
+      if ('abs_bb_i' in schematic[i]) schematic[i].abs.push(schematic[i].abs_bb_i);
+      if (!(Array.isArray(schematic[i].unit))) {
+        schematic[i].unit = [schematic[i].unit];
+      }
+    }
+
+    //update freq units
+    var opts = domFreqSel.options;
+    for (var opt, j = 0; opt = opts[j]; j++) {
+      if (opt.value == schematic[0].freq_unit.unit) {
+        domFreqSel.selectedIndex = j;
+        break;
+      }
+    }
+    opts = domSpanSel.options;
+    for (opt, j = 0; opt = opts[j]; j++) {
+      if (opt.value == schematic[0].span_unit.unit) {
+        domSpanSel.selectedIndex = j;
+        break;
+      }
+    }
+    
     domFreq.value=Number(schematic[0].freq);
     domSpan.value=Number(schematic[0].span);
+    domEr.value=Number(schematic[0].er);
 		zo=Number(schematic[0].zo);
 		domZo.value=zo;
+    console.log("READING", schematic);
     updateFromDom();
 	}
 	reader.readAsText(file);
@@ -148,11 +179,11 @@ function updateFromDom () {
   else if (domFreqSel.value == 'GHz') schematic[0]['freq_unit'].multiplier = 1e9;
   else if (domFreqSel.value == 'THz') schematic[0]['freq_unit'].multiplier = 1e12;
 
-  if      (domFreqSel.value == 'Hz') schematic[0]['span_unit'].multiplier = 1;
-  else if (domFreqSel.value == 'KHz') schematic[0]['span_unit'].multiplier = 1e3;
-  else if (domFreqSel.value == 'MHz') schematic[0]['span_unit'].multiplier = 1e6;
-  else if (domFreqSel.value == 'GHz') schematic[0]['span_unit'].multiplier = 1e9;
-  else if (domFreqSel.value == 'THz') schematic[0]['span_unit'].multiplier = 1e12;
+  if      (domSpanSel.value == 'Hz') schematic[0]['span_unit'].multiplier = 1;
+  else if (domSpanSel.value == 'KHz') schematic[0]['span_unit'].multiplier = 1e3;
+  else if (domSpanSel.value == 'MHz') schematic[0]['span_unit'].multiplier = 1e6;
+  else if (domSpanSel.value == 'GHz') schematic[0]['span_unit'].multiplier = 1e9;
+  else if (domSpanSel.value == 'THz') schematic[0]['span_unit'].multiplier = 1e12;
 
   update_smith_chart()
 }
@@ -789,13 +820,15 @@ var layout_polar = {
       range: [-1.3, 1.3],
       zeroline: false,
       showgrid: false,
-      visible: false
+      visible: false,
+      fixedrange: true,
     },
     yaxis: {
       range: [-1.3, 1.3],
       zeroline: false,
       showgrid: false,
-      visible: false
+      visible: false,
+      fixedrange: true,
     },
     shapes: [
       //draw the perimiter
@@ -1075,6 +1108,7 @@ function draw_schematic(i) {
             innerText += '<option value='+unit[unitIndex][ittUnit]+' '+varSelect+'>'+unit[unitIndex][ittUnit]+'</option>'
           }
           innerText += '</select>'
+          // console.log('Unit', schematic[i].unit[unitIndex], innerText);
         } else {
           if (cntC>0) innerText += '<span class="input-group-text">+</span>'
           innerText += '<input type="text" class="form-control" value='+schematic[i][boxType][absCounter]+' name="'+boxType+'" onchange="update_schem_abs('+i+',this,'+absCounter+')">'
