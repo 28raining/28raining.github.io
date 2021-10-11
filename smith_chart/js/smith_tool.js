@@ -685,7 +685,7 @@ function update_smith_chart() {
     for (i=1; i<200;i++) {
       constQZArray.push((Math.E ** (i*step))-1);
     }
-    constQZArray.push(1e20); //~inf
+    constQZArray.push(1e10); //~inf
     //convert impedances to coordinates
     for (i=0; i<constQZArray.length;i++) {
       sp_coord = find_smith_coord(constQZArray[i],constQZArray[i]*constQ,false);
