@@ -45,8 +45,18 @@
   min-width:270px
 }
 
+.inputMW {
+  min-width: 45px !important;
+}
+
 @media only screen and (max-width: 992px) {
     .inputGroupmw {
       min-width:0px
     }
+}
+
+@media only screen and (max-width: 960px) {
+  .inputMW {
+    min-width: 50% !important;
+  }
 }

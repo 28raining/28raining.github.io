@@ -92,8 +92,8 @@ function delCustomMarker(i) {
 //#2 - Impedance at each Data Point (DP)
 function drawMakerTable() {
   var table = document.getElementById("customMarkerTable");
-  var inner = "<table class='table table-striped '><tr><th>Real</th><th>Imaginary</th><th>Name</th><th>add/remove</th></tr>"
-  inner += "<tr><td><input type='text' id='customMarkerRe'></td><td><input type='text' id='customMarkerIm'></td><td></td><td><button onclick=addCustomMarker()>add</button></td></tr>"
+  var inner = "<table class='table table-striped table-sm'><tr><th>Real</th><th>Imaginary</th><th>Name</th><th></th></tr>"
+  inner += "<tr><td><input type='text' id='customMarkerRe' style='width:75px'></td><td><input type='text' id='customMarkerIm' style='width:75px'></td><td></td><td><button onclick=addCustomMarker()>add</button></td></tr>"
   var i=0;
   for (i=0; i<customMarkers.length; i++) {
     inner += "<tr><td>"+ customMarkers[i].re +"</td><td>"+customMarkers[i].im+"</td><td>MP"+i+"</td><td><button onClick='delCustomMarker("+i+")')>Remove</button></td></tr>"
@@ -210,6 +210,7 @@ function updatespan(sch_num, obj, unitIndex=0) {
   var schematic = [];
   var dataPoints = [];
   var vswr=0.0;
+  var constQ=0.0;
   var zo=50;
 	//var freq_multiplier=1e6;
 	//var span_multiplier=1e6;
@@ -675,8 +676,41 @@ function update_smith_chart() {
     else var vswr_color = 'green';
     layout_shapes.push({type: "circle", line: {color: vswr_color}, x0:x0,y0:y0,x1:x1,y1:y1});
   }
+  if (constQ != 0.0) {
+    //Create a 100-point line from Z=0 to Z=20*zo with logarithmic steps
+    var constQZArray = [0]
+    var step = Math.log(20)/200;
+    var constQ_trace_x=[]
+    var constQ_trace_y=[];
+    for (i=1; i<200;i++) {
+      constQZArray.push((Math.E ** (i*step))-1);
+    }
+    constQZArray.push(1e20); //~inf
+    //convert impedances to coordinates
+    for (i=0; i<constQZArray.length;i++) {
+      sp_coord = find_smith_coord(constQZArray[i],constQZArray[i]*constQ,false);
+      constQ_trace_x.push(sp_coord[0]);
+      constQ_trace_y.push(sp_coord[1]);
+    }
+    for (i=constQZArray.length-1; i>=0;i--) {
+      sp_coord = find_smith_coord(constQZArray[i],-constQZArray[i]*constQ,false);
+      constQ_trace_x.push(sp_coord[0]);
+      constQ_trace_y.push(sp_coord[1]);
+    }
+    var constQ_trace = {
+      x: constQ_trace_x,
+      y: constQ_trace_y,
+      line: {
+          color: 'black',
+          width: 4
+      },
+      mode: 'lines',
+      type: 'scatter'
+    };
+
+  } else var constQ_trace = {};
 	
-	var data = trace.concat(textbox_trace,trace_im_neg,trace_im_pos,trace_real,trace_adm,trace_sus_pos,trace_sus_neg,span_trace);
+	var data = trace.concat(textbox_trace,trace_im_neg,trace_im_pos,trace_real,trace_adm,trace_sus_pos,trace_sus_neg,span_trace,constQ_trace);
 
 	//console.log(data, layout, layout_shapes);
   var exWidth = document.getElementById("myDiv").offsetWidth
@@ -1111,7 +1145,7 @@ function draw_schematic(i) {
           // console.log('Unit', schematic[i].unit[unitIndex], innerText);
         } else {
           if (cntC>0) innerText += '<span class="input-group-text">+</span>'
-          innerText += '<input type="text" class="form-control" value='+schematic[i][boxType][absCounter]+' name="'+boxType+'" onchange="update_schem_abs('+i+',this,'+absCounter+')">'
+          innerText += '<input type="text" class="form-control inputMW" value='+schematic[i][boxType][absCounter]+' name="'+boxType+'" onchange="update_schem_abs('+i+',this,'+absCounter+')">'
           if (cntC>0) innerText += '<span class="input-group-text">j</span>'
           if (boxType == 'abs') absCounter=absCounter+1;
         }

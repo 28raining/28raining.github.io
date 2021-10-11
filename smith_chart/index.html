@@ -84,9 +84,9 @@
 				<div class="row">
 					<div class="col-lg">
 						<div class="input-group mb-2">
-							<span class="input-group-text inputGroupmw">Operational Frequency</span>
-							<input type="number"  class="form-control" value="2440" id="freq" onchange="updateFromDom();">
-							<select class="form-select" id="freq_sel" onchange="updateFromDom()">
+							<span class="input-group-text inputGroupmw">Frequency</span>
+							<input type="number"  class="form-control" value="2440" id="freq" onchange="updateFromDom();" autocomplete="off">
+							<select class="form-select" id="freq_sel" onchange="updateFromDom()" autocomplete="off">
 								<option value='Hz'>Hz</option>
 								<option value='KHz'>KHz</option>
 								<option value='MHz' selected>MHz</option>
@@ -98,8 +98,8 @@
 					<div class="col-lg">
 						<div class="input-group mb-2">
 							<span class="input-group-text inputGroupmw">Frequency span (&#8723)</span>
-							<input type="number" value="0" id="span" class="form-control" onchange="updateFromDom();">
-							<select class="form-select" id="span_sel" onchange="updateFromDom()">
+							<input type="number" value="0" id="span" class="form-control" onchange="updateFromDom();" autocomplete="off">
+							<select class="form-select" id="span_sel" onchange="updateFromDom()" autocomplete="off">
 								<option value='Hz'>Hz</option>
 								<option value='KHz'>KHz</option>
 								<option value='MHz' selected>MHz</option>
@@ -113,14 +113,14 @@
 					<div class="col-lg">
 						<div class="input-group mb-2">
 							<span class="input-group-text inputGroupmw">Characteristic Impedance</span>
-							<input type="number" value="50" id="zo" class="form-control" onchange="updateFromDom();">
+							<input type="number" value="50" id="zo" class="form-control" onchange="updateFromDom();" autocomplete="off">
 							<span class="input-group-text">Ω</span>
 						</div>
 					</div>
 					<div class="col-lg">
 						<div class="input-group mb-2">
-							<span class="input-group-text inputGroupmw">Permittivity e<small>eff (note all λ=C/f&radic;e<small>eff</small></small>)</span>
-							<input type="number" value="1" id="er" class="form-control"   data-bs-toggle="modal" data-bs-target="#permModal" onchange="updateFromDom();">
+							<span class="input-group-text inputGroupmw">Permittivity e<small>eff</small>)</span>
+							<input type="number" value="1" id="er" class="form-control"   data-bs-toggle="modal" data-bs-target="#permModal" onchange="updateFromDom();" autocomplete="off">
 						</div>
 					</div>
 				</div>
@@ -237,31 +237,31 @@
 				<div class="row mt-4">
 					<div class="col-12 col-lg-2">
 						<div class="input-group">
-							<div class="input-group-text"><input class="form-check-input mt-0" type="checkbox" checked onchange="toggle_labels_DP()"></div>
+							<div class="input-group-text"><input class="form-check-input mt-0" autocomplete="off" type="checkbox" checked onchange="toggle_labels_DP()"></div>
 							<span class="input-group-text">Show label: DP</span>
 						</div>
 					</div>
 					<div class="col-12 col-lg-2">
 						<div class="input-group">
-							<div class="input-group-text"><input class="form-check-input mt-0" type="checkbox" checked onchange="toggle_labels_imag()"></div>
+							<div class="input-group-text"><input class="form-check-input mt-0" autocomplete="off" type="checkbox" checked onchange="toggle_labels_imag()"></div>
 							<span class="input-group-text">Show label: adm</span>
 						</div>
 					</div>
 					<div class="col-12 col-lg-2">
 						<div class="input-group">
-							<div class="input-group-text"><input class="form-check-input mt-0" type="checkbox" checked onchange="toggle_labels_real()"></div>
+							<div class="input-group-text"><input class="form-check-input mt-0" autocomplete="off" type="checkbox" checked onchange="toggle_labels_real()"></div>
 							<span class="input-group-text">Show label: res</span>
 						</div>
 					</div>
 					<div class="col-12 col-lg-2">
 						<div class="input-group">
-							<div class="input-group-text"><input class="form-check-input mt-0" type="checkbox" checked onchange="toggle_circles_adm()"></div>
+							<div class="input-group-text"><input class="form-check-input mt-0" autocomplete="off" type="checkbox" checked onchange="toggle_circles_adm()"></div>
 							<span class="input-group-text">Show circle: adm</span>
 						</div>
 					</div>
 					<div class="col-12 col-lg-2">
 						<div class="input-group">
-							<div class="input-group-text"><input class="form-check-input mt-0" type="checkbox" checked onchange="toggle_circles_res()"></div>
+							<div class="input-group-text"><input class="form-check-input mt-0" autocomplete="off" type="checkbox" checked onchange="toggle_circles_res()"></div>
 							<span class="input-group-text">Show circle: res</span>
 						</div>
 					</div>
@@ -329,8 +329,18 @@
 					<div class="col">
 						<h3>Add a VSWR circle<small> (set to 0 to remove it)</small></h3>
 						<div class="input-group mb-3">
-							<span class="input-group-text">VSWR:</span>
+							<span class="input-group-text">VSWR</span>
 							<input type="number" value="0" onchange="vswr=Number(this.value); update_smith_chart();" class="form-control">
+						</div>
+					</div>
+				</div>
+
+				<div class="row mt-5">
+					<div class="col">
+						<h3>Add a constant-Q circle<small> (set to 0 to remove it)</small></h3>
+						<div class="input-group mb-3">
+							<span class="input-group-text">Const Q</span>
+							<input type="number" value="0" onchange="constQ=Number(this.value); update_smith_chart();" class="form-control">
 						</div>
 					</div>
 				</div>
@@ -391,8 +401,8 @@
 				</div>
 			</div>
 				<div class="row mt-3 mb-2">
-					<div class="col">
-						Hosted by GitHub pages here -> https://github.com/28raining/28raining.github.io/tree/master/smith_chart
+					<div class="col ">
+						<a class="text-break link-light" href="https://github.com/28raining/28raining.github.io/tree/master/smith_chart">Hosted by GitHub pages here -> https://github.com/28raining/28raining.github.io/tree/master/smith_chart</a>
 					</div>
 				</div>
 			</div>
