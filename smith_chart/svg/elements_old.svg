@@ -7,7 +7,7 @@
   <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="12" d="M1235 20v140M1265 20v140" />
   <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M1270 90h230M1500 90h500M1750 180V90M1750 410V310M1750 410h50q10 0 2 6l-44 38q-8 6-16 0l-44-38q-8-6 2-6h50M1750 304q-50-20 0-40M1750 264q-50-20 0-40M1750 224q-50-20 0-40M2000 90h190M2310 90h190M2190 90q20-50 40 0M2230 90q20-50 40 0M2270 90q20-50 40 0M2500 90h500M2750 190V90M2750 410V310M2750 410h50q10 0 2 6l-44 38q-8 6-16 0l-44-38q-8-6 2-6h50M2780 200l-30-10M2780 240l-60-20M2780 280l-60-20M2780 240l-60 20M2780 200l-60 20M2780 280l-60 20M2750 310l-30-10M3000 90h190M3310 90h190M3200 60l-10 30M3200 60l20 60M3240 60l20 60M3280 60l20 60M3240 60l-20 60M3280 60l-20 60M3310 90l-10 30M3500 90h190M3820 90h180" />
   <path stroke-linecap="round" fill="none" stroke="#000" stroke-width="10" d="M3690 50h130v80h-130z" />
-      <text x="3755" y="110" font-family="Helvetica" font-size="50" text-anchor="middle">
+    <text x="3755" y="110" font-family="Helvetica" font-size="50" text-anchor="middle">
       Zo
     </text>
   <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M4000 90h500M4250 190V90" />
@@ -20,10 +20,6 @@
   <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="12" d="M6310 300h140M6310 330h140" />
   <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M6380 400v-70M6380 400h50q10 0 2 6l-44 38q-8 6-16 0l-44-38q-8-6 2-6h50M6120 270v-20M6120 270h60M6300 270h80M6380 300v-30M320 90h180" />
   <path stroke-linecap="round" fill="#ccc" stroke="#000" stroke-width="10" d="M80 20h240v140H80z" />
-  <!-- <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" d="M0 400V0" /> -->
-  <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M6500 90h500M6750 190V90M6750 410V310" />
-  <path stroke-linecap="round" fill="none" stroke="#000" stroke-width="10" d="M6700 190h100v120h-100z" />
-  <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M6600 410h300" />
     <text x="200" y="105" font-family="Helvetica" font-size="35" text-anchor="middle">
       BLACK BOX
     </text>

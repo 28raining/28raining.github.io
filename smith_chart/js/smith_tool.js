@@ -303,14 +303,15 @@ function pad(n) {
 }
 
 function unitTextToNum (unit, freq_here) {
-  if      (unit[0][0] == 'f') return 1e-15;
-  else if (unit[0][0] == 'p') return 1e-12;
-  else if (unit[0][0] == 'n') return 1e-9;
-  else if (unit[0][0] == 'u') return 1e-6;
-  else if (unit[0][0] == 'm') return 1e-3;	//tl can have unit of meters
-  else if (unit[0][0] == 'K') return 1e3;
-  else if (unit[0][0] == 'M') return 1e6;
-  else if (unit[0][0] == 'λ') return (3e8/(freq_here*Math.sqrt(schematic[0].er)));
+  if      (unit[0] == 'f') return 1e-15;
+  else if (unit[0] == 'p') return 1e-12;
+  else if (unit[0] == 'n') return 1e-9;
+  else if (unit[0] == 'u') return 1e-6;
+  else if (unit    == 'm') return 1;       //tl can have unit of meters
+  else if (unit[0] == 'm') return 1e-3;	
+  else if (unit[0] == 'K') return 1e3;
+  else if (unit[0] == 'M') return 1e6;
+  else if (unit[0] == 'λ') return (3e8/(freq_here*Math.sqrt(schematic[0].er)));
   else                        return 1;
 }
 
@@ -463,9 +464,9 @@ function update_smith_chart() {
               else start_at_qtr_wl = 0;
               start_impedance[0]=span_impedance_re[sp];
               start_impedance[1]=span_impedance_im[sp];
-              start = one_over_complex(span_impedance_re[sp],span_impedance_im[sp]);
-              var temp_array = arc_smith_points(start[0],start[1],ln_length,schematic[i].line_zo,schematic[i].type,true,2*Math.PI*frequency_at_sp*Math.sqrt(schematic[0].er)/3e8,start_at_qtr_wl);
-              var schem_inv = one_over_complex(temp_array[4],temp_array[5]);
+                start = one_over_complex(span_impedance_re[sp],span_impedance_im[sp]);
+                var temp_array = arc_smith_points(start[0],start[1],ln_length,schematic[i].line_zo,schematic[i].type,true,2*Math.PI*frequency_at_sp*Math.sqrt(schematic[0].er)/3e8,start_at_qtr_wl);
+                var schem_inv = one_over_complex(temp_array[4],temp_array[5]);
               span_impedance_re[sp] = schem_inv[0];
               span_impedance_im[sp] = schem_inv[1];
 
