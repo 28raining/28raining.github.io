@@ -1,1 +1,4 @@
-1 - Review behavior of stub when length = 0.5 and Zo changes
+1 - Add tolerances to components
+2 - Plot S-parameters (= 1+R / 1-R)
+3 - Add a s-parameter to impedance converter
+4 - Add a frequency vs impedance imput option

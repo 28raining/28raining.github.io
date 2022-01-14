@@ -230,7 +230,7 @@ function updatespan(sch_num, obj, unitIndex=0) {
   var customMarkers = [];
   
   schematic.push({type:'raw', zo : 50, freq:2440, er : 1, freq_unit:{unit:'MHz',multiplier:1e6}, span:0.0, span_unit:{unit:'MHz',multiplier:1e6}});
-  schematic.push({type:'bb',real:1,imaginary:0,abs:[50,0],unit:'null',tol:0});
+  schematic.push({type:'bb',real:1,imaginary:0,abs:[50,0],unit:'null'});
   
 function one_over_complex(real, imaginary) {
 	var realn = real/(real*real + imaginary*imaginary);
@@ -240,29 +240,29 @@ function one_over_complex(real, imaginary) {
 
 function clicked_cell(type) {
 	if (type == "pr") {
-		schematic.push({type:'pr',real:0,imaginary:0,abs:[50],unit:['Ω'],tol:0});
+		schematic.push({type:'pr',real:0,imaginary:0,abs:[50],unit:['Ω']});
 	} else if (type=="sr") {
-		schematic.push({type:'sr',real:0,imaginary:0,abs:[50],unit:['Ω'],tol:0});
+		schematic.push({type:'sr',real:0,imaginary:0,abs:[50],unit:['Ω']});
 	} else if (type=="si") {
-		schematic.push({type:'si',real:0,imaginary:0,abs:[1],unit:['nH'],tol:0});
+		schematic.push({type:'si',real:0,imaginary:0,abs:[1],unit:['nH']});
 	} else if (type=="pi") {
-		schematic.push({type:'pi',real:0,imaginary:0,abs:[1],unit:['nH'],tol:0});
+		schematic.push({type:'pi',real:0,imaginary:0,abs:[1],unit:['nH']});
 	} else if (type=="sc") {
-		schematic.push({type:'sc',real:0,imaginary:0,abs:[1],unit:['pF'],tol:0});
+		schematic.push({type:'sc',real:0,imaginary:0,abs:[1],unit:['pF']});
 	} else if (type=="pc") {
-		schematic.push({type:'pc',real:0,imaginary:0,abs:[1],unit:['pF'],tol:0});
+		schematic.push({type:'pc',real:0,imaginary:0,abs:[1],unit:['pF']});
 	} else if (type=="tl") {
-		schematic.push({type:'tl',line_length:1e-3,abs:[1],line_zo:50,unit:['mm'],real:0,imaginary:0,tol:0});
+		schematic.push({type:'tl',line_length:1e-3,abs:[1],line_zo:50,unit:['mm'],real:0,imaginary:0});
 	} else if (type=="ss") {
-		schematic.push({type:'ss',line_length:1e-3,abs:[1],line_zo:50,unit:['mm'],real:0,imaginary:0,tol:0});
+		schematic.push({type:'ss',line_length:1e-3,abs:[1],line_zo:50,unit:['mm'],real:0,imaginary:0});
 	} else if (type=="so") {
-		schematic.push({type:'so',line_length:1e-3,abs:[1],line_zo:50,unit:['mm'],real:0,imaginary:0,tol:0});
+		schematic.push({type:'so',line_length:1e-3,abs:[1],line_zo:50,unit:['mm'],real:0,imaginary:0});
 	} else if (type=="rc") {
-		schematic.push({type:'rc',real:0,imaginary:0,abs:[50,1],unit:['Ω','pF'],tol:0});
+		schematic.push({type:'rc',real:0,imaginary:0,abs:[50,1],unit:['Ω','pF']});
 	} else if (type=="rl") {
-		schematic.push({type:'rl',real:0,imaginary:0,abs:[50,1],unit:['Ω','nH'],tol:0});
+		schematic.push({type:'rl',real:0,imaginary:0,abs:[50,1],unit:['Ω','nH']});
 	} else if (type=="rlc") {
-		schematic.push({type:'rlc',real:0,imaginary:0,abs:[50,1,1],unit:['Ω','nH','pF'],tol:0});
+		schematic.push({type:'rlc',real:0,imaginary:0,abs:[50,1,1],unit:['Ω','nH','pF']});
 	}
 	update_smith_chart();
 }
@@ -308,7 +308,7 @@ function unitTextToNum (unit, freq_here) {
   else if (unit[0] == 'n') return 1e-9;
   else if (unit[0] == 'u') return 1e-6;
   else if (unit    == 'm') return 1;       //tl can have unit of meters
-  else if (unit[0] == 'm') return 1e-3;	  //milli...
+  else if (unit[0] == 'm') return 1e-3;	
   else if (unit[0] == 'K') return 1e3;
   else if (unit[0] == 'M') return 1e6;
   else if (unit[0] == 'λ') return (3e8/(freq_here*Math.sqrt(schematic[0].er)));
@@ -950,7 +950,23 @@ var layout_polar = {
 
   //update the HTML tables
   drawMakerTable();
+
+
 }
+
+// function createAbsBox(i,content) {
+//   return "<div class=\"abs_box\"><input type=\"text\" value="+schematic[i].abs+" onchange=\"update_schem_abs("+i+",this,'abs')\"></input>" + content + "</div>";
+// }
+
+// function createDropdown (i,unit, unitIndex=0) {
+//   //Add units selector
+//   var content = "<div id=\"sch_"+i+"_"+unitIndex+"\" class=\"wrapper-dropdown-5 \" tabindex=\"1\"><div>"+schematic[i].unit[unitIndex]+"</div><ul class=\"dropdown\">";
+//   for (j=0;j<unit.length;j++) {
+//     content += "<li onclick=\"updatespan(parentElement.parentElement.id,'"+unit[j]+"',"+unitIndex+")\"><a href=\"#\">"+unit[j]+"</a></li>";
+//   }
+//   content +="</ul></div>";
+//   return createAbsBox(i,content);
+// }
 
 function draw_schematic(i) {
 
@@ -973,10 +989,10 @@ function draw_schematic(i) {
             sch_abs=true;
             sch_icon="black_box";
             sch_svg=0;
-            rows_to_create = [['Impedance'],['abs','abs'],['tol']];
+            rows_to_create = [['abs','abs'],['Impedance']];
             break;
         case ("pr") :
-            rows_to_create = [['Impedance'],['abs','unit_0'],['tol']];
+            rows_to_create = [['abs','unit_0'],['Impedance']];
             sch_label="Parallel Resistor";
             sch_imag=false;
             sch_real=true;
@@ -986,7 +1002,7 @@ function draw_schematic(i) {
             sch_svg=2500;
             break;
         case ("sr") :
-            rows_to_create = [['Impedance'],['abs','unit_0'],['tol']];
+            rows_to_create = [['abs','unit_0'],['Impedance']];
             sch_label="Series Resistor";
             sch_imag=false;
             sch_real=true;
@@ -996,7 +1012,7 @@ function draw_schematic(i) {
             sch_svg=3000;
             break;
         case ("pc") :
-            rows_to_create = [['Impedance'], ['abs','unit_0'],['tol']];
+            rows_to_create = [['abs','unit_0'],['Impedance']];
             sch_label="Parallel Capacitor";
             sch_imag=true;
             sch_real=false;
@@ -1006,7 +1022,7 @@ function draw_schematic(i) {
             sch_svg=500;
             break;
         case ("sc") :
-            rows_to_create = [['Impedance'], ['abs','unit_0'],['tol']];
+            rows_to_create = [['abs','unit_0'],['Impedance']];
             sch_label="Series Capacitor";
             sch_imag=true;
             sch_real=false;
@@ -1016,7 +1032,7 @@ function draw_schematic(i) {
             sch_svg=1000;
             break;
         case ("pi") :
-            rows_to_create = [['Impedance'], ['abs','unit_0'],['tol']];
+            rows_to_create = [['abs','unit_0'],['Impedance']];
             sch_label="Parallel Inductor";
             sch_imag=true;
             sch_real=false;
@@ -1026,7 +1042,7 @@ function draw_schematic(i) {
             sch_svg=1500;
             break;
         case ("si") :
-            rows_to_create = [['Impedance'], ['abs','unit_0'],['tol']];
+            rows_to_create = [['abs','unit_0'],['Impedance']];
             sch_label="Series Inductor";
             sch_imag=true;
             sch_real=false;
@@ -1036,7 +1052,7 @@ function draw_schematic(i) {
             sch_svg=2000;
             break;
         case ("tl") :
-            rows_to_create = [['blank-impedance'],['abs','unit_0'],['line_zo']];
+            rows_to_create = [['abs','unit_0'],['line_zo']];
             sch_label="Transmission Line";
             sch_imag=false;
             sch_real=false;
@@ -1046,7 +1062,7 @@ function draw_schematic(i) {
             sch_svg=3500;
             break;
         case ("ss") :
-            rows_to_create = [['blank-impedance'],['abs','unit_0'],['line_zo']];
+            rows_to_create = [['abs','unit_0'],['line_zo']];
             sch_label="Short Stub";
             sch_imag=false;
             sch_real=false;
@@ -1056,7 +1072,7 @@ function draw_schematic(i) {
             sch_svg=4500;
             break;
         case ("so") :
-            rows_to_create = [['blank-impedance'],['abs','unit_0'],['line_zo']];
+            rows_to_create = [['abs','unit_0'],['line_zo']];
             sch_label="Open Stub";
             sch_imag=false;
             sch_real=false;
@@ -1066,7 +1082,7 @@ function draw_schematic(i) {
             sch_svg=4000;
             break
         case ("rc") :
-            rows_to_create = [['Impedance'], ['abs','unit_0'],['abs','unit_1'],['tol']];
+            rows_to_create = [['abs','unit_0'],['abs','unit_1'],['Impedance']];
             sch_label="Capacitor w/ ESR";
             sch_imag=true;
             sch_real=true;
@@ -1076,7 +1092,7 @@ function draw_schematic(i) {
             sch_svg=5000;
             break;
         case ("rl") :
-            rows_to_create = [['Impedance'], ['abs','unit_0'],['abs','unit_1'],['tol']];
+            rows_to_create = [['abs','unit_0'],['abs','unit_1'],['Impedance']];
             sch_label="Inductor w/ ESR";
             sch_imag=true;
             sch_real=true;
@@ -1086,7 +1102,7 @@ function draw_schematic(i) {
             sch_svg=5500;
             break;
         case ("rlc") :
-            rows_to_create = [['Impedance'], ['abs','unit_0'],['abs','unit_1'],['abs','unit_2'],['tol']];
+            rows_to_create = [['abs','unit_0'],['abs','unit_1'],['abs','unit_2'],['Impedance']];
             sch_label="Inductor w/ ESR";
             sch_imag=true;
             sch_real=true;
@@ -1096,6 +1112,8 @@ function draw_schematic(i) {
             sch_svg=6000;
             break;
     }
+    //div.innerHTML = "<p>"+sch_label+"</p>";
+    // div.innerHTML += "<img src=\"icons/"+sch_icon+".png\" alt="+sch_label+">";
     innerText += '<div class="row"><div class="col"><svg viewBox="'+sch_svg+' 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="'+sch_label+'" /></svg></div></div>';
 
     var cntR, cntC, ittUnit, boxType, varSelect, unitIndex;
@@ -1104,15 +1122,8 @@ function draw_schematic(i) {
       innerText += '<div class="row ms-3 me-3"><div class="input-group mb-1 p-0">'
       for (cntC=0; cntC<rows_to_create[cntR].length;cntC++) {
         boxType = rows_to_create[cntR][cntC];
-        if (boxType == 'tolxxx') {
-          innerText += '<span class="input-group-text">tol &plusmn; </span>'
-          innerText += '<input type="text" class="form-control" value="0" name="tol" onchange="update_schem_tol('+i+',this)">'
-          innerText += '<span class="input-group-text">%</span>'
-        } else 
-        if (boxType == 'blank-impedance') {
-          innerText += '<div class="fst-italic m-auto">&nbsp</div>';
-        } else if (boxType == 'Impedance') {
-          innerText += '<div class="fst-italic m-auto">Z = '
+        if (boxType == 'Impedance') {
+          innerText += '<div class="row ms-3">Impedance = '
           if (sch_real) innerText += Number(((schematic[i].real*zo)).toPrecision(precision))
           if (sch_real && sch_imag) {
             if (schematic[i].imaginary*zo >= 0) innerText += ' + '
@@ -1136,7 +1147,7 @@ function draw_schematic(i) {
         } else {
           if (cntC>0) innerText += '<span class="input-group-text">+</span>'
           innerText += '<input type="text" class="form-control inputMW" value='+schematic[i][boxType][absCounter]+' name="'+boxType+'" onchange="update_schem_abs('+i+',this,'+absCounter+')">'
-          if (cntC>0) innerText += '<span class="input-group-text ps-2 pe-2">j</span>'
+          if (cntC>0) innerText += '<span class="input-group-text">j</span>'
           if (boxType == 'abs') absCounter=absCounter+1;
         }
       }

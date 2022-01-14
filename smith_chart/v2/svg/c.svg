@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="511px" height="501px" viewBox="-0.5 -0.5 511 501">
+   <defs/>
+   <g>
+      <rect x="5" y="0" width="500" height="500" fill="none" stroke="#000000" pointer-events="all"/>
+      <path stroke-linecap="round" d="M 5 100 L 505 100" fill="none" stroke="#000000" stroke-width="10" stroke-miterlimit="10" pointer-events="stroke"/>
+      <path stroke-linecap="round" d="M 255 240 L 255 100" fill="none" stroke="#000000" stroke-width="10" stroke-miterlimit="10" pointer-events="stroke"/>
+      <path stroke-linecap="round" d="M 185 240 L 325 240" fill="none" stroke="#000000" stroke-width="12" stroke-miterlimit="10" pointer-events="stroke"/>
+      <path stroke-linecap="round" d="M 185 270 L 325 270" fill="none" stroke="#000000" stroke-width="12" stroke-miterlimit="10" pointer-events="stroke"/>
+      <path stroke-linecap="round" d="M 255 420 L 255 270" fill="none" stroke="#000000" stroke-width="10" stroke-miterlimit="10" pointer-events="stroke"/>
+      <path stroke-linecap="round" d="M 255 420 L 305 420 Q 315 420 307.32 426.4 L 262.68 463.6 Q 255 470 247.32 463.6 L 202.68 426.4 Q 195 420 205 420 L 255 420" fill="none" stroke="#000000" stroke-width="10" stroke-miterlimit="10" pointer-events="stroke"/>
+   </g>
+</svg>

@@ -1,27 +1,18 @@
 
-// document.getElementById('file').addEventListener('change', readFile, false);
-//get dom elements
-var vmin_distanceEl = document.getElementById('vmin_distance');
-var vmax_distanceEl = document.getElementById('vmax_distance');
+document.getElementById('file').addEventListener('change', readFile, false);
 
 function expo(x, f) {
   return Number.parseFloat(x).toExponential(f);
 }
 
 function toggle_color_scheme(){
-  var element = document.getElementById("mainSection");
-  var x = document.getElementsByClassName("bg-white");
-  if (x.length > 0){
-    element.classList.remove("bg-white");
-    element.classList.add("bg-green");
-    // document.getElementsByTagName('section')[0].style["background-color"] = "rgb(184, 255, 241)";  
-    // document.getElementsByTagName('section')[0].style.color = "rgb(37, 50, 64)";
+  if (document.getElementsByTagName('section')[0].style["background-color"] == "white"){
+    document.getElementsByTagName('section')[0].style["background-color"] = "rgb(184, 255, 241)";  
+    document.getElementsByTagName('section')[0].style.color = "rgb(37, 50, 64)";
     document.getElementById('hollowed_circle').style["boxShadow"] = "0px 0px 0px 2000px rgb(184, 255, 241)";
   } else {
-    element.classList.add("bg-white");
-    element.classList.remove("bg-green");
-    // document.getElementsByTagName('section')[0].style["background-color"] = "white";
-    // document.getElementsByTagName('section')[0].style.color = "black";
+    document.getElementsByTagName('section')[0].style["background-color"] = "white";
+    document.getElementsByTagName('section')[0].style.color = "black";
     document.getElementById('hollowed_circle').style["boxShadow"] = "0px 0px 0px 2000px white";
   }
 
@@ -92,8 +83,8 @@ function delCustomMarker(i) {
 //#2 - Impedance at each Data Point (DP)
 function drawMakerTable() {
   var table = document.getElementById("customMarkerTable");
-  var inner = "<table class='table table-striped table-sm'><tr><th>Real</th><th>Imaginary</th><th>Name</th><th></th></tr>"
-  inner += "<tr><td><input type='text' id='customMarkerRe' style='width:75px'></td><td><input type='text' id='customMarkerIm' style='width:75px'></td><td></td><td><button onclick=addCustomMarker()>add</button></td></tr>"
+  var inner = "<table><tr><th>Real</th><th>Imaginary</th><th width='100px'>Name</th><th width='100px'>add/remove</th></tr>"
+  inner += "<tr><td><input type='text' id='customMarkerRe'></td><td><input type='text' id='customMarkerIm'></td><td></td><td><button onclick=addCustomMarker()>add</button></td></tr>"
   var i=0;
   for (i=0; i<customMarkers.length; i++) {
     inner += "<tr><td>"+ customMarkers[i].re +"</td><td>"+customMarkers[i].im+"</td><td>MP"+i+"</td><td><button onClick='delCustomMarker("+i+")')>Remove</button></td></tr>"
@@ -103,118 +94,59 @@ function drawMakerTable() {
 
   //#2nd table
   table = document.getElementById("DPImpedance");
-  inner = "<table class='table table-striped'><tr><th>Data Point (DP)</th><th>Real</th><th>Imaginary</th></tr>"
+  inner = "<table><tr><th>Data Point (DP)</th><th>Real</th><th>Imaginary</th></tr>"
   for (i=0; i<dataPoints.length; i++) {
     inner += "<tr><td>"+(i+1)+"</td><td>"+ dataPoints[i].re +"</td><td>"+dataPoints[i].im+"</td></tr>"
   }
   table.innerHTML = inner + "</table>";
 }
 
-fileDom = document.getElementById('file');
-domFreq = document.getElementById('freq');
-domFreqSel = document.getElementById('freq_sel');
-domSpanSel = document.getElementById('span_sel');
-domSpan = document.getElementById('span');
-domZo = document.getElementById('zo');
-domEr = document.getElementById('er');
-
-function readFile() {
-	var files = fileDom.files;
+function readFile (evt) {
+	var files = evt.target.files;
 	var file = files[0];           
 	var reader = new FileReader();
-  var i;
 	reader.onload = function(event) {
-
 		schematic = JSON.parse(event.target.result);
-    //check for old version of file
-    for (i=1;i<schematic.length;i++){
-      if (!(Array.isArray(schematic[i].abs))) {
-        schematic[i].abs = [schematic[i].abs];
-      }
-      if ('abs_bb_i' in schematic[i]) schematic[i].abs.push(schematic[i].abs_bb_i);
-      if (!(Array.isArray(schematic[i].unit))) {
-        schematic[i].unit = [schematic[i].unit];
-      }
-    }
-
-    //update freq units
-    var opts = domFreqSel.options;
-    for (var opt, j = 0; opt = opts[j]; j++) {
-      if (opt.value == schematic[0].freq_unit.unit) {
-        domFreqSel.selectedIndex = j;
-        break;
-      }
-    }
-    opts = domSpanSel.options;
-    for (opt, j = 0; opt = opts[j]; j++) {
-      if (opt.value == schematic[0].span_unit.unit) {
-        domSpanSel.selectedIndex = j;
-        break;
-      }
-    }
-    
-    domFreq.value=Number(schematic[0].freq);
-    domSpan.value=Number(schematic[0].span);
-    domEr.value=Number(schematic[0].er);
+    document.getElementById('freq').value=Number(schematic[0].freq);
+    document.getElementById('span').value=Number(schematic[0].span);
 		zo=Number(schematic[0].zo);
-		domZo.value=zo;
-    console.log("READING", schematic);
-    updateFromDom();
+		document.getElementById('zo').value=zo;
+    updatespan('freq_sel',schematic[0].freq_unit.unit,'freq_unit');
+    updatespan('span_sel',schematic[0].span_unit.unit,'span_unit');
 	}
 	reader.readAsText(file);
 }
 
-
-function updateFromDom () {
-  schematic[0].freq=Number(domFreq.value);
-  schematic[0].span=Number(domSpan.value)
-  zo=Number(domZo.value); 
-  schematic[0].zo=Number(domZo.value);
-  schematic[0].er=Number(domEr.value);
-
-  //dropdowns
-  if      (domFreqSel.value == 'Hz') schematic[0]['freq_unit'].multiplier = 1;
-  else if (domFreqSel.value == 'KHz') schematic[0]['freq_unit'].multiplier = 1e3;
-  else if (domFreqSel.value == 'MHz') schematic[0]['freq_unit'].multiplier = 1e6;
-  else if (domFreqSel.value == 'GHz') schematic[0]['freq_unit'].multiplier = 1e9;
-  else if (domFreqSel.value == 'THz') schematic[0]['freq_unit'].multiplier = 1e12;
-
-  if      (domSpanSel.value == 'Hz') schematic[0]['span_unit'].multiplier = 1;
-  else if (domSpanSel.value == 'KHz') schematic[0]['span_unit'].multiplier = 1e3;
-  else if (domSpanSel.value == 'MHz') schematic[0]['span_unit'].multiplier = 1e6;
-  else if (domSpanSel.value == 'GHz') schematic[0]['span_unit'].multiplier = 1e9;
-  else if (domSpanSel.value == 'THz') schematic[0]['span_unit'].multiplier = 1e12;
-
-  update_smith_chart()
+function change_class(this_id) {
+	document.getElementById(this_id).classList.toggle("active");
 }
 
-function updatespan(sch_num, obj, unitIndex=0) {
-	// if ((this_val[this_val.length-2]+this_val[this_val.length-1])=='Hz') {
-	// 	if      (this_val == 'Hz') freq_multiplier = 1;
-	// 	else if (this_val == 'KHz') freq_multiplier = 1e3;
-	// 	else if (this_val == 'MHz') freq_multiplier = 1e6;
-	// 	else if (this_val == 'GHz') freq_multiplier = 1e9;
-	// 	else if (this_val == 'THz') freq_multiplier = 1e12;		
-  //   schematic[0][element].unit=this_val;
-  //   schematic[0][element].multiplier=freq_multiplier;
-	// } else {
-		// var sch_num = this_id.split('_')[1];
-  schematic[sch_num].unit[unitIndex] = obj.value;
-		// is_active[sch_num]="active";
-  // }
-  // document.getElementById(this_id).children[0].innerText=this_val;	
+function updatespan(this_id,this_val,element, unitIndex=0) {
+	if ((this_val[this_val.length-2]+this_val[this_val.length-1])=='Hz') {
+		if      (this_val == 'Hz') freq_multiplier = 1;
+		else if (this_val == 'KHz') freq_multiplier = 1e3;
+		else if (this_val == 'MHz') freq_multiplier = 1e6;
+		else if (this_val == 'GHz') freq_multiplier = 1e9;
+		else if (this_val == 'THz') freq_multiplier = 1e12;		
+    schematic[0][element].unit=this_val;
+    schematic[0][element].multiplier=freq_multiplier;
+	} else {
+		var sch_num = this_id.split('_')[1];
+		schematic[sch_num].unit[unitIndex] = this_val;
+		is_active[sch_num]="active";
+  }
+  document.getElementById(this_id).children[0].innerText=this_val;	
   update_smith_chart()
-	// is_active=[];
+	is_active=[];
 }
 
   var schematic = [];
   var dataPoints = [];
   var vswr=0.0;
-  var constQ=0.0;
   var zo=50;
 	//var freq_multiplier=1e6;
 	//var span_multiplier=1e6;
-  // var is_active=[];
+  var is_active=[];
   var precision=3;
   // var start_x_coord=0;
   // var start_y_coord=0;
@@ -230,7 +162,7 @@ function updatespan(sch_num, obj, unitIndex=0) {
   var customMarkers = [];
   
   schematic.push({type:'raw', zo : 50, freq:2440, er : 1, freq_unit:{unit:'MHz',multiplier:1e6}, span:0.0, span_unit:{unit:'MHz',multiplier:1e6}});
-  schematic.push({type:'bb',real:1,imaginary:0,abs:[50,0],unit:'null',tol:0});
+  schematic.push({type:'bb',real:1,imaginary:0,abs:50,abs_bb_i:0,unit:'null'});
   
 function one_over_complex(real, imaginary) {
 	var realn = real/(real*real + imaginary*imaginary);
@@ -240,59 +172,48 @@ function one_over_complex(real, imaginary) {
 
 function clicked_cell(type) {
 	if (type == "pr") {
-		schematic.push({type:'pr',real:0,imaginary:0,abs:[50],unit:['Ω'],tol:0});
+		schematic.push({type:'pr',real:0,imaginary:0,abs:1,unit:['Ω']});
 	} else if (type=="sr") {
-		schematic.push({type:'sr',real:0,imaginary:0,abs:[50],unit:['Ω'],tol:0});
+		schematic.push({type:'sr',real:0,imaginary:0,abs:1,unit:['Ω']});
 	} else if (type=="si") {
-		schematic.push({type:'si',real:0,imaginary:0,abs:[1],unit:['nH'],tol:0});
+		schematic.push({type:'si',real:0,imaginary:0,abs:1,unit:['nH']});
 	} else if (type=="pi") {
-		schematic.push({type:'pi',real:0,imaginary:0,abs:[1],unit:['nH'],tol:0});
+		schematic.push({type:'pi',real:0,imaginary:0,abs:1,unit:['nH']});
 	} else if (type=="sc") {
-		schematic.push({type:'sc',real:0,imaginary:0,abs:[1],unit:['pF'],tol:0});
+		schematic.push({type:'sc',real:0,imaginary:0,abs:1,unit:['pF']});
 	} else if (type=="pc") {
-		schematic.push({type:'pc',real:0,imaginary:0,abs:[1],unit:['pF'],tol:0});
+		schematic.push({type:'pc',real:0,imaginary:0,abs:1,unit:['pF']});
 	} else if (type=="tl") {
-		schematic.push({type:'tl',line_length:1e-3,abs:[1],line_zo:50,unit:['mm'],real:0,imaginary:0,tol:0});
+		schematic.push({type:'tl',line_length:1e-3,abs:1,line_zo:50,unit:['mm'],real:0,imaginary:0});
 	} else if (type=="ss") {
-		schematic.push({type:'ss',line_length:1e-3,abs:[1],line_zo:50,unit:['mm'],real:0,imaginary:0,tol:0});
+		schematic.push({type:'ss',line_length:1e-3,abs:1,line_zo:50,unit:['mm'],real:0,imaginary:0});
 	} else if (type=="so") {
-		schematic.push({type:'so',line_length:1e-3,abs:[1],line_zo:50,unit:['mm'],real:0,imaginary:0,tol:0});
+		schematic.push({type:'so',line_length:1e-3,abs:1,line_zo:50,unit:['mm'],real:0,imaginary:0});
 	} else if (type=="rc") {
-		schematic.push({type:'rc',real:0,imaginary:0,abs:[50,1],unit:['Ω','pF'],tol:0});
-	} else if (type=="rl") {
-		schematic.push({type:'rl',real:0,imaginary:0,abs:[50,1],unit:['Ω','nH'],tol:0});
-	} else if (type=="rlc") {
-		schematic.push({type:'rlc',real:0,imaginary:0,abs:[50,1,1],unit:['Ω','nH','pF'],tol:0});
+		schematic.push({type:'rc',real:0,imaginary:0,abs:1,unit:['pF','Ω']});
 	}
 	update_smith_chart();
 }
 
-function update_schem_abs(target_num, obj, absCounter) {
-  var complex = obj.name;
-  // console.log('dbg0',target_num, obj.value, complex)
+function update_schem_abs(target_num, obj, complex) {
 	switch(schematic[target_num].type) {
-		// case ("bb") :
-    //   // console.log('dbg1',target_num, obj.value, complex)
-		// 	if (complex=="abs") schematic[target_num].abs[absCounter] = Number(obj.value);
-    //   // else schematic[target_num].abs_bb_i = Number(obj.value);
-		// 	break;
+		case ("bb") :
+			if (complex=="abs") schematic[target_num].abs = Number(obj.value);
+      else schematic[target_num].abs_bb_i = Number(obj.value);
+			break;
     case ("tl") :
     case ("ss") :
     case ("so") :
-			if (complex=="abs") schematic[target_num].abs[absCounter] = Number(obj.value);
+			if (complex=="abs") schematic[target_num].abs = Number(obj.value);
 			else if (complex=="line_zo") schematic[target_num].line_zo = Number(obj.value);
 			break;
-		case ("rc") :
-		case ("rl") :
-		case ("rlc") :
-		case ("bb") :
 		case ("sr") :
 		case ("pr") :
 		case ("pc"):
 		case ("sc"):
 		case ("pi"):
 		case ("si"):
-			schematic[target_num].abs[absCounter] = Number(obj.value)
+			schematic[target_num].abs = Number(obj.value)
 			break;
   }
 	update_smith_chart();
@@ -302,62 +223,44 @@ function pad(n) {
 		return n<10 ? '0'+n : n
 }
 
-function unitTextToNum (unit, freq_here) {
-  if      (unit[0] == 'f') return 1e-15;
-  else if (unit[0] == 'p') return 1e-12;
-  else if (unit[0] == 'n') return 1e-9;
-  else if (unit[0] == 'u') return 1e-6;
-  else if (unit    == 'm') return 1;       //tl can have unit of meters
-  else if (unit[0] == 'm') return 1e-3;	  //milli...
-  else if (unit[0] == 'K') return 1e3;
-  else if (unit[0] == 'M') return 1e6;
-  else if (unit[0] == 'λ') return (3e8/(freq_here*Math.sqrt(schematic[0].er)));
-  else                        return 1;
-}
-
 function update_schem_component(freq_here,save_impedance,sch_index) {
+    var absolute_val = 0;
     var re_here = 0;
     var im_here = 0;
     var ln_here = 0;
-    var scaler = [];
-    var i = 0;
-    for (i=0; i<schematic[sch_index].unit.length; i++) {
-      scaler[i] = unitTextToNum(schematic[sch_index].unit[i], freq_here);
-    }
-
+	//for (i=1;i<schematic.length;i++) {
+		//if (schematic[i].abs != 0) { 
+    if      (schematic[sch_index].unit[0][0] == 'f') absolute_val = schematic[sch_index].abs * 1e-15;
+    else if (schematic[sch_index].unit[0][0] == 'p') absolute_val = schematic[sch_index].abs * 1e-12;
+    else if (schematic[sch_index].unit[0][0] == 'n') absolute_val = schematic[sch_index].abs * 1e-9;
+    else if (schematic[sch_index].unit[0][0] == 'u') absolute_val = schematic[sch_index].abs * 1e-6;
+    else if (schematic[sch_index].unit[0][0] == 'm') absolute_val = schematic[sch_index].abs * 1e-3;	//tl can have unit of meters
+    else if (schematic[sch_index].unit[0][0] == 'K') absolute_val = schematic[sch_index].abs * 1e3;
+    else if (schematic[sch_index].unit[0][0] == 'M') absolute_val = schematic[sch_index].abs * 1e6;
+    else if (schematic[sch_index].unit[0][0] == 'λ') absolute_val = schematic[sch_index].abs * (3e8/freq_here);
+    else                                          absolute_val = schematic[sch_index].abs;
+    
     switch(schematic[sch_index].type) {
         case ("bb") :
-            re_here = (schematic[sch_index].abs[0] / zo);
-            im_here = (schematic[sch_index].abs[1] / zo);
+            re_here = (schematic[sch_index].abs / zo);
+            im_here = (schematic[sch_index].abs_bb_i / zo);
             break;
         case ("sr") :
         case ("pr") :
-            re_here = (schematic[sch_index].abs[0] * scaler[0]/ zo);
+            re_here = (absolute_val / zo);
             break;
         case ("pc"):
         case ("sc"):
-            im_here = -(1 / (schematic[sch_index].abs[0] * scaler[0] * 2 * Math.PI * freq_here * zo));
+            im_here = -(1 / (absolute_val * 2 * Math.PI * freq_here * zo));
             break;
         case ("pi"):
         case ("si"):
-            im_here = (schematic[sch_index].abs[0] * scaler[0] * 2 * Math.PI * freq_here / zo);
-            break;
-        case ("rlc"):
-            re_here = schematic[sch_index].abs[0] * scaler[0]/ zo;
-            im_here = ((schematic[sch_index].abs[1] * scaler[1] * 2 * Math.PI * freq_here) - (1 / (schematic[sch_index].abs[2] * scaler[2] * 2 * Math.PI * freq_here))) / zo;
-            break;
-        case ("rl"):
-            re_here = schematic[sch_index].abs[0] * scaler[0]/ zo;
-            im_here = ((schematic[sch_index].abs[1] * scaler[1] * 2 * Math.PI * freq_here)) / zo;
-            break;
-        case ("rc"):
-            re_here = schematic[sch_index].abs[0] * scaler[0]/ zo;
-            im_here =  - (1 / (schematic[sch_index].abs[1] * scaler[1] * 2 * Math.PI * freq_here)) / zo;
+            im_here = (absolute_val * 2 * Math.PI * freq_here / zo);
             break;
         case ("tl"):
         case ("ss") :
         case ("so") :
-            ln_here = schematic[sch_index].abs[0] * scaler[0];
+            ln_here = absolute_val;
             break;
     }
     
@@ -409,8 +312,13 @@ function update_smith_chart() {
 	} else {
 		span_res = span_resolution;
 	}
-
-
+	
+	var myNode = document.getElementById("schematic");
+	myNode.innerHTML = '<div class="schematic-title">Below is your system, note impedance is looking towards the BLACK BOX</div>';
+	/*var point_div = document.createElement("div");
+	point_div.setAttribute('class', 'cell-picker-text');
+	point_div.innerHTML += "";
+	document.getElementById("schematic").appendChild(point_div);*/
 	var real_old = 0.0;
   var imag_old = 0.0;
   var x;
@@ -418,11 +326,8 @@ function update_smith_chart() {
   var x0,x1,y0,y1;
   
   //update black box
-  update_schem_component(freq,true,1);
-  var schemEl = document.getElementById("schematic");
-  schemEl.innerHTML="";
-  var newDiv = draw_schematic(1);
-  schemEl.appendChild(newDiv);
+  update_schem_component(freq,true,1)
+  draw_schematic(1);
 
 	for (var i= 0; i <= span_res*2; i++) {
 		span_impedance_re[i] = Number(schematic[1].real);
@@ -464,13 +369,13 @@ function update_smith_chart() {
               else start_at_qtr_wl = 0;
               start_impedance[0]=span_impedance_re[sp];
               start_impedance[1]=span_impedance_im[sp];
-                start = one_over_complex(span_impedance_re[sp],span_impedance_im[sp]);
-                var temp_array = arc_smith_points(start[0],start[1],ln_length,schematic[i].line_zo,schematic[i].type,true,2*Math.PI*frequency_at_sp*Math.sqrt(schematic[0].er)/3e8,start_at_qtr_wl);
-                var schem_inv = one_over_complex(temp_array[4],temp_array[5]);
+              start = one_over_complex(span_impedance_re[sp],span_impedance_im[sp]);
+              var temp_array = arc_smith_points(start[0],start[1],ln_length,schematic[i].line_zo,schematic[i].type,true,2*Math.PI*frequency_at_sp*Math.sqrt(schematic[0].er)/3e8,start_at_qtr_wl);
+              var schem_inv = one_over_complex(temp_array[4],temp_array[5]);
               span_impedance_re[sp] = schem_inv[0];
               span_impedance_im[sp] = schem_inv[1];
 
-            } else if ((schematic[i].type[0]=='p') || (schematic[i].type=='rlc') || (schematic[i].type=='rc') || (schematic[i].type=='rl')) {
+            } else if (schematic[i].type[0]=='p') {
               //For parallel elements plotted on rotated graph....
               start_impedance[0]=span_impedance_re[sp];
               start_impedance[1]=span_impedance_im[sp];
@@ -526,8 +431,7 @@ function update_smith_chart() {
                 }
             }
         }
-        newDiv = draw_schematic(i);
-        schemEl.appendChild(newDiv);
+        draw_schematic(i);
 	}
 	
   //If only the black box exists...
@@ -550,23 +454,20 @@ function update_smith_chart() {
   }
 
   //Update the impedance box
-	var txt = "<div class=\"text_box\">";
-	txt += (real_old*zo).toPrecision(3);
-	if (imag_old < 0) txt += " - ";
-	else txt += " + ";
-	txt += Math.abs(imag_old*zo).toPrecision(3) + "j</div>";
-	document.getElementById("current_impedance").innerHTML = txt;
+	document.getElementById("current_impedance").innerHTML = "<div class=\"text_box\">"+(real_old*zo).toPrecision(3)+"</div>";
+	if (imag_old < 0) document.getElementById("current_impedance").innerHTML += "<div class=\"text_box\">-</div>";
+	else document.getElementById("current_impedance").innerHTML += "<div class=\"text_box\">+</div>";
+	document.getElementById("current_impedance").innerHTML += "<div class=\"text_box\">"+Math.abs(imag_old*zo).toPrecision(3) + "j</div>";
 	
 	//Calculate the admittance
 	var admittance_real,admittance_imaginary;
 	temp_array =  one_over_complex(real_old*zo,imag_old*zo);
 	admittance_real=temp_array[0];
 	admittance_imaginary=temp_array[1];
-	txt = "<div class=\"text_box\">"+(admittance_real).toPrecision(3);
-	if (admittance_imaginary < 0) txt += " - ";
-	else txt += " + ";
-	txt += Math.abs(admittance_imaginary).toPrecision(3) + "j</div>";
-  document.getElementById("current_admittance").innerHTML = txt
+	document.getElementById("current_admittance").innerHTML = "<div class=\"text_box\">"+(admittance_real).toPrecision(3)+"</div>";
+	if (admittance_imaginary < 0) document.getElementById("current_admittance").innerHTML += "<div class=\"text_box\">-</div>";
+	else document.getElementById("current_admittance").innerHTML += "<div class=\"text_box\">+</div>";
+	document.getElementById("current_admittance").innerHTML += "<div class=\"text_box\">"+Math.abs(admittance_imaginary).toPrecision(3) + "j</div>";
 	
 	//Calculate the reflection coefficient -current_admittance (zo-zimp) / (zo+zimp)
 	var bot_real,bot_imag;
@@ -575,34 +476,26 @@ function update_smith_chart() {
 	bot_imag = temp_array[1];
 	var reflectio_coeff_real = ((real_old*zo - zo) * bot_real) - ((imag_old*zo)*bot_imag);
 	var reflectio_coeff_imag = ((imag_old*zo) * bot_real) + ((real_old*zo - zo) * bot_imag);
-	txt = "<div class=\"text_box\">"+(reflectio_coeff_real).toPrecision(3);
-	if (reflectio_coeff_imag < 0) txt += " - ";
-	else txt += " + ";
-	txt += Math.abs(reflectio_coeff_imag).toPrecision(3) + "j</div>";
-	document.getElementById("current_reflection").innerHTML = txt;
+	document.getElementById("current_reflection").innerHTML = "<div class=\"text_box\">"+(reflectio_coeff_real).toPrecision(3)+"</div>";
+	if (reflectio_coeff_imag < 0) document.getElementById("current_reflection").innerHTML += "<div class=\"text_box\">-</div>";
+	else document.getElementById("current_reflection").innerHTML += "<div class=\"text_box\">+</div>";
+	document.getElementById("current_reflection").innerHTML += "<div class=\"text_box\">"+Math.abs(reflectio_coeff_imag).toPrecision(3) + "j</div>";
 	
 	//plot reflection coefficient magnitude
   //console.log(reflectio_coeff_imag,reflectio_coeff_real);
   var reflection_mag = Math.sqrt((reflectio_coeff_real*reflectio_coeff_real)+(reflectio_coeff_imag*reflectio_coeff_imag));
-	txt = "<div class=\"text_box\">"+reflection_mag.toPrecision(3);
-  txt += " &ang; ";
+	document.getElementById("current_reflection_mag").innerHTML = "<div class=\"text_box\">"+reflection_mag.toPrecision(3)+"</div>";
+  document.getElementById("current_reflection_mag").innerHTML += "<div class=\"text_box\">&ang;</div>";
   if (reflectio_coeff_real == 0)  var reflection_phase = 0;
   else  var reflection_phase = 360*Math.atan(reflectio_coeff_imag/reflectio_coeff_real)/(2*Math.PI);
   if (reflectio_coeff_real < 0) reflection_phase += 180;
-  if (reflection_phase < 0) reflection_phase = 360 + reflection_phase;
-	txt += (reflection_phase).toPrecision(3) + "&deg; </div>";
-	document.getElementById("current_reflection_mag").innerHTML = txt;
+	document.getElementById("current_reflection_mag").innerHTML += "<div class=\"text_box\">"+(reflection_phase).toPrecision(3) + "&deg; </div>";
 	
   //calculate VSWR (1+r) / (1-r)
+  console.log(reflection_mag);
   var vswr_live = (1+reflection_mag)/(1-reflection_mag);
+  console.log(vswr_live);
   document.getElementById("vswr_live").innerHTML = "<div class=\"text_box\">"+vswr_live.toPrecision(3)+"</div>"; 
-
-  //populate vmin_distanceEl and vmax_distanceEl
-  vmax_distanceEl.value = (0.5 * reflection_phase / 360).toPrecision(precision);
-
-  if (reflection_phase > 180)  vmin_distanceEl.value = (0.5 * (reflection_phase-180) / 360).toPrecision(precision);
-  else vmin_distanceEl.value = (0.5 * (reflection_phase+180) / 360).toPrecision(precision);
-
 
 
 	//redefine the labels in case zo has changed
@@ -677,61 +570,11 @@ function update_smith_chart() {
     else var vswr_color = 'green';
     layout_shapes.push({type: "circle", line: {color: vswr_color}, x0:x0,y0:y0,x1:x1,y1:y1});
   }
-  if (constQ != 0.0) {
-    //Create a 100-point line from Z=0 to Z=20*zo with logarithmic steps
-    var constQZArray = [0]
-    var step = Math.log(20)/200;
-    var constQ_trace_x=[]
-    var constQ_trace_y=[];
-    for (i=1; i<200;i++) {
-      constQZArray.push((Math.E ** (i*step))-1);
-    }
-    constQZArray.push(1e10); //~inf
-    //convert impedances to coordinates
-    for (i=0; i<constQZArray.length;i++) {
-      sp_coord = find_smith_coord(constQZArray[i],constQZArray[i]*constQ,false);
-      constQ_trace_x.push(sp_coord[0]);
-      constQ_trace_y.push(sp_coord[1]);
-    }
-    for (i=constQZArray.length-1; i>=0;i--) {
-      sp_coord = find_smith_coord(constQZArray[i],-constQZArray[i]*constQ,false);
-      constQ_trace_x.push(sp_coord[0]);
-      constQ_trace_y.push(sp_coord[1]);
-    }
-    var constQ_trace = {
-      x: constQ_trace_x,
-      y: constQ_trace_y,
-      line: {
-          color: 'black',
-          width: 4
-      },
-      mode: 'lines',
-      type: 'scatter'
-    };
-
-  } else var constQ_trace = {};
 	
-	var data = trace.concat(textbox_trace,trace_im_neg,trace_im_pos,trace_real,trace_adm,trace_sus_pos,trace_sus_neg,span_trace,constQ_trace);
+	var data = trace.concat(textbox_trace,trace_im_neg,trace_im_pos,trace_real,trace_adm,trace_sus_pos,trace_sus_neg,span_trace);
 
 	//console.log(data, layout, layout_shapes);
-  var exWidth = document.getElementById("myDiv").offsetWidth
-  // var exWidth = document.getElementById("myDiv").offsetWidth
-  var PlLayout = {
-    paper_bgcolor: 'rgba(255,255,255,0.2)', 
-    plot_bgcolor: 'rgba(255,255,255,0.0)', 
-    showlegend: false,
-    margin:layout.margin, 
-    height:exWidth,
-    width:exWidth,
-    hovermode:layout.hovermode,
-    xaxis:layout.xaxis,
-    yaxis:layout.yaxis,
-    shapes:layout.shapes.concat(layout_shapes)
-  };
-  var config = {
-    displayModeBar: false, // this is the line that hides the bar.
-  };
-	Plotly.react('myDiv', data, PlLayout, config);	
+	Plotly.newPlot('myDiv', data, {paper_bgcolor: 'rgba(255,255,255,0.2)', plot_bgcolor: 'rgba(255,255,255,0.0)', showlegend: false,margin:layout.margin, height:layout.height,width:layout.width,hovermode:layout.hovermode,xaxis:layout.xaxis,yaxis:layout.yaxis,shapes:layout.shapes.concat(layout_shapes)});	
   
 
 
@@ -766,190 +609,27 @@ function update_smith_chart() {
     )
   }
 
+  Plotly.newPlot('PolarPlot', data_polar, layout_polar, {staticPlot: true})
   
-var layout_polar = {
-  hovermode: false,
-  showlegend: false,
-  paper_bgcolor: 'rgba(0,0,0,0)',
-  plot_bgcolor: 'rgba(0,0,0,0)',
-  polar: {
-    radialaxis: {
-      tickfont: {
-        size: 12
-      },
-      range: [0, 1],
-      gridcolor: "rgba(145, 145, 145, 0.75)",
-      dtick:'0.2'
-    },
-    angularaxis: {
-      tickfont: {
-        size: 12
-      },
-      gridcolor: "rgba(145, 145, 145, 0.75)",
-      dtick:'15'
-    },
-    bgcolor:'rgba(255,255,255,0.2)',
-  }
-};
-
-  var polarWidth = document.getElementById("smith_polar").offsetWidth
-  layout_polar.width = polarWidth;
-  layout_polar.height = polarWidth;
-  Plotly.react('PolarPlot', data_polar, layout_polar, config)
-
-
-  //Create the plots for distance to Vmax and Vmin
-  var markX, markY;
-  [markX, markY] = find_smith_coord(real_old,imag_old,false)
-
-  //Create 2 arcs, one to Vmax and one to Vmin
-  var arcRad = 1.1;
-  var arcStartAng = reflection_phase * Math.PI / 180;
-  var arcStartX = Math.cos(arcStartAng) * arcRad;
-  var arcStartY = Math.sin(arcStartAng) * arcRad;
-  var pathMax="M " + arcStartX + " " + arcStartY;
-  var arcAng;
-  for (i=100; i>=0; i--) {
-    arcAng = arcStartAng * i / 100;
-    arcStartX = Math.cos(arcAng) * arcRad;
-    arcStartY = Math.sin(arcAng) * arcRad;
-    pathMax += " L " + arcStartX + " " + arcStartY;
-  }
-  pathMax += " L " + (arcRad + 0.05) + " 0.05";
-  pathMax += " M " + arcRad + " 0";
-  pathMax += " L " + (arcRad - 0.05) + " 0.05";
-
-
-
-  arcRad = 1.2;
-  if (arcStartAng < Math.PI) arcStartAng = arcStartAng+2*Math.PI;
-  arcStartX = Math.cos(arcStartAng) * arcRad;
-  arcStartY = Math.sin(arcStartAng) * arcRad;
-  var pathMin="M " + arcStartX + " " + arcStartY;
-  for (i=0; i<101; i++) {
-    arcAng = arcStartAng - (arcStartAng - Math.PI) * i / 100;
-    arcStartX = Math.cos(arcAng) * arcRad;
-    arcStartY = Math.sin(arcAng) * arcRad;
-    pathMin += " L " + arcStartX + " " + arcStartY;
-  }
-  pathMin += " L " + (-arcRad - 0.05) + " -0.05";
-  pathMin += " M " + -arcRad + " 0";
-  pathMin += " L " + (-arcRad + 0.05) + " -0.05";
-  // console.log(pathMax);
-
-
-
-  var layout_lambda = {
-    autosize: true,
-    margin: {
-      l: 20,
-      r: 20,
-      b: 20,
-      t: 20
-    },
-    hovermode: false,
-    showlegend: false,
-    paper_bgcolor: 'rgba(0,0,0,0)',
-    plot_bgcolor: 'rgba(0,0,0,0)',
-    xaxis: {
-      range: [-1.3, 1.3],
-      zeroline: false,
-      showgrid: false,
-      visible: false,
-      fixedrange: true,
-    },
-    yaxis: {
-      range: [-1.3, 1.3],
-      zeroline: false,
-      showgrid: false,
-      visible: false,
-      fixedrange: true,
-    },
-    shapes: [
-      //draw the perimiter
-      {
-        type: 'circle',
-        xref: 'x',
-        yref: 'y',
-        x0: -1,
-        y0: -1,
-        x1: 1,
-        y1: 1,
-        line: {
-          color: 'black'
-        }
-      },
-      //draw an arc
-      {
-        type: 'path',
-        path: pathMax,
-        line: {
-          color: 'rgb(93, 164, 214)'
-        }
-      },
-      {
-        type: 'path',
-        path: pathMin,
-        line: {
-          color: 'rgb(93, 164, 214)'
-        }
-      }
-    ]
-  }
-
-    
-  var data_lambda = [
-    //show the data marker
-    {
-      x: [0],
-      y: [0],
-      mode: 'markers',
-      marker : {
-        size:20,
-      },
-    },
-    {
-      x: [markX],
-      y: [markY],
-      mode: 'markers',
-      marker : {
-        size:20,
-        symbol: 'x',
-        color: 'rgb(37, 50, 64)'
-      },
-    },
-    //dashed line from 0,0, thru point, to rotation
-    {
-      x: [0,Math.cos(arcStartAng) * arcRad],
-      y: [0,Math.sin(arcStartAng) * arcRad],
-      line: {
-          dash: 'dot',
-          width: 1,
-          color: 'black'
-      },
-      mode: 'lines',
-      type: 'scatter'
-    },
-    //Vmin and Vmax labels
-    {
-      x: [0.9,-0.9],
-      y: [0,0],
-      text: ["Vmax","Vmin"],
-      mode: 'text',
-      textfont: {
-        size:fontsize
-      }
-    }
-  ]  ;
-
-
-    var smith_lambda = document.getElementById("smith_lambda").offsetWidth;
-    layout_lambda.width = smith_lambda;
-    layout_lambda.height = smith_lambda;
-    Plotly.react('LambdaPlot', data_lambda, layout_lambda, config);
 
   //update the HTML tables
   drawMakerTable();
+
+
+}
+
+function createAbsBox(i,content) {
+  return "<div class=\"abs_box\"><input type=\"text\" value="+schematic[i].abs+" onchange=\"update_schem_abs("+i+",this,'abs')\"></input>" + content + "</div>";
+}
+
+function createDropdown (i,unit, unitIndex=0) {
+  //Add units selector
+  var content = "<div id=\"sch_"+i+"_"+unitIndex+"\" class=\"wrapper-dropdown-5 "+is_active[i]+"\" tabindex=\"1\" onclick=\"change_class(this.id,"+unitIndex+")\"><div>"+schematic[i].unit[unitIndex]+"</div><ul class=\"dropdown\">";
+  for (j=0;j<unit.length;j++) {
+    content += "<li onclick=\"updatespan(parentElement.parentElement.id,'"+unit[j]+"',"+unitIndex+")\"><a href=\"#\">"+unit[j]+"</a></li>";
+  }
+  content +="</ul></div>";
+  return createAbsBox(i,content);
 }
 
 function draw_schematic(i) {
@@ -957,14 +637,11 @@ function draw_schematic(i) {
     //Add the element to the schematic view
     var div = document.createElement("div");
     unit=[];
-    div.setAttribute('class', 'col-6 col-lg-2 g-0');
+    div.setAttribute('class', 'cell');
     //Add a close button, but can't remove black boxes...
-    var innerText = ""
-    // if (schematic[i].type!='bb') div.innerHTML += "<div class=\"rem\" onclick=\"schematic.splice("+i+",1); update_smith_chart()\"><div class=\"dp_txt\">DP"+i+"</div><div class=\"close-button\"></div></div>";
-    // else div.innerHTML += "<div class=\"rem\">DP"+i+"</div>"; 
-    if (schematic[i].type!='bb') innerText += '<div class="row me-2 ms-2" style="height: 26px;"><div class="col"><small>DP'+i+'</small></div><div class="col text-end"><button type="button" class="btn-close" onclick="schematic.splice('+i+',1); update_smith_chart()"></button></div></div>'
-    else innerText += '<div class="row me-2 ms-2" style="height: 26px;"><small>DP'+i+'</small></div>';
-    var rows_to_create = []
+    if (schematic[i].type!='bb') div.innerHTML += "<div class=\"rem\" onclick=\"schematic.splice("+i+",1); update_smith_chart()\"><div class=\"dp_txt\">DP"+i+"</div><div class=\"close-button\"></div></div>";
+    else div.innerHTML += "<div class=\"rem\">DP"+i+"</div>";
+        
     switch(schematic[i].type) {
         case ("bb") :
             sch_label="Black Box";
@@ -973,180 +650,149 @@ function draw_schematic(i) {
             sch_abs=true;
             sch_icon="black_box";
             sch_svg=0;
-            rows_to_create = [['Impedance'],['abs','abs'],['tol']];
             break;
         case ("pr") :
-            rows_to_create = [['Impedance'],['abs','unit_0'],['tol']];
             sch_label="Parallel Resistor";
             sch_imag=false;
             sch_real=true;
             sch_abs=true;
-            unit = [['mΩ','Ω','KΩ','MΩ']];
+            unit = ['mΩ','Ω','KΩ','MΩ'];
             sch_icon="resistor_parallel";
             sch_svg=2500;
             break;
         case ("sr") :
-            rows_to_create = [['Impedance'],['abs','unit_0'],['tol']];
             sch_label="Series Resistor";
             sch_imag=false;
             sch_real=true;
             sch_abs=true;
-            unit = [['mΩ','Ω','KΩ','MΩ']];
+            unit = ['mΩ','Ω','KΩ','MΩ'];
             sch_icon="resistor_series";
             sch_svg=3000;
             break;
         case ("pc") :
-            rows_to_create = [['Impedance'], ['abs','unit_0'],['tol']];
             sch_label="Parallel Capacitor";
             sch_imag=true;
             sch_real=false;
             sch_abs=true;
-            unit = [['mF','uF','nF','pF','fF']];
+            unit = ['mF','uF','nF','pF','fF'];
             sch_icon="capacitor_parallel";
             sch_svg=500;
             break;
         case ("sc") :
-            rows_to_create = [['Impedance'], ['abs','unit_0'],['tol']];
             sch_label="Series Capacitor";
             sch_imag=true;
             sch_real=false;
             sch_abs=true;
-            unit = [['mF','uF','nF','pF','fF']];
+            unit = ['mF','uF','nF','pF','fF'];
             sch_icon="capacitor_series";
             sch_svg=1000;
             break;
         case ("pi") :
-            rows_to_create = [['Impedance'], ['abs','unit_0'],['tol']];
             sch_label="Parallel Inductor";
             sch_imag=true;
             sch_real=false;
             sch_abs=true;
-            unit = [['H','mH','uH','nH','pH']];
+            unit = ['H','mH','uH','nH','pH'];
             sch_icon="inductor_parallel";
             sch_svg=1500;
             break;
         case ("si") :
-            rows_to_create = [['Impedance'], ['abs','unit_0'],['tol']];
             sch_label="Series Inductor";
             sch_imag=true;
             sch_real=false;
             sch_abs=true;
-            unit = [['H','mH','uH','nH','pH']];
+            unit = ['H','mH','uH','nH','pH'];
             sch_icon="inductor_series";
             sch_svg=2000;
             break;
         case ("tl") :
-            rows_to_create = [['blank-impedance'],['abs','unit_0'],['line_zo']];
             sch_label="Transmission Line";
             sch_imag=false;
             sch_real=false;
             sch_abs=true; //is actually length
-            unit = [[' m','mm','um','λ']];
+            unit = [' m','mm','um','λ'];
             sch_icon="transmission_line";
             sch_svg=3500;
             break;
         case ("ss") :
-            rows_to_create = [['blank-impedance'],['abs','unit_0'],['line_zo']];
             sch_label="Short Stub";
             sch_imag=false;
             sch_real=false;
             sch_abs=true; //is actually length
-            unit = [[' m','mm','um','λ']];
+            unit = [' m','mm','um','λ'];
             sch_icon="stub_short";
-            sch_svg=4500;
+            sch_svg=4000;
             break;
         case ("so") :
-            rows_to_create = [['blank-impedance'],['abs','unit_0'],['line_zo']];
             sch_label="Open Stub";
             sch_imag=false;
             sch_real=false;
             sch_abs=true; //is actually length
-            unit = [[' m','mm','um','λ']];
+            unit = [' m','mm','um','λ'];
             sch_icon="stub_open";
-            sch_svg=4000;
+            sch_svg=4500;
             break
         case ("rc") :
-            rows_to_create = [['Impedance'], ['abs','unit_0'],['abs','unit_1'],['tol']];
             sch_label="Capacitor w/ ESR";
             sch_imag=true;
             sch_real=true;
             sch_abs=true;
-            unit = [['mΩ','Ω','KΩ','MΩ'],['mF','uF','nF','pF','fF']];
+            unit_re = ['mΩ','Ω','KΩ','MΩ'];
+            unit_im = ['mF','uF','nF','pF','fF'];
             sch_icon="black_box";
             sch_svg=5000;
-            break;
-        case ("rl") :
-            rows_to_create = [['Impedance'], ['abs','unit_0'],['abs','unit_1'],['tol']];
-            sch_label="Inductor w/ ESR";
-            sch_imag=true;
-            sch_real=true;
-            sch_abs=true;
-            unit = [['mΩ','Ω','KΩ','MΩ'],['H','mH','uH','nH','pH']];
-            sch_icon="black_box";
-            sch_svg=5500;
-            break;
-        case ("rlc") :
-            rows_to_create = [['Impedance'], ['abs','unit_0'],['abs','unit_1'],['abs','unit_2'],['tol']];
-            sch_label="Inductor w/ ESR";
-            sch_imag=true;
-            sch_real=true;
-            sch_abs=true;
-            unit = [['mΩ','Ω','KΩ','MΩ'],['H','mH','uH','nH','pH'],['mF','uF','nF','pF','fF']];
-            sch_icon="black_box";
-            sch_svg=6000;
-            break;
     }
-    innerText += '<div class="row"><div class="col"><svg viewBox="'+sch_svg+' 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="'+sch_label+'" /></svg></div></div>';
-
-    var cntR, cntC, ittUnit, boxType, varSelect, unitIndex;
-    var absCounter = 0;
-    for (cntR=0; cntR<rows_to_create.length; cntR++){
-      innerText += '<div class="row ms-3 me-3"><div class="input-group mb-1 p-0">'
-      for (cntC=0; cntC<rows_to_create[cntR].length;cntC++) {
-        boxType = rows_to_create[cntR][cntC];
-        if (boxType == 'tolxxx') {
-          innerText += '<span class="input-group-text">tol &plusmn; </span>'
-          innerText += '<input type="text" class="form-control" value="0" name="tol" onchange="update_schem_tol('+i+',this)">'
-          innerText += '<span class="input-group-text">%</span>'
-        } else 
-        if (boxType == 'blank-impedance') {
-          innerText += '<div class="fst-italic m-auto">&nbsp</div>';
-        } else if (boxType == 'Impedance') {
-          innerText += '<div class="fst-italic m-auto">Z = '
-          if (sch_real) innerText += Number(((schematic[i].real*zo)).toPrecision(precision))
-          if (sch_real && sch_imag) {
-            if (schematic[i].imaginary*zo >= 0) innerText += ' + '
-            else innerText += ' - '
-          }
-          if (sch_imag) innerText += Number((Math.abs(schematic[i].imaginary*zo)).toPrecision(precision)) + 'j'
-          innerText += '</div>'
-        } else if (boxType == 'line_zo') {
-          innerText += '<span class="input-group-text">Zo = </span>'
-          innerText += '<input type="text" class="form-control" value='+schematic[i][boxType]+' name="'+boxType+'" onchange="update_schem_abs('+i+',this,0)">'
-        } else if ((boxType == 'unit_0') || (boxType == 'unit_1') || (boxType == 'unit_2')) {
-          unitIndex = boxType.split('_')[1];
-          innerText += '<select class="form-select" onchange="updatespan('+i+', this, '+unitIndex+')">'
-          for (ittUnit=0; ittUnit<unit[unitIndex].length; ittUnit++) {
-            if (unit[unitIndex][ittUnit] == schematic[i].unit[unitIndex]) varSelect = "selected"
-            else varSelect = ""
-            innerText += '<option value='+unit[unitIndex][ittUnit]+' '+varSelect+'>'+unit[unitIndex][ittUnit]+'</option>'
-          }
-          innerText += '</select>'
-          // console.log('Unit', schematic[i].unit[unitIndex], innerText);
+    //div.innerHTML = "<p>"+sch_label+"</p>";
+    // div.innerHTML += "<img src=\"icons/"+sch_icon+".png\" alt="+sch_label+">";
+    div.innerHTML += '<svg viewBox="'+sch_svg+' 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt='+sch_label+' /></svg>';
+    //if (sch_abs) {
+        // var dropdown_menu = "<div class=\"abs_box\"><input type=\"text\" value="+schematic[i].abs+" onchange=\"update_schem_abs("+i+",this,'abs')\"></input>";
+        if (schematic[i].type=='rc') {
+          var divclass = 'complex_box';
+          var dropdown_menu = createDropdown(i, unit_im);
+          dropdown_menu += createDropdown(i, unit_re, 1);
+        } else if (schematic[i].type=='bb') {
+            var divclass = 'complex_box';
+            var dropdown_menu = createAbsBox(i, "<input type=\"text\" value="+schematic[i].abs_bb_i+" onchange=\"update_schem_abs("+i+",this,'abs_bb_i')\"></input> j");
         } else {
-          if (cntC>0) innerText += '<span class="input-group-text">+</span>'
-          innerText += '<input type="text" class="form-control inputMW" value='+schematic[i][boxType][absCounter]+' name="'+boxType+'" onchange="update_schem_abs('+i+',this,'+absCounter+')">'
-          if (cntC>0) innerText += '<span class="input-group-text ps-2 pe-2">j</span>'
-          if (boxType == 'abs') absCounter=absCounter+1;
+            var divclass = 'complex_box_wide';
+            var dropdown_menu = createDropdown(i, unit);
+            //Add units selector
+            // dropdown_menu += "<div id=\"sch_"+i+"\" class=\"wrapper-dropdown-5 "+is_active[i]+"\" tabindex=\"1\" onclick=\"change_class(this.id)\"><div>"+schematic[i].unit+"</div><ul class=\"dropdown\">";
+            // for (j=0;j<unit.length;j++) {
+            //     dropdown_menu += "<li onclick=\"updatespan(parentElement.parentElement.id,'"+unit[j]+"')\"><a href=\"#\">"+unit[j]+"</a></li>";
+            // }
+            // dropdown_menu +="</ul></div>";
         }
-      }
-      innerText += '</div></div>'
-    }
+        div.innerHTML += dropdown_menu;
+    //}
+    //} else if (schematic[i].type=='bb') {
+        if (sch_real || sch_imag) var complex_box = "<div class=\"trans\">";
+        
+        if (sch_real) {
+            complex_box += "<div class=\""+divclass+"\">" + Number((schematic[i].real*zo).toPrecision(precision)) + "</div>";
+        }
+        if (sch_imag) {
+            if (schematic[i].imaginary>=0) {
+                var sign = '+';
+                var imag_val =  Number((schematic[i].imaginary*zo).toPrecision(precision));
+            } else {
+                var sign = '-';
+                var imag_val = Number((schematic[i].imaginary*-1*zo).toPrecision(precision));
+               // if ((Math.abs(imag_val) < 0.1) && (imag_val != 0)) imag_val = Number(imag_val).toExponential();
+            }
+            complex_box += sign;
+            complex_box += "<div class=\""+divclass+"\">" + imag_val + "</div>j";
+        }
+        if (sch_real || sch_imag) complex_box += "</div>";
+        if (sch_real || sch_imag) div.innerHTML += complex_box;
+        
+        if ((schematic[i].type=='tl') || (schematic[i].type=='ss') || (schematic[i].type=='so')) {
+            div.innerHTML +=  "<div class=\"complex_box_wide\"><span>Zo = </span><input class=\"trans\" type=\"text\" value="+schematic[i].line_zo+" onchange=\"update_schem_abs("+i+",this,'line_zo')\"></input></span></div>";
+          //  div.innerHTML +=  "<div class=\"global_inputs\"><div class=\"trans\"><p>e<sub>r</sub>=</p><input class=\"trans\" type=\"text\" value="+schematic[i].er+" onchange=\"update_schem_abs("+i+",this,'er')\"></input></div>";
+        }
 
-    div.innerHTML = innerText;
-    return div;
-    // console.log("appending this:", div)
-    // document.getElementById("schematic").appendChild(div);
+    document.getElementById("schematic").appendChild(div);
 
 
 }
@@ -1393,22 +1039,22 @@ function arc_smith_points(x1,y1,x2,y2,type,rotate,beta,start_at_qtr_wl) {
 	return [x_coord,y_coord,end_x_coord,end_y_coord,real_old,imag_old,start_x_coord,start_y_coord,x1,y1,x2,y2];
 }
 
-// function download_state() {
-// 	var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(schematic, null, "\t"));
-// 	//var dlAnchorElem = document.getElementById('downloadAnchorElem');
-// 	//dlAnchorElem.setAttribute("href",     dataStr     );
-// 	var myDate = new Date();
-// 	var date = myDate.getDate();
-// 	var month = myDate.getMonth();
-// 	var year = myDate.getFullYear();
-// 	var hour = myDate.getHours();
-// 	var minutes = myDate.getMinutes();
-// 	var seconds = myDate.getSeconds();
+function download_state() {
+	var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(schematic, null, "\t"));
+	//var dlAnchorElem = document.getElementById('downloadAnchorElem');
+	//dlAnchorElem.setAttribute("href",     dataStr     );
+	var myDate = new Date();
+	var date = myDate.getDate();
+	var month = myDate.getMonth();
+	var year = myDate.getFullYear();
+	var hour = myDate.getHours();
+	var minutes = myDate.getMinutes();
+	var seconds = myDate.getSeconds();
 
-// 	var ddmmyyyy = year + pad(month + 1) + pad(date) + pad(hour) + pad(minutes) + pad(seconds);
-// 	//dlAnchorElem.setAttribute("download", "online_smith_tool_"+ddmmyyyy+".json");
-// 	download(dataStr,"online_smith_tool_"+ddmmyyyy+".json","text/plain");
-// }
+	var ddmmyyyy = year + pad(month + 1) + pad(date) + pad(hour) + pad(minutes) + pad(seconds);
+	//dlAnchorElem.setAttribute("download", "online_smith_tool_"+ddmmyyyy+".json");
+	download(dataStr,"online_smith_tool_"+ddmmyyyy+".json","text/plain");
+}
 
 var layout = {
     title: 'Circles',
@@ -1852,41 +1498,98 @@ function configure_layout_shapes() {
   return shapes;
 }
 
-
-function download2() {
-  var myDate = new Date();
-	var date = myDate.getDate();
-	var month = myDate.getMonth();
-	var year = myDate.getFullYear();
-	var hour = myDate.getHours();
-	var minutes = myDate.getMinutes();
-	var seconds = myDate.getSeconds();
-
-	var ddmmyyyy = year + pad(month + 1) + pad(date) + pad(hour) + pad(minutes) + pad(seconds);
-
-  var element = document.createElement('a');
-  element.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(schematic, null, "\t")));
-  element.setAttribute('download', "online_smith_tool_"+ddmmyyyy+".json");
-
-  element.style.display = 'none';
-  document.body.appendChild(element);
-
-  element.click();
-
-  document.body.removeChild(element);
-}
-
-
-//run when resize is finished
-function resizedw(){
-  update_smith_chart();
-}
-
-var doit;
-window.onresize = function(){
-  clearTimeout(doit);
-  doit = setTimeout(resizedw, 200);
+var layout_polar = {
+  showlegend: false,
+  width: 650,
+  height: 650,
+  paper_bgcolor: 'rgba(0,0,0,0)',
+  plot_bgcolor: 'rgba(0,0,0,0)',
+  polar: {
+    radialaxis: {
+      tickfont: {
+        size: 12
+      },
+      range: [0, 1],
+      gridcolor: "rgba(145, 145, 145, 0.75)",
+      dtick:'0.2'
+    },
+    angularaxis: {
+      tickfont: {
+        size: 12
+      },
+      gridcolor: "rgba(145, 145, 145, 0.75)",
+      dtick:'15'
+    },
+    bgcolor:'rgba(255,255,255,0.2)',
+  }
 };
+
+
+function resize_fn(x) {
+  if (window.matchMedia("(max-width: 300px)").matches) { // If media query matches
+    layout.width = 200;
+    layout.height = 200;
+    layout_polar.width = 200;
+    layout_polar.height = 200;
+    fontsize = 7;
+  } else if (window.matchMedia("(max-width: 350px)").matches) { 
+    layout.width = 290;
+    layout.height = 290;
+    layout_polar.width = 290;
+    layout_polar.height = 290;
+    fontsize = 8;
+  } else if (window.matchMedia("(max-width: 400px)").matches) { 
+    layout.width = 340;
+    layout.height = 340;
+    layout_polar.width = 340;
+    layout_polar.height = 340;
+    fontsize = 8;
+  } else if (window.matchMedia("(max-width: 600px)").matches) { 
+    layout.width = 390;
+    layout.height = 390;
+    layout_polar.width = 390;
+    layout_polar.height = 390;
+    fontsize = 10;
+  } else if (window.matchMedia("(max-width: 800px)").matches) { 
+    layout.width = 525;
+    layout.height = 525;
+    layout_polar.width = 525;
+    layout_polar.height = 525;
+    fontsize = 12;
+  } else {
+    layout.width = 650;
+    layout.height = 650;
+    layout_polar.width = 650;
+    layout_polar.height = 650;
+    fontsize = 12;
+  }
+  var smith_holder = document.getElementById("smith_chart");
+  smith_holder.style.width = layout.width + "px";
+  smith_holder.style.height = layout.height + "px";
+  var cartesian_holder = document.getElementById("smith_polar");
+  cartesian_holder.style.width = layout.width + "px";
+  cartesian_holder.style.height = layout.height + "px";
+  update_smith_chart();
+ // console.log("executing a resize");
+}
+
+///------ Items below are run at power up
+
+
+// var layout = configure_layout_shapes('colorful');
+
+//var size_gt_800 = window.matchMedia("(min-width: 800px)");
+var size_lt_800 = window.matchMedia("(max-width: 800px)");
+var size_lt_600 = window.matchMedia("(max-width: 600px)");
+var size_lt_400 = window.matchMedia("(max-width: 400px)");
+var size_lt_350 = window.matchMedia("(max-width: 350px)");
+var size_lt_300 = window.matchMedia("(max-width: 300px)");
+resize_fn(size_lt_800) // Call listener function at run time
+size_lt_800.addListener(resize_fn); // Attach listener function on state changes
+size_lt_600.addListener(resize_fn); // Attach listener function on state changes
+size_lt_400.addListener(resize_fn);
+size_lt_350.addListener(resize_fn);
+size_lt_300.addListener(resize_fn);
 
 //functions that are run at startup
 update_smith_chart();
