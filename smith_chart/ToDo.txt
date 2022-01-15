@@ -1,4 +1,7 @@
-1 - Add tolerances to components
+CONE - 1 - Add tolerances to components
 2 - Plot S-parameters (= 1+R / 1-R)
 3 - Add a s-parameter to impedance converter
 4 - Add a frequency vs impedance imput option
+
+//TODO - A big improvement here would be to separate out the impedance calculation and arc drawing. It should calculate impedances, then calculate points along the arc
+//also could use a complex number function for all the math

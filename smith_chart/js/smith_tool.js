@@ -1,3 +1,8 @@
+//parameters
+var resolution = 100;// 100; //number of points per arc
+var span_resolution = 10;
+var precision=3;
+
 
 // document.getElementById('file').addEventListener('change', readFile, false);
 //get dom elements
@@ -212,17 +217,6 @@ function updatespan(sch_num, obj, unitIndex=0) {
   var vswr=0.0;
   var constQ=0.0;
   var zo=50;
-	//var freq_multiplier=1e6;
-	//var span_multiplier=1e6;
-  // var is_active=[];
-  var precision=3;
-  // var start_x_coord=0;
-  // var start_y_coord=0;
- //var end_x_coord=0.0;
- // var end_y_coord=0.0;
-//var real_old,imag_old=0.0;
-	var resolution = 100;
-  var span_resolution = 10;
   var fontsize=12;
   var color_of_smith_curves = "colorful";
 
@@ -379,6 +373,7 @@ function update_schem_component(freq_here,save_impedance,sch_index) {
 	//update_smith_chart();
 }
 
+//TODO - A big improvement here would be to separate out the impedance calculation and arc drawing. It should calculate impedances, then calculate points along the arc
 function update_smith_chart() {
   //Update the layout variable
   layout.shapes = configure_layout_shapes();
@@ -418,136 +413,193 @@ function update_smith_chart() {
   var x0,x1,y0,y1;
   
   //update black box
-  update_schem_component(freq,true,1);
+  update_schem_component(0,true,1);
   var schemEl = document.getElementById("schematic");
   schemEl.innerHTML="";
   var newDiv = draw_schematic(1);
   schemEl.appendChild(newDiv);
 
-	for (var i= 0; i <= span_res*2; i++) {
-		span_impedance_re[i] = Number(schematic[1].real);
-		span_impedance_im[i] = Number(schematic[1].imaginary);
-  }    
-	
-  dataPoints = [];
-	for (var i = 2; i < schematic.length; i++) {
-		//Add the arc to the smith chart
-        for (sp = 0; sp <= 2*span_res; sp++) {
-            //frequency at this point in the frequency span
-            if (span_res==0) frequency_at_sp = freq;
-            else frequency_at_sp = freq + (span_freq * (sp-span_res)/span_res)
 
-            //calcuate re and im values of component at this frequency
-            //if sp offset is at the original frequency, calculate a lot more points
-            if (sp == span_res) {
-                num_points = resolution;
-                var temp_array = update_schem_component(frequency_at_sp,true,i)
-            } else {
-                num_points = 1;
-                var temp_array = update_schem_component(frequency_at_sp,false,i)
-            }
-            var re = Number(temp_array[0]);
-            var im = Number(temp_array[1]);
-            var ln_length = Number(temp_array[2]);
-
-            var temp_trace = {}
-            var x_points, y_points;
-            var start=[];
-            var start_impedance=[];
-
-            if ((schematic[i].type=='ss') || (schematic[i].type=='so')) {
-              //if the stub is longer than 0.5 waves then there is a full circle. Trim to 1 wave so user can see if there are multiple loops
-              var wave_length = 3e8 / (frequency_at_sp*Math.sqrt(schematic[0].er));
-              //if (ln_length>wave_length) ln_length = wave_length + ln_length % wave_length;   
-              //for "ss" matching, can't assume that we start at 0 length
-              if (ln_length<(0.5*wave_length)) var start_at_qtr_wl = wave_length/4;
-              else start_at_qtr_wl = 0;
-              start_impedance[0]=span_impedance_re[sp];
-              start_impedance[1]=span_impedance_im[sp];
-                start = one_over_complex(span_impedance_re[sp],span_impedance_im[sp]);
-                var temp_array = arc_smith_points(start[0],start[1],ln_length,schematic[i].line_zo,schematic[i].type,true,2*Math.PI*frequency_at_sp*Math.sqrt(schematic[0].er)/3e8,start_at_qtr_wl);
-                var schem_inv = one_over_complex(temp_array[4],temp_array[5]);
-              span_impedance_re[sp] = schem_inv[0];
-              span_impedance_im[sp] = schem_inv[1];
-
-            } else if ((schematic[i].type[0]=='p') || (schematic[i].type=='rlc') || (schematic[i].type=='rc') || (schematic[i].type=='rl')) {
-              //For parallel elements plotted on rotated graph....
-              start_impedance[0]=span_impedance_re[sp];
-              start_impedance[1]=span_impedance_im[sp];
-              start = one_over_complex(span_impedance_re[sp],span_impedance_im[sp]);
-              var schem_inv = one_over_complex(re,im);
-              var temp_array = arc_smith_points(start[0],start[1],start[0]+schem_inv[0],start[1]+schem_inv[1],schematic[i].type,true);
-              var schem_inv = one_over_complex(start[0]+schem_inv[0],start[1]+schem_inv[1]);
-              span_impedance_re[sp] = schem_inv[0];
-              span_impedance_im[sp] = schem_inv[1];
-            } else if ((schematic[i].type[0]=='s') || (schematic[i].type[0]=='b')) {
-              //For series elements plotted on normal curves....
-              start_impedance[0] = span_impedance_re[sp];
-              start_impedance[1] = span_impedance_im[sp];
-              var temp_array = arc_smith_points(span_impedance_re[sp],span_impedance_im[sp],re+span_impedance_re[sp],im+span_impedance_im[sp],"impedance",false);
-              span_impedance_re[sp] = span_impedance_re[sp] + re;
-              span_impedance_im[sp] = span_impedance_im[sp] + im;
-            } else if (schematic[i].type=='tl') {
-              //For transmission lines...
-              start_impedance[0] = span_impedance_re[sp];
-              start_impedance[1] = span_impedance_im[sp];
-              var temp_array = arc_smith_points(span_impedance_re[sp],span_impedance_im[sp],ln_length,schematic[i].line_zo,"transmission_line",false,2*Math.PI*frequency_at_sp*Math.sqrt(schematic[0].er)/3e8);
-              span_impedance_re[sp] = temp_array[4];
-              span_impedance_im[sp] = temp_array[5];
-            }
-
-            //If at original frequency, save and plot the data points
-            if (sp == span_res) {
-                x_points=temp_array[0];
-                y_points=temp_array[1];
-                end_x_coord=temp_array[2];
-                end_y_coord=temp_array[3];
-                real_old = span_impedance_re[sp];
-                imag_old = span_impedance_im[sp];
-                var start_x_coord = temp_array[6];
-                var start_y_coord = temp_array[7];
-                temp_trace = {
-                    x: x_points,
-                    y: y_points,
-                    line: {
-                        color: 'rgb(0, 0, 0)',
-                        width: 4
-                    },
-                    mode: 'lines',
-                    type: 'scatter'
-                };
-                trace[i-2]=temp_trace;
-            
-                //add a data point rectangle to the smith chart
-                dataPoints.push({'re': (zo*Number(start_impedance[0])).toPrecision(3), 'im': (zo*Number(start_impedance[1])).toPrecision(3)});
-                if (show_labels_DP) {
-                  layout_shapes.push({type: "rectangle", x0:Number(start_x_coord)-0.01,y0:Number(start_y_coord)-0.01,x1:Number(start_x_coord)+0.01,y1:Number(start_y_coord)+0.01});
-                  textbox_trace.push({x:[Number(start_x_coord)+0.04],y:[Number(start_y_coord)-0.03],text:["DP"+(i-1)],mode:'text'});
-                }
-            }
-        }
-        newDiv = draw_schematic(i);
-        schemEl.appendChild(newDiv);
-	}
-	
-  //If only the black box exists...
-	if (schematic.length == 2) {
-    temp_array = []
-    temp_array = find_smith_coord(schematic[1].real,schematic[1].imaginary,false);
-    real_old = schematic[1].real;
-    imag_old = schematic[1].imaginary;
-		end_x_coord=temp_array[0];
-		end_y_coord=temp_array[1];
+  //Create an array of all different arcs to draw. There will be 1 + 2 ^ (number of tolerances) arcs (every max and min combination, plus the ideal case)
+  var originalSchematic = JSON.parse(JSON.stringify(schematic));
+  var tolElements = []; //always 1 arc
+  var numTolElements = 0;
+  var i,j,x;
+  for (i = 1; i < schematic.length; i++) if (schematic[i].tol > 0) numTolElements++;
+  var arrLen = Math.pow(2,numTolElements);
+  var tolJumper = 2;
+  for (i = 1; i < schematic.length; i++) {
+    tolElements[i] = Array(arrLen);
+    tolElements[i].fill(1);
+    if (schematic[i].tol > 0) {
+      tolElements[i] = Array(arrLen);
+      tolElements[i].fill(1);
+      for (x=0;x<tolJumper/2;x++) {
+        for (j=x; j<arrLen; j+=tolJumper) {
+          tolElements[i][j] = 1 + schematic[i].tol/100;
+        } 
+      }
+      for (x=0;x<tolJumper/2;x++) {
+        for (j=x+tolJumper/2; j<arrLen; j+=tolJumper) {
+          tolElements[i][j] = 1 - schematic[i].tol/100;
+        } 
+      }
+      tolJumper = tolJumper*2;
+    }
+    if (arrLen>1) tolElements[i].push(1); //this setting uses ideal components
   }
+  // console.log(tolElements);
 
 
+  var idealArc = false;
+	for (xx=0; xx<tolElements[1].length; xx++) {
+    if (xx == (tolElements[1].length-1)) idealArc = true;
+    if (idealArc) var arcColor = 'rgb(0, 0, 0)';
+    else var arcColor = 'rgb(100, 100, 100)';
+
+    //for each 'corner' set every component to min, max or ideal
+    for (i = 1; i < schematic.length; i++){
+      for (j=0;j<schematic[i].abs.length;j++){
+        // console.log("overwrite vals",tolElements[i][xx],originalSchematic[i].abs[j]);
+        schematic[i].abs[j] = tolElements[i][xx] * originalSchematic[i].abs[j];
+      }
+    } 
   
-    //Create rectangles indicating end data points
-  dataPoints.push({'re': (zo*Number(real_old)).toPrecision(3), 'im': (zo*Number(imag_old)).toPrecision(3)});
-  if (show_labels_DP) {
-    layout_shapes.push({type: "rectangle", x0:Number(end_x_coord)-0.01,y0:Number(end_y_coord)-0.01,x1:Number(end_x_coord)+0.01,y1:Number(end_y_coord)+0.01});
-    textbox_trace.push({x:[Number(end_x_coord)+0.04],y:[Number(end_y_coord)-0.03],text:["DP"+(i-1)],mode:'text'});
+    dataPoints = [];
+    update_schem_component(0,true,1);
+    for (i= 0; i <= span_res*2; i++) {
+      span_impedance_re[i] = Number(schematic[1].real);
+      span_impedance_im[i] = Number(schematic[1].imaginary);
+    }    
+    for (i = 2; i < schematic.length; i++) {
+      //If tol is defined, loop this 3 times with min, typ and max value
+      // Create some values to be fed into update_schem_component
+
+          for (sp = 0; sp <= 2*span_res; sp++) {
+              if((!idealArc) || (span_freq==0)) sp = span_res; //if trying different tolerances, don't compute all the spans 
+              //frequency at this point in the frequency span
+              if (span_res==0) frequency_at_sp = freq;
+              else frequency_at_sp = freq + (span_freq * (sp-span_res)/span_res)
+
+              //calcuate re and im values of component at this frequency
+              //if sp offset is at the original frequency, calculate a lot more points
+              if (sp == span_res) {
+                  num_points = resolution;
+                  var temp_array = update_schem_component(frequency_at_sp,true,i)
+              } else {
+                  num_points = 1;
+                  var temp_array = update_schem_component(frequency_at_sp,false,i)
+              }
+              var re = Number(temp_array[0]);
+              var im = Number(temp_array[1]);
+              var ln_length = Number(temp_array[2]);
+
+              var temp_trace = {}
+              var x_points, y_points;
+              var start=[];
+              var start_impedance=[];
+
+              if ((schematic[i].type=='ss') || (schematic[i].type=='so')) {
+                //if the stub is longer than 0.5 waves then there is a full circle. Trim to 1 wave so user can see if there are multiple loops
+                var wave_length = 3e8 / (frequency_at_sp*Math.sqrt(schematic[0].er));
+                //if (ln_length>wave_length) ln_length = wave_length + ln_length % wave_length;   
+                //for "ss" matching, can't assume that we start at 0 length
+                if (ln_length<(0.5*wave_length)) var start_at_qtr_wl = wave_length/4;
+                else start_at_qtr_wl = 0;
+                start_impedance[0]=span_impedance_re[sp];
+                start_impedance[1]=span_impedance_im[sp];
+                  start = one_over_complex(span_impedance_re[sp],span_impedance_im[sp]);
+                  var temp_array = arc_smith_points(start[0],start[1],ln_length,schematic[i].line_zo,schematic[i].type,true,2*Math.PI*frequency_at_sp*Math.sqrt(schematic[0].er)/3e8,start_at_qtr_wl);
+                  var schem_inv = one_over_complex(temp_array[4],temp_array[5]);
+                span_impedance_re[sp] = schem_inv[0];
+                span_impedance_im[sp] = schem_inv[1];
+
+              } else if ((schematic[i].type[0]=='p') || (schematic[i].type=='rlc') || (schematic[i].type=='rc') || (schematic[i].type=='rl')) {
+                //For parallel elements plotted on rotated graph....
+                start_impedance[0]=span_impedance_re[sp];
+                start_impedance[1]=span_impedance_im[sp];
+                start = one_over_complex(span_impedance_re[sp],span_impedance_im[sp]);
+                var schem_inv = one_over_complex(re,im);
+                var temp_array = arc_smith_points(start[0],start[1],start[0]+schem_inv[0],start[1]+schem_inv[1],schematic[i].type,true);
+                var schem_inv = one_over_complex(start[0]+schem_inv[0],start[1]+schem_inv[1]);
+                span_impedance_re[sp] = schem_inv[0];
+                span_impedance_im[sp] = schem_inv[1];
+              } else if ((schematic[i].type[0]=='s') || (schematic[i].type[0]=='b')) {
+                //For series elements plotted on normal curves....
+                start_impedance[0] = span_impedance_re[sp];
+                start_impedance[1] = span_impedance_im[sp];
+                var temp_array = arc_smith_points(span_impedance_re[sp],span_impedance_im[sp],re+span_impedance_re[sp],im+span_impedance_im[sp],"impedance",false);
+                span_impedance_re[sp] = span_impedance_re[sp] + re;
+                span_impedance_im[sp] = span_impedance_im[sp] + im;
+              } else if (schematic[i].type=='tl') {
+                //For transmission lines...
+                start_impedance[0] = span_impedance_re[sp];
+                start_impedance[1] = span_impedance_im[sp];
+                var temp_array = arc_smith_points(span_impedance_re[sp],span_impedance_im[sp],ln_length,schematic[i].line_zo,"transmission_line",false,2*Math.PI*frequency_at_sp*Math.sqrt(schematic[0].er)/3e8);
+                span_impedance_re[sp] = temp_array[4];
+                span_impedance_im[sp] = temp_array[5];
+              }
+
+              //If at original frequency, save and plot the data points
+              if (sp == span_res) {
+                  x_points=temp_array[0];
+                  y_points=temp_array[1];
+                  end_x_coord=temp_array[2];
+                  end_y_coord=temp_array[3];
+                  real_old = span_impedance_re[sp];
+                  imag_old = span_impedance_im[sp];
+                  var start_x_coord = temp_array[6];
+                  var start_y_coord = temp_array[7];
+                  temp_trace = {
+                      x: x_points,
+                      y: y_points,
+                      line: {
+                          color: arcColor,
+                          width: 4
+                      },
+                      mode: 'lines',
+                      type: 'scatter'
+                  };
+                  trace.push(temp_trace);
+              
+                  //add a data point rectangle to the smith chart
+                  dataPoints.push({'re': (zo*Number(start_impedance[0])).toPrecision(3), 'im': (zo*Number(start_impedance[1])).toPrecision(3)});
+                  if (show_labels_DP) {
+                    layout_shapes.push({type: "circle", fillcolor: arcColor,line: { color: arcColor}, x0:Number(start_x_coord)-0.01,y0:Number(start_y_coord)-0.01,x1:Number(start_x_coord)+0.01,y1:Number(start_y_coord)+0.01});
+                    if(idealArc) textbox_trace.push({x:[Number(start_x_coord)+0.04],y:[Number(start_y_coord)-0.03],text:["DP"+(i-1)],mode:'text'});
+                  }
+              }
+              if((!idealArc) || (span_freq==0)) break; //if trying different tolerances, don't compute all the spans 
+          }
+
+
+    }
+    
+    //If only the black box exists...
+    if (schematic.length == 2) {
+      temp_array = []
+      temp_array = find_smith_coord(schematic[1].real,schematic[1].imaginary,false);
+      real_old = schematic[1].real;
+      imag_old = schematic[1].imaginary;
+      end_x_coord=temp_array[0];
+      end_y_coord=temp_array[1];
+    }
+
+        //Create rectangles indicating end data points
+    if (show_labels_DP) {
+      layout_shapes.push({type: "circle", fillcolor: arcColor, line: { color: arcColor}, x0:Number(end_x_coord)-0.01,y0:Number(end_y_coord)-0.01,x1:Number(end_x_coord)+0.01,y1:Number(end_y_coord)+0.01});
+      if(idealArc) textbox_trace.push({x:[Number(end_x_coord)+0.04],y:[Number(end_y_coord)-0.03],text:["DP"+(i-1)],mode:'text'});
+    }
   }
+
+  //draw the components
+  for (i = 2; i < schematic.length; i++) {
+    newDiv = draw_schematic(i);
+    schemEl.appendChild(newDiv);
+  }
+
+  dataPoints.push({'re': (zo*Number(real_old)).toPrecision(3), 'im': (zo*Number(imag_old)).toPrecision(3)});
+
 
   //Update the impedance box
 	var txt = "<div class=\"text_box\">";
@@ -952,6 +1004,11 @@ var layout_polar = {
   drawMakerTable();
 }
 
+function update_schem_tol(i,tol) {
+  schematic[i].tol = Math.abs(tol.value);
+  update_smith_chart();
+}
+
 function draw_schematic(i) {
 
     //Add the element to the schematic view
@@ -1104,9 +1161,9 @@ function draw_schematic(i) {
       innerText += '<div class="row ms-3 me-3"><div class="input-group mb-1 p-0">'
       for (cntC=0; cntC<rows_to_create[cntR].length;cntC++) {
         boxType = rows_to_create[cntR][cntC];
-        if (boxType == 'tolxxx') {
+        if (boxType == 'tol') {
           innerText += '<span class="input-group-text">tol &plusmn; </span>'
-          innerText += '<input type="text" class="form-control" value="0" name="tol" onchange="update_schem_tol('+i+',this)">'
+          innerText += '<input type="text" class="form-control" value="'+schematic[i].tol+'" name="tol" onchange="update_schem_tol('+i+',this)">'
           innerText += '<span class="input-group-text">%</span>'
         } else 
         if (boxType == 'blank-impedance') {
