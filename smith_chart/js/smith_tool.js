@@ -1,6 +1,6 @@
 //parameters
 var resolution = 100;// 100; //number of points per arc
-var span_resolution = 10;
+var span_resolution = 20;
 var precision=3;
 
 
@@ -373,6 +373,22 @@ function update_schem_component(freq_here,save_impedance,sch_index) {
 	//update_smith_chart();
 }
 
+function impedanceToReflectionCoefficient (real_old, imag_old, zo) {
+	//Calculate the reflection coefficient -current_admittance (zo-zimp) / (zo+zimp)
+	var bot_real,bot_imag;
+  temp_array = one_over_complex(real_old*zo + zo,imag_old*zo);
+	bot_real= temp_array[0];
+	bot_imag = temp_array[1];
+	var reflectio_coeff_real = ((real_old*zo - zo) * bot_real) - ((imag_old*zo)*bot_imag);
+	var reflectio_coeff_imag = ((imag_old*zo) * bot_real) + ((real_old*zo - zo) * bot_imag);
+  var reflection_mag = Math.sqrt((reflectio_coeff_real*reflectio_coeff_real)+(reflectio_coeff_imag*reflectio_coeff_imag));
+  if (reflectio_coeff_real == 0)  var reflection_phase = 0;
+  else  var reflection_phase = 360*Math.atan(reflectio_coeff_imag/reflectio_coeff_real)/(2*Math.PI);
+  if (reflectio_coeff_real < 0) reflection_phase += 180;
+  if (reflection_phase < 0) reflection_phase = 360 + reflection_phase;
+  return [reflectio_coeff_real, reflectio_coeff_imag, reflection_mag, reflection_phase];
+}
+
 //TODO - A big improvement here would be to separate out the impedance calculation and arc drawing. It should calculate impedances, then calculate points along the arc
 function update_smith_chart() {
   //Update the layout variable
@@ -621,27 +637,15 @@ function update_smith_chart() {
   document.getElementById("current_admittance").innerHTML = txt
 	
 	//Calculate the reflection coefficient -current_admittance (zo-zimp) / (zo+zimp)
-	var bot_real,bot_imag;
-  temp_array = one_over_complex(real_old*zo + zo,imag_old*zo);
-	bot_real= temp_array[0];
-	bot_imag = temp_array[1];
-	var reflectio_coeff_real = ((real_old*zo - zo) * bot_real) - ((imag_old*zo)*bot_imag);
-	var reflectio_coeff_imag = ((imag_old*zo) * bot_real) + ((real_old*zo - zo) * bot_imag);
+  var reflectio_coeff_real, reflectio_coeff_imag, reflection_mag, reflection_phase;
+  [reflectio_coeff_real, reflectio_coeff_imag, reflection_mag, reflection_phase] = impedanceToReflectionCoefficient (real_old, imag_old, zo) 
 	txt = "<div class=\"text_box\">"+(reflectio_coeff_real).toPrecision(3);
 	if (reflectio_coeff_imag < 0) txt += " - ";
 	else txt += " + ";
 	txt += Math.abs(reflectio_coeff_imag).toPrecision(3) + "j</div>";
 	document.getElementById("current_reflection").innerHTML = txt;
-	
-	//plot reflection coefficient magnitude
-  //console.log(reflectio_coeff_imag,reflectio_coeff_real);
-  var reflection_mag = Math.sqrt((reflectio_coeff_real*reflectio_coeff_real)+(reflectio_coeff_imag*reflectio_coeff_imag));
-	txt = "<div class=\"text_box\">"+reflection_mag.toPrecision(3);
+  txt = "<div class=\"text_box\">"+reflection_mag.toPrecision(3);
   txt += " &ang; ";
-  if (reflectio_coeff_real == 0)  var reflection_phase = 0;
-  else  var reflection_phase = 360*Math.atan(reflectio_coeff_imag/reflectio_coeff_real)/(2*Math.PI);
-  if (reflectio_coeff_real < 0) reflection_phase += 180;
-  if (reflection_phase < 0) reflection_phase = 360 + reflection_phase;
 	txt += (reflection_phase).toPrecision(3) + "&deg; </div>";
 	document.getElementById("current_reflection_mag").innerHTML = txt;
 	
@@ -765,7 +769,9 @@ function update_smith_chart() {
 	
 	var data = trace.concat(textbox_trace,trace_im_neg,trace_im_pos,trace_real,trace_adm,trace_sus_pos,trace_sus_neg,span_trace,constQ_trace);
 
-	//console.log(data, layout, layout_shapes);
+  //
+  //Create a plot for reflection coefficient plotted on its own
+  //
   var exWidth = document.getElementById("myDiv").offsetWidth
   // var exWidth = document.getElementById("myDiv").offsetWidth
   var PlLayout = {
@@ -781,7 +787,7 @@ function update_smith_chart() {
     shapes:layout.shapes.concat(layout_shapes)
   };
   var config = {
-    displayModeBar: false, // this is the line that hides the bar.
+    displayModeBar: false, // this is the line that hides the hover bar.
   };
 	Plotly.react('myDiv', data, PlLayout, config);	
   
@@ -849,8 +855,9 @@ var layout_polar = {
   layout_polar.height = polarWidth;
   Plotly.react('PolarPlot', data_polar, layout_polar, config)
 
-
-  //Create the plots for distance to Vmax and Vmin
+  //
+  //Create a plots for distance to Vmax and Vmin
+  //
   var markX, markY;
   [markX, markY] = find_smith_coord(real_old,imag_old,false)
 
@@ -999,6 +1006,105 @@ var layout_polar = {
     layout_lambda.width = smith_lambda;
     layout_lambda.height = smith_lambda;
     Plotly.react('LambdaPlot', data_lambda, layout_lambda, config);
+
+  //
+  //Create a plots showing the S-parameters
+  //
+  var traceS11 = {
+    line: {
+      color: 'blue',
+    },
+    name: 'S11 (dB)',
+    type: 'scatter'
+  };
+  
+  // var traceS22 = {
+  //   line: {
+  //     color: 'red',
+  //   },
+  //   name: 'S22 (dB)',
+  //   yaxis: 'y2',
+  //   type: 'scatter'
+  // };
+  
+  var sParamLayout = {
+    yaxis: {
+      tickfont: {color: 'blue'},
+      zeroline: false,
+      showgrid: true,
+      gridcolor: "rgb(37, 50, 64)",
+      fixedrange: true,
+      title: 'S11 (dB)',
+      automargin: true,
+    },
+    // yaxis2: {
+    //   tickfont: {color: 'red'},
+    //   side: 'right',
+    //   zeroline: false,
+    //   showgrid: true,
+    //   gridcolor: "rgb(37, 50, 64)",
+    //   fixedrange: true,
+    // },
+    xaxis: {
+      automargin: true,
+      title: 'frequency (' + domFreqSel.value + ')',
+      zeroline: false,
+      showgrid: false,
+      fixedrange: true,
+    },
+    autosize: true,
+    margin: {
+      l: 20,
+      r: 20,
+      b: 20,
+      t: 20
+    },
+    hovermode: false,
+    showlegend: false,
+    // legend: {
+    //   x: 1,
+    //   xanchor: 'right',
+    //   y: 1
+    // },
+    paper_bgcolor: 'rgba(0,0,0,0)',
+    plot_bgcolor: 'rgba(0,0,0,0)',
+
+  };
+
+  var scaledFreq = freq/schematic[0].freq_unit.multiplier;
+  //just show 1 point
+  traceS11.y = [];
+  if (span_freq == 0) {
+    var newSpanFreq = 1
+    traceS11.x = [scaledFreq];
+    if (reflection_mag == 0) traceS11.y.push(0)
+    else traceS11.y.push(20*Math.log10(reflection_mag))
+    // traceS22.x = [scaledFreq];
+    // traceS22.y = [0.5];
+    // sParamLayout.yaxis.range = [0, 2];
+    // sParamLayout.yaxis2.range = [0, 2];
+  } else {
+    // [reflectio_coeff_real, reflectio_coeff_imag, reflection_mag, reflection_phase] = impedanceToReflectionCoefficient (real_old, imag_old, zo) 
+    traceS11.x = [];
+    for (i=0; i<span_impedance_re.length;i++) {
+       [reflectio_coeff_real, reflectio_coeff_imag, reflection_mag, reflection_phase] = impedanceToReflectionCoefficient (span_impedance_re[i],span_impedance_im[i], zo) 
+       if (reflection_mag == 0) traceS11.y.push(0)
+       else traceS11.y.push(20*Math.log10(reflection_mag))
+       traceS11.x.push((freq + span_freq * (i-span_res)/span_res)/schematic[0].freq_unit.multiplier);
+    }
+    newSpanFreq = span_freq/schematic[0].freq_unit.multiplier;
+  }
+
+  sParamLayout.xaxis.range = [scaledFreq - newSpanFreq, scaledFreq + newSpanFreq];
+  
+  // var data = [traceS11, traceS22];
+  var data = [traceS11];
+  // var smith_lambda = document.getElementById("SParamPlot").offsetWidth;
+  // sParamLayout.width = smith_lambda;
+  // sParamLayout.height = smith_lambda;
+
+  Plotly.react('SParamPlot', data, sParamLayout, config);
+
 
   //update the HTML tables
   drawMakerTable();
