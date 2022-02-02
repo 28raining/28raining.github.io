@@ -1,7 +1,15 @@
-CONE - 1 - Add tolerances to components
-2 - Plot S-parameters (= 1+R / 1-R)
-3 - Add a s-parameter to impedance converter
-4 - Add a frequency vs impedance imput option
+NOT GOING TO DO - 3 - Add a s-parameter to impedance converter
+
+DONE - 1 - Add tolerances to components
+DONE - 2 - Plot S-parameters (= 1+R / 1-R)
+DONE - 4 - Add a frequency vs impedance imput option
+DONE:- Save modal will save the data to the custom components
+DONE: - Next time modal is opened it is auto-populated
+DONE:- button for S&H or linear
+DONE:- plot graph of Z vs F
+DONE:- Add form validation to make sure input contains only numbers,spaces,commas and e or E
+DONE - Update function update_schem_component
+DONE: -deal with blank line at end of input
 
 //TODO - A big improvement here would be to separate out the impedance calculation and arc drawing. It should calculate impedances, then calculate points along the arc
 //also could use a complex number function for all the math

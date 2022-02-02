@@ -41,8 +41,12 @@
   margin:0 auto;
 }
 
+.noPointerClass{
+  pointer-events: none;
+}
+
 .inputGroupmw {
-  min-width:270px
+  min-width:200px
 }
 
 .inputMW {

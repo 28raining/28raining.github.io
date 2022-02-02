@@ -45,6 +45,11 @@ var show_labels_res=true;
 var show_circles_adm=true;
 var show_circles_res=true;
 
+function toggle_zoom_en() {
+  var element = document.getElementById("smithChartOverlay");
+  element.classList.toggle("noPointerClass");
+}
+
 function toggle_labels_DP() {
   show_labels_DP = !show_labels_DP;
   update_smith_chart();
@@ -257,6 +262,8 @@ function clicked_cell(type) {
 		schematic.push({type:'rl',real:0,imaginary:0,abs:[50,1],unit:['Ω','nH'],tol:0});
 	} else if (type=="rlc") {
 		schematic.push({type:'rlc',real:0,imaginary:0,abs:[50,1,1],unit:['Ω','nH','pF'],tol:0});
+	} else if (type=="customZ") {
+		schematic.push({type:'customZ',real:0,imaginary:0,abs:[50,1,1],unit:['Ω','nH','pF'],lut:[[2440e6,50,50]],interp:"linear",raw:"2440e6,50,50", tol:0});
 	}
 	update_smith_chart();
 }
@@ -353,6 +360,29 @@ function update_schem_component(freq_here,save_impedance,sch_index) {
         case ("so") :
             ln_here = schematic[sch_index].abs[0] * scaler[0];
             break;
+        case ("customZ") :
+          const searchFn = (element) => element[0] > freq_here;  //finds the index which is greater that freq_here
+          var indexRes = schematic[sch_index].lut.findIndex(searchFn);
+          var lutLen = schematic[sch_index].lut.length;
+          if (indexRes == -1) { //frequency is greater than largest value in lut
+            // console.log('bpa', schematic[sch_index].lut, schematic[sch_index].lut.length - 1 )
+            re_here = schematic[sch_index].lut[lutLen - 1][1];
+            im_here = schematic[sch_index].lut[lutLen - 1][2];
+          } else if (indexRes == 0) {
+            re_here = schematic[sch_index].lut[0][1];
+            im_here = schematic[sch_index].lut[0][2];
+          } else {
+            var f1 = schematic[sch_index].lut[indexRes-1][0];
+            var f2 = schematic[sch_index].lut[indexRes][0];
+            var frac = (freq_here - f1) / (f2 - f1);
+            if (schematic[sch_index].interp == "sah") frac = 0;
+            re_here = schematic[sch_index].lut[indexRes-1][1] + frac * (schematic[sch_index].lut[indexRes][1] - schematic[sch_index].lut[indexRes-1][1]);
+            im_here = schematic[sch_index].lut[indexRes-1][2] + frac * (schematic[sch_index].lut[indexRes][2] - schematic[sch_index].lut[indexRes-1][2]);
+          }
+            //ToDo - use LUT to find impedance at this frequency
+          re_here = re_here / zo;
+          im_here = im_here / zo;
+          break;
     }
     
     if (save_impedance) {
@@ -540,7 +570,7 @@ function update_smith_chart() {
                 var schem_inv = one_over_complex(start[0]+schem_inv[0],start[1]+schem_inv[1]);
                 span_impedance_re[sp] = schem_inv[0];
                 span_impedance_im[sp] = schem_inv[1];
-              } else if ((schematic[i].type[0]=='s') || (schematic[i].type[0]=='b')) {
+              } else if ((schematic[i].type[0]=='s') || (schematic[i].type[0]=='b') || (schematic[i].type=='customZ')) {
                 //For series elements plotted on normal curves....
                 start_impedance[0] = span_impedance_re[sp];
                 start_impedance[1] = span_impedance_im[sp];
@@ -1138,6 +1168,15 @@ function draw_schematic(i) {
             sch_svg=0;
             rows_to_create = [['Impedance'],['abs','abs'],['tol']];
             break;
+        case ("customZ") :
+            sch_label="Custom";
+            sch_imag=true;
+            sch_real=true;
+            sch_abs=true;
+            sch_icon="CustomZ";
+            sch_svg=6500;
+            rows_to_create = [['blank-impedance'],['custom']];
+            break;
         case ("pr") :
             rows_to_create = [['Impedance'],['abs','unit_0'],['tol']];
             sch_label="Parallel Resistor";
@@ -1259,7 +1298,7 @@ function draw_schematic(i) {
             sch_svg=6000;
             break;
     }
-    innerText += '<div class="row"><div class="col"><svg viewBox="'+sch_svg+' 0 500 500"><use xlink:href="svg/elements.svg#rainbow3" alt="'+sch_label+'" /></svg></div></div>';
+    innerText += '<div class="row"><div class="col"><svg viewBox="'+sch_svg+' 0 500 500"><use xlink:href="svg/elements_w_custom.svg#rainbow3" alt="'+sch_label+'" /></svg></div></div>';
 
     var cntR, cntC, ittUnit, boxType, varSelect, unitIndex;
     var absCounter = 0;
@@ -1283,6 +1322,8 @@ function draw_schematic(i) {
           }
           if (sch_imag) innerText += Number((Math.abs(schematic[i].imaginary*zo)).toPrecision(precision)) + 'j'
           innerText += '</div>'
+        } else if (boxType == 'custom') {
+          innerText += '<button type="button" class="btn btn-secondary m-auto" data-bs-toggle="modal" data-bs-target="#customZModal" onclick="createCustomZModal('+i+')">Impedance Table</button>';
         } else if (boxType == 'line_zo') {
           innerText += '<span class="input-group-text">Zo = </span>'
           innerText += '<input type="text" class="form-control" value='+schematic[i][boxType]+' name="'+boxType+'" onchange="update_schem_abs('+i+',this,0)">'
@@ -1312,6 +1353,109 @@ function draw_schematic(i) {
     // document.getElementById("schematic").appendChild(div);
 
 
+}
+
+var lastCustomModal = 0;
+
+function createCustomZModal (index) {
+  var modalTitle = document.getElementById('customZModalTitle');
+  var modalBody = document.getElementById('customZModalBody');
+  modalTitle.innerHTML = "Impedance Table for element #" + index;
+  modalBody.value = schematic[index].raw
+  lastCustomModal = index;
+  checkCustomZValid();
+}
+
+const regexCustomZ = /[^0-9,eE\s\-\+]/;  //list of acceptable characters
+const regexCustomZComma = /[,]/;
+var customZImpedanceTable = [];
+
+function checkCustomZValid () {
+  var warn = document.getElementById('customZValidWarning');
+  var textbox = document.getElementById('customZModalBody');
+  var saveButton = document.getElementById('saveLUT');
+  var regexRes = textbox.value.match(regexCustomZ);
+  var regexResComma = textbox.value.match(regexCustomZComma);
+  var customZPrevFreq = 0;
+  var customZImpedanceTable = []
+  // if (regexResComma == null) var splitStr = ','
+  // else var splitStr = ''
+  var allLinesHave3Values = true;
+  var allvaluesAreNotBlank = true;
+  var frequencyIncreases = true;
+  var lines = textbox.value.split(/\r?\n/);
+  var splitLines;
+  //ToDo - remove trailing blanklines
+  for (var i=0; i<lines.length; i++) {
+    lines[i] = lines[i].trim();
+    if (lines[i]=='') console.log('blank line found');
+    else {
+      if (regexResComma == null) splitLines = lines[i].split(/\s+/);
+      else splitLines = lines[i].split(',');
+      if (splitLines.length == 3) {
+        if ((splitLines[0] == '') || (splitLines[1] == '') || (splitLines[2] == '')) allvaluesAreNotBlank = false
+        else {
+          splitLines[0] = Number(splitLines[0]);
+          splitLines[1] = Number(splitLines[1]);
+          splitLines[2] = Number(splitLines[2]);
+          if ((i>0) && (splitLines[0] <= customZPrevFreq)) frequencyIncreases = false;
+          else {
+            customZImpedanceTable.push(splitLines);
+            customZPrevFreq = Number(splitLines[0]);
+          }
+        } 
+      } else allLinesHave3Values = false;
+    }
+
+  }
+  if ((regexRes == null) && allLinesHave3Values && allvaluesAreNotBlank && frequencyIncreases) {
+    textbox.classList.remove("is-invalid");
+    textbox.classList.add("is-valid");
+    saveButton.classList.remove("disabled");
+    warn.style.display = "none";
+    schematic[lastCustomModal].lut = customZImpedanceTable;
+    schematic[lastCustomModal].raw = textbox.value;
+    if(document.getElementById('customz_interp_sah').checked) schematic[lastCustomModal].interp = 'sah';
+    else schematic[lastCustomModal].interp = 'linear';
+    plotCustomZ ();
+    // console.log('Pass',splitLines);
+  } else {
+    textbox.classList.remove("is-valid");
+    textbox.classList.add("is-invalid");
+    saveButton.classList.add("disabled");
+    warn.style.display = "block"
+    // console.log('FAIL', regexRes,allLinesHave3Values, splitLines);
+  }
+}
+
+function removeCustom () {
+  schematic.splice(lastCustomModal,1); 
+  update_smith_chart()
+}
+
+function plotCustomZ () {
+  var x = [];
+  var y = [];
+  var mag;
+  var temp;
+  // console.log('plotting lut', schematic[lastCustomModal].lut, schematic[lastCustomModal].lut.length);
+  for (var i = 0; i < schematic[lastCustomModal].lut.length; i++) {
+    temp = schematic[lastCustomModal].lut[i];
+    x.push(temp[0])
+    mag = Math.sqrt(temp[1]*temp[1] + temp[2]*temp[2]);
+    y.push(mag);
+  }
+  var trace = {
+    x: x,
+    y: y,
+    mode: 'lines+markers'
+  };
+  if(document.getElementById('customz_interp_sah').checked) trace.line = {shape: 'hv'};
+  var data = [ trace ];
+  var layout = {
+    title:'mag(Impedance) vs Frequency'
+  };  
+  Plotly.react('plotlyCustomZplot', data, layout);
 }
 
 var trace_im_neg,trace_im_pos,trace_real,trace_adm,trace_sus_pos,trace_sus_neg = {};
