@@ -824,66 +824,66 @@ function update_smith_chart() {
 
 
 
-  var data_polar = [
-    {
-      type: "scatterpolargl",
-      r: [Number(reflection_mag)],
-      theta: [reflection_phase],
-      marker: {
-        color: "black",
-        symbol: "square",
-        size: 8
-      },
-      subplot: "polar"
-    }
-  ]
+  // var data_polar = [
+  //   {
+  //     type: "scatterpolargl",
+  //     r: [Number(reflection_mag)],
+  //     theta: [reflection_phase],
+  //     marker: {
+  //       color: "black",
+  //       symbol: "square",
+  //       size: 8
+  //     },
+  //     subplot: "polar"
+  //   }
+  // ]
 
-  for(i=0;i<refl_mag.length;i++){
-    data_polar.push(
-      {
-        type: "scatterpolargl",
-        r: [refl_mag[i]],
-        theta: [refl_phase[i]],
-        marker: {
-          color: 'rgb(200, 0, 0)',
-          symbol: "circle",
-          size: 4
-        },
-        subplot: "polar"
-      }
-    )
-  }
+  // for(i=0;i<refl_mag.length;i++){
+  //   data_polar.push(
+  //     {
+  //       type: "scatterpolargl",
+  //       r: [refl_mag[i]],
+  //       theta: [refl_phase[i]],
+  //       marker: {
+  //         color: 'rgb(200, 0, 0)',
+  //         symbol: "circle",
+  //         size: 4
+  //       },
+  //       subplot: "polar"
+  //     }
+  //   )
+  // }
 
   
-var layout_polar = {
-  hovermode: false,
-  showlegend: false,
-  paper_bgcolor: 'rgba(0,0,0,0)',
-  plot_bgcolor: 'rgba(0,0,0,0)',
-  polar: {
-    radialaxis: {
-      tickfont: {
-        size: 12
-      },
-      range: [0, 1],
-      gridcolor: "rgba(145, 145, 145, 0.75)",
-      dtick:'0.2'
-    },
-    angularaxis: {
-      tickfont: {
-        size: 12
-      },
-      gridcolor: "rgba(145, 145, 145, 0.75)",
-      dtick:'15'
-    },
-    bgcolor:'rgba(255,255,255,0.2)',
-  }
-};
+// var layout_polar = {
+//   hovermode: false,
+//   showlegend: false,
+//   paper_bgcolor: 'rgba(0,0,0,0)',
+//   plot_bgcolor: 'rgba(0,0,0,0)',
+//   polar: {
+//     radialaxis: {
+//       tickfont: {
+//         size: 12
+//       },
+//       range: [0, 1],
+//       gridcolor: "rgba(145, 145, 145, 0.75)",
+//       dtick:'0.2'
+//     },
+//     angularaxis: {
+//       tickfont: {
+//         size: 12
+//       },
+//       gridcolor: "rgba(145, 145, 145, 0.75)",
+//       dtick:'15'
+//     },
+//     bgcolor:'rgba(255,255,255,0.2)',
+//   }
+// };
 
-  var polarWidth = document.getElementById("smith_polar").offsetWidth
-  layout_polar.width = polarWidth;
-  layout_polar.height = polarWidth;
-  Plotly.react('PolarPlot', data_polar, layout_polar, config)
+//   var polarWidth = document.getElementById("smith_polar").offsetWidth
+//   layout_polar.width = polarWidth;
+//   layout_polar.height = polarWidth;
+  // Plotly.react('PolarPlot', data_polar, layout_polar, config)
 
   //
   //Create a plots for distance to Vmax and Vmin
@@ -1044,18 +1044,18 @@ var layout_polar = {
     line: {
       color: 'blue',
     },
-    name: 'S11 (dB)',
+    name: 'Magnitude',
     type: 'scatter'
   };
   
-  // var traceS22 = {
-  //   line: {
-  //     color: 'red',
-  //   },
-  //   name: 'S22 (dB)',
-  //   yaxis: 'y2',
-  //   type: 'scatter'
-  // };
+  var traceS11Ph = {
+    line: {
+      color: 'red',
+    },
+    name: 'Phase',
+    yaxis: 'y2',
+    type: 'scatter'
+  };
   
   var sParamLayout = {
     yaxis: {
@@ -1067,14 +1067,16 @@ var layout_polar = {
       title: 'S11 (dB)',
       automargin: true,
     },
-    // yaxis2: {
-    //   tickfont: {color: 'red'},
-    //   side: 'right',
-    //   zeroline: false,
-    //   showgrid: true,
-    //   gridcolor: "rgb(37, 50, 64)",
-    //   fixedrange: true,
-    // },
+    yaxis2: {
+      tickfont: {color: 'red'},
+      side: 'right',
+      zeroline: false,
+      // showgrid: true,
+      gridcolor: "rgb(37, 50, 64)",
+      fixedrange: true,
+      title: 'Phase (deg)',
+      automargin: true,
+    },
     xaxis: {
       automargin: true,
       title: 'frequency (' + domFreqSel.value + ')',
@@ -1104,11 +1106,18 @@ var layout_polar = {
   var scaledFreq = freq/schematic[0].freq_unit.multiplier;
   //just show 1 point
   traceS11.y = [];
+  traceS11Ph.y = [];
   if (span_freq == 0) {
     var newSpanFreq = 1
     traceS11.x = [scaledFreq];
-    if (reflection_mag == 0) traceS11.y.push(0)
-    else traceS11.y.push(20*Math.log10(reflection_mag))
+    traceS11Ph.x = [scaledFreq];
+    if (reflection_mag == 0) {
+      traceS11.y.push(0);
+      traceS11Ph.y.push(0);
+    } else {
+      traceS11.y.push(20*Math.log10(reflection_mag));
+      traceS11Ph.y.push(reflection_phase);
+    }
     // traceS22.x = [scaledFreq];
     // traceS22.y = [0.5];
     // sParamLayout.yaxis.range = [0, 2];
@@ -1116,11 +1125,18 @@ var layout_polar = {
   } else {
     // [reflectio_coeff_real, reflectio_coeff_imag, reflection_mag, reflection_phase] = impedanceToReflectionCoefficient (real_old, imag_old, zo) 
     traceS11.x = [];
+    traceS11Ph.x = [];
     for (i=0; i<span_impedance_re.length;i++) {
        [reflectio_coeff_real, reflectio_coeff_imag, reflection_mag, reflection_phase] = impedanceToReflectionCoefficient (span_impedance_re[i],span_impedance_im[i], zo) 
-       if (reflection_mag == 0) traceS11.y.push(0)
-       else traceS11.y.push(20*Math.log10(reflection_mag))
+       if (reflection_mag == 0) {
+        traceS11.y.push(0);
+        traceS11Ph.y.push(0);
+       } else {
+         traceS11.y.push(20*Math.log10(reflection_mag));
+         traceS11Ph.y.push(reflection_phase);
+       }
        traceS11.x.push((freq + span_freq * (i-span_res)/span_res)/schematic[0].freq_unit.multiplier);
+       traceS11Ph.x.push((freq + span_freq * (i-span_res)/span_res)/schematic[0].freq_unit.multiplier);
     }
     newSpanFreq = span_freq/schematic[0].freq_unit.multiplier;
   }
@@ -1128,7 +1144,7 @@ var layout_polar = {
   sParamLayout.xaxis.range = [scaledFreq - newSpanFreq, scaledFreq + newSpanFreq];
   
   // var data = [traceS11, traceS22];
-  var data = [traceS11];
+  var data = [traceS11, traceS11Ph];
   // var smith_lambda = document.getElementById("SParamPlot").offsetWidth;
   // sParamLayout.width = smith_lambda;
   // sParamLayout.height = smith_lambda;
