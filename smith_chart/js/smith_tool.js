@@ -1382,7 +1382,7 @@ function createCustomZModal (index) {
   checkCustomZValid();
 }
 
-const regexCustomZ = /[^0-9,eE\s\-\+]/;  //list of acceptable characters
+const regexCustomZ = /[^0-9,eE\s\-\+\.]/;  //list of acceptable characters
 const regexCustomZComma = /[,]/;
 var customZImpedanceTable = [];
 
