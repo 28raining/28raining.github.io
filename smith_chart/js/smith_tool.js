@@ -120,6 +120,15 @@ function drawMakerTable() {
   table.innerHTML = inner + "</table>";
 }
 
+function freqUnitToText(multiplier) {
+  if      (multiplier == 1) return 'Hz';
+  else if (multiplier == 1e3) return 'KHz' ;
+  else if (multiplier == 1e6) return 'MHz' ;
+  else if (multiplier == 1e9) return 'GHz' ;
+  else if (multiplier == 1e12) return 'THz' ;
+  else return 'Hz'
+}
+
 fileDom = document.getElementById('file');
 domFreq = document.getElementById('freq');
 domFreqSel = document.getElementById('freq_sel');
@@ -150,14 +159,14 @@ function readFile() {
     //update freq units
     var opts = domFreqSel.options;
     for (var opt, j = 0; opt = opts[j]; j++) {
-      if (opt.value == schematic[0].freq_unit.unit) {
+      if (opt.value == freqUnitToText(schematic[0].freq_unit.multiplier)) {
         domFreqSel.selectedIndex = j;
         break;
       }
     }
     opts = domSpanSel.options;
     for (opt, j = 0; opt = opts[j]; j++) {
-      if (opt.value == schematic[0].span_unit.unit) {
+      if (opt.value == freqUnitToText(schematic[0].span_unit.multiplier)) {
         domSpanSel.selectedIndex = j;
         break;
       }
@@ -228,7 +237,7 @@ function updatespan(sch_num, obj, unitIndex=0) {
   //Add custom markers from the user, to help matching to exact impedances
   var customMarkers = [];
   
-  schematic.push({type:'raw', zo : 50, freq:2440, er : 1, freq_unit:{unit:'MHz',multiplier:1e6}, span:0.0, span_unit:{unit:'MHz',multiplier:1e6}});
+  schematic.push({type:'raw', zo : 50, freq:2440, er : 1, freq_unit:{multiplier:1e6}, span:0.0, span_unit:{multiplier:1e6}});
   schematic.push({type:'bb',real:1,imaginary:0,abs:[50,0],unit:'null',tol:0});
   
 function one_over_complex(real, imaginary) {
