@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<defs>
+		<g id="rainbow3">
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M500 90h500M750 230V90" />
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="12" d="M680 230h140m-140 30h140" />
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M750 410V260m0 150h50q10 0 2 6l-44 38q-8 6-16 0l-44-38q-8-6 2-6h50m250-320h230" />
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="12" d="M1235 20v140m30-140v140" />
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M1270 90h230m0 0h500m-250 90V90m0 320V310m0 100h50q10 0 2 6l-44 38q-8 6-16 0l-44-38q-8-6 2-6h50m0-106q-50-20 0-40m0 0q-50-20 0-40m0 0q-50-20 0-40m250-94h190m120 0h190m-310 0q20-50 40 0m0 0q20-50 40 0m0 0q20-50 40 0m190 0h500m-250 100V90m0 320V310m0 100h50q10 0 2 6l-44 38q-8 6-16 0l-44-38q-8-6 2-6h50m30-210-30-10m30 50-60-20m60 60-60-20m60-20-60 20m60-60-60 20m60 60-60 20m30 10-30-10m280-210h190m120 0h190m-300-30-10 30m10-30 20 60m20-60 20 60m20-60 20 60m-60-60-20 60m60-60-20 60m50-30-10 30m200-30h190m130 0h180" />
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-width="10" d="M3690 50h130v80h-130z" />
+  <text x="3755" y="110" font-family="Helvetica" font-size="50" text-anchor="middle">
+    Zo
+  </text>
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M4000 90h500m-250 100V90" />
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-width="10" d="M4200 190h100v120h-100z" />
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M4500 90h500m-250 100V90m0 320V310m0 100h50q10 0 2 6l-44 38q-8 6-16 0l-44-38q-8-6 2-6h50" />
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-width="10" d="M4700 190h100v120h-100z" />
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M5000 90h500m-250 40V90" />
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="12" d="M5180 310h140m-140 30h140" />
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M5250 410v-70m0 70h50q10 0 2 6l-44 38q-8 6-16 0l-44-38q-8-6 2-6h50m30-270-30-10m30 50-60-20m60 60-60-20m60-20-60 20m60-60-60 20m60 60-60 20m30 10-30-10m30 70v-60m250-160h500m-250 40V90m0 320h50q10 0 2 6l-44 38q-8 6-16 0l-44-38q-8-6 2-6h50m30-270-30-10m30 50-60-20m60 60-60-20m60-20-60 20m60-60-60 20m60 60-60 20m30 10-30-10m30 150q-50-20 0-40m0 0q-50-20 0-40m0 0q-50-20 0-40m0 0v-20m0 160v-20m250-300h500m-380 40V90m30 50-30-10m30 50-60-20m60 60-60-20m60-20-60 20m60-60-60 20m60 60-60 20m30 10-30-10m90 35q20-50 40 0m0 0q20-50 40 0m0 0q20-50 40 0" />
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="12" d="M6310 300h140m-140 30h140" />
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M6380 400v-70m0 70h50q10 0 2 6l-44 38q-8 6-16 0l-44-38q-8-6 2-6h50m-260-130v-20m0 20h60m120 0h80m0 30v-30M320 90h180" />
+  <path stroke-linecap="round" fill="#ccc" stroke="#000" stroke-width="10" d="M80 20h240v140H80z" />
+  <text x="200" y="105" font-family="Helvetica" font-size="35" text-anchor="middle">
+    BLACK BOX
+  </text>
+  <!-- <path stroke-linecap="round"  fill="none" stroke="#000" stroke-miterlimit="10" d="M0 400V0" /> -->
+  <path stroke-linecap="round"  fill="none" stroke="#000" stroke-width="10" d="M6680 140h140v120h-140z" />
+  <text x="6750" y="195" font-family="Helvetica" font-size="35" text-anchor="middle">custom</text>
+  <text x="6750" y="234" font-family="Helvetica" font-size="35" text-anchor="middle">Z vs F</text>
+  <path stroke-linecap="round"  fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M6500 90h30q10 0 10 10v90q0 10 10 10h130m140 0h130q10 0 10-10v-90q0-10 10-10h30" />
+		</g>
+	</defs>
+</svg>

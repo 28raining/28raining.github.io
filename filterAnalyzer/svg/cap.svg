@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 153 331">
+  <g fill="none" stroke="#000" stroke-miterlimit="10" pointer-events="stroke">
+    <path stroke-width="10" d="M76 145V5"/>
+    <path stroke-width="12" d="M6 145h140M6 175h140"/>
+    <path stroke-width="10" d="M76 325V175"/>
+  </g>
+</svg>

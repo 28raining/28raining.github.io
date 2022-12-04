@@ -1,0 +1,19 @@
+<!-- Testing algebrite -->
+<script src="../algebrite.bundle-for-browser-min.js"></script>
+<script>
+  // var Algebrite = require('algebrite')
+
+
+  // composing...
+  // var x = Algebrite.integral(Algebrite.eval('x')).toString() // => "1/2 x^2"
+
+  var a = Algebrite.eval("j = [[a,b],[c,d]]");
+  Algebrite.inv('x = inv(j)')
+  Algebrite.eval("z = x[2][1]");
+  var z = Algebrite.eval("z");
+  var zz = Algebrite.run("printlatex(z)");
+  console.log(Algebrite.eval('x').toString());
+  console.log(z.toString());
+  console.log(zz);
+
+</script>
