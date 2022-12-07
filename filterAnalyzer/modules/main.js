@@ -3,15 +3,8 @@ import ReactDOM from "https://unpkg.com/es-react@latest/dev/react-dom.js";
 import PropTypes from "https://unpkg.com/es-react@latest/dev/prop-types.js";
 import htm from "https://unpkg.com/htm@latest?module";
 import { init_draw2d } from './wdk_draw2d.js'
+import { calculateMNA } from './mna.js'
 const html = htm.bind(React.createElement);
-
-
-
-var schematicReadiness = {
-  vout: false,
-  vin: false,
-  gnd: false,
-};
 
 // Three global variables
 export var state = {
@@ -43,8 +36,15 @@ function elementSelector(element) {
 }
 function schematicValidator(props) {
   // console.log(element, schematicReadiness[element]);
-  if (schematicReadiness[props.name]) return html`<li className="list-group-item list-group-item-success">${props.name} Connected</li>`
-  else return html`<li className="list-group-item list-group-item-danger">${props.name} Connected</li>`
+  if (props.ready)  var color="success"
+  else var color="danger"
+  return html`
+  <div className="col">
+    <div className="d-grid gap-2">
+      <span className="badge bg-${color}">${props.name} connected</span>
+    </div>
+  </div>
+  `
 }
 
 function navBar(props) {
@@ -60,32 +60,35 @@ function navBar(props) {
     </div>`
 }
 
+function SchematicComponents() {
+  return html`
+  <div className="row">
+    <div className="col" >
+        <div key="1" data-shape="res" className="btn btn-primary draw2d_droppable" title="dragdrop the table into the canvas..">Resistor</div>
+        <div key="2" data-shape="cap" className="btn btn-primary draw2d_droppable" title="dragdrop the table into the canvas..">Capacitor</div>
+        <div key="3" data-shape="vin" className="btn btn-primary draw2d_droppable" title="dragdrop the table into the canvas..">Input voltage</div>
+        <div key="4" data-shape="gnd" className="btn btn-primary draw2d_droppable" title="dragdrop the table into the canvas..">GND</div>
+        <div key="5" data-shape="vout" className="btn btn-primary draw2d_droppable" title="dradrop the table into the canvas..">Vout</div>
+    </div>
+  </div>
+  `
+}
 function Schematic() {
   return html`
   <div className="row" key="r124">
-    <div className="col-2" >
-      <div className="d-grid">
-        <div key="1" data-shape="res" className="btn btn-primary draw2d_droppable" title="drag&amp;drop the table into the canvas..">Resistor</div>
-        <div key="2" data-shape="cap" className="btn btn-primary draw2d_droppable" title="drag&amp;drop the table into the canvas..">Capacitor</div>
-        <div key="3" data-shape="vin" className="btn btn-primary draw2d_droppable" title="drag&amp;drop the table into the canvas..">Input voltage</div>
-        <div key="4" data-shape="gnd" className="btn btn-primary draw2d_droppable" title="drag&amp;drop the table into the canvas..">GND</div>
-        <div key="5" data-shape="vout" className="btn btn-primary draw2d_droppable" title="drag&amp;drop the table into the canvas..">Vout</div>
-      </div>
-    </div>
-
     <div className="col-10" style=${{height:"300px"}} id="canvasHolder">
       <div id="canvas" className="bg-light border" style=${{position:'absolute'}} />
     </div>
 
   </div>
-  <div className="row"  key="r124r">
-
-      <ul className="list-group list-group-horizontal" key="dfsdfdsf" >
-        <${schematicValidator} name="vout" key="vout" />
-        <${schematicValidator} name="vin" key="vin" />
-        <${schematicValidator} name="gnd" key="gnd" />
-      </ul>
-
+  `
+}
+function SchematicVal(props) {
+  return html`
+  <div className="row">
+        <${schematicValidator} name="vout" key="vout" ready=${props.schematicReadiness['vout']} />
+        <${schematicValidator} name="vin" key="vin" ready=${props.schematicReadiness['vin']} />
+        <${schematicValidator} name="gnd" key="gnd" ready=${props.schematicReadiness['gnd']} />
   </div>
   `
 }
@@ -100,7 +103,7 @@ function FreqResponse() {
       `
 }
 
-function TransformResults() {
+function TransformResults(props) {
 
   return html`
     <div className="row">
@@ -110,7 +113,7 @@ function TransformResults() {
         </div>
         <div className="row">
           <div id="math">
-            The answer you provided is: \({ }\).
+            The answer you provided is: ${MyComponent(props.latex)}
           </div>
         </div>
       </div>
@@ -131,52 +134,95 @@ function TransformResults() {
   `
 }
 
-// function updateComponent (e, val) {
-//   state.elements[e].value = val;
-//   renderPage();
-// }
+function selectUnits (name) {
+  var resUnits = ['m','','K','M','G']
+  var capUnits = ['f','p','n','u','m']
+  var unitSize, units;
+  var r = [];
+  var firstLetter = Array.from(name)[0];
+  if (firstLetter == 'R') {
+    units = String.fromCharCode(8486);
+    unitSize = resUnits;
+  } else {
+    units = 'F';
+    unitSize = capUnits;
+  }
+  for (const item of unitSize) {
+      r.push(html`<option value="${item}" key="${item}">${item}${units}</option>`)
+  }
+  return r;
+}
+
 
 function e1 (props) {
-  return html`
-  <div  className="input-group mb-3">
-    <span className="input-group-text">${props.name}</span>
-    <input  type="text" className="form-control" value="${props.value}" onChange=${(e) => props.onChange(e,props.idxx)} />
-  </div>
-  `
-  return html`<div>Element ${props.name} value is <input type=text value=${props.value} onChange=${(e) => props.onChange(e,props.idxx)} /></div>`
-}
-    // objEditor.push(html`
-    // <div className="col">
-    //   <div className="input-group mb-3">
-    //     <span className="input-group-text">${key}</span>
-    //     <input type="text" className="form-control" value="${elements[key].value}" onchange=${temp(4)}/>
-    //   </div>
-    // </div>`);
-function listElements (props) {
-  {
-    if( Object.keys(props.e).length === 0) return html`<div key="123" className="row">Add components to the schematic by dragging from the left</div>`
-    // var r = [];
-    var z, j;
-    // for (z=0; z<props.e.length; z++) {
-    const r = props.e.map((j, idx) => 
-      // j = props.e[z];
-      // r = r.concat([
-        html`
-        <div className="col" key=${idx}>
-            <${e1} name=${j.name} value=${j.value} idxx=${idx} onChange=${props.onChange} />
-        </div>`
-      // ])
-    );
-    console.log("r",r);
-    return r;
+  
+  if (props.idxx >= props.length) return null
+  else {
+    return html`
+      <div className="input-group mt-1">
+        <span className="input-group-text">${props.el.name}</span>
+        <input  type="text" className="form-control" value="${props.el.value}" onChange=${(e) => props.onChange(e,props.idxx)} />
+        <select  value=${props.el.unit} className="form-select" onChange=${(e) => props.unitChange(e,props.idxx)}>
+          ${selectUnits(props.el.name)}
+        </select>
+      </div>
+    `
+
   }
+}
+
+function createMarkup(latex) {
+  return {__html: katex.renderToString(`${latex}`, {
+    throwOnError: false
+  })};
+}
+
+function MyComponent(latex) {
+  return html`<div dangerouslySetInnerHTML=${createMarkup(latex)} />`
+}
+
+function listElements (props) {
+    if( Object.keys(props.e).length === 0) {
+      return html`
+      <div className="row py-3">
+        <div className="col text-center">
+          <div className="row"><p>Drag components from the top onto the schematic</p></div>
+        </div>
+      </div>`
+    }
+
+    var elPerRow = 3;
+    var r=[]
+    var z;
+    for (z=0; z<props.e.length; z=z+elPerRow) {
+      r.push(html`
+      <div className="row" key=row${z}>
+        <div className="col" key=${z}>
+          <${e1} el=${props.e[z]} idxx=${z} length=${props.e.length} onChange=${props.onChange} unitChange=${props.unitChange} />
+        </div>
+        <div className="col" key=${z+1}>
+          <${e1} el=${props.e[z+1]} idxx=${z+1} length=${props.e.length} onChange=${props.onChange} unitChange=${props.unitChange} />
+        </div>
+        <div className="col" key=${z+2}>
+          <${e1} el=${props.e[z+2]} idxx=${z+2} length=${props.e.length} onChange=${props.onChange} unitChange=${props.unitChange} />
+        </div>
+      </div>`)
+    }
+
+    return r;
 }
 
 class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      elements: []
+      elements: [],
+      latex: null
+    };
+    this.schematicReadiness = {
+      vout: false,
+      vin: false,
+      gnd: false,
     };
   }
 
@@ -184,25 +230,46 @@ class Game extends React.Component {
   handledropCb (a) {
     console.log("dropCB", a, this.state);
     const elements = this.state.elements.slice();
-    elements.push({
-      name: a,
-      value: 10
-    });
+
+    var firstLetter = Array.from(a)[0];
+    if (firstLetter =='R') {
+      elements.push({
+        name: a,
+        value: 10,
+        unit: 'K',
+      });
+    } else {
+      elements.push({
+        name: a,
+        value: 1,
+        unit: 'p',
+      });
+    }
     this.setState({
         elements:elements
     })
+    
   }
 
-  tff (a) {
-    console.log('xaxx');
-    console.log(a);
+  handleCanvasChange (canvasState) {
+    console.log("Inside handleCanvasChange");
+    console.log(canvasState);
+    var latexResult;
+    [this.schematicReadiness, latexResult] = calculateMNA(canvasState, this.schematicReadiness);
+    if (latexResult) {
+      console.log("latex",latexResult);
+      // console.log("latex", a);
+      this.setState({
+        latex: latexResult
+      })
+    }
   }
 
   componentDidMount() {
     // #after dom tree is updated
     this.a = new init_draw2d((a) => {this.handledropCb(a)});
     // pass this.tff as above
-    this.a.addEvL(this.a.view, this.a.writer, this.tff);
+    this.a.addEvL(this.a.view, this.a.writer, (canvasState)=>this.handleCanvasChange(canvasState));
   }
 
   
@@ -213,11 +280,21 @@ class Game extends React.Component {
         elements:elements
     })
   }
+  
+  handleUnitChange(e,i) {
+    const elements = this.state.elements.slice();
+    elements[i].unit = e.target.value
+    this.setState({
+        elements:elements
+    })
+  }
+
+
 
   render() {
+    
     // // Use state (variable containing all user inputs) to do MNA (modified nodal analysis)
-    // var y = calculateMNA();
-    // var x = componentValues();
+    // 
   
     // const classes = `header ${
     //   for (const key in state.elements) {
@@ -230,11 +307,11 @@ class Game extends React.Component {
       <${navBar} title="ONLINE ELECTRONIC CIRCUIT LAPLACE SOLVER" key="navBar"/>
       <div className="w-100 p-3 bg-green" key="1244554">
         <div className="container-xl" key="12445546">
+          <${SchematicComponents} key="schemComp"/>
           <${Schematic} key="schem"/>
-          <div className="row" key="compRowf543">
-            <${listElements} e=${this.state.elements} key="valueList" onChange=${(e,i) => this.handleElChange(e,i)} />
-          </div>
-          <${TransformResults} name="World" key="TransformResults" />
+          <${SchematicVal} key="schemVal" schematicReadiness=${this.schematicReadiness}/>
+          <${listElements} e=${this.state.elements} key="valueList" onChange=${(e,i) => this.handleElChange(e,i)} unitChange=${(e,i) => this.handleUnitChange(e,i)}/>
+          <${TransformResults} name="World" key="TransformResults" latex=${this.state.latex} />
           <${FreqResponse}  key="FreqResponse"/>
         </div>
       </div>
@@ -273,212 +350,6 @@ class Game extends React.Component {
       margin: { t: 0 }
     });
   }
-}
-
-
-
-//Draw2D stuff
-// document.addEventListener("DOMContentLoaded", function () {
-//   new init_draw2d();
-// });
-
-function calculateMNA(canvas) {
-  var elementsOnNodes = [];
-  var nodeMap = [];
-  var conList = [];
-  var i, j;
-  var createNode;
-  var vinNode, gndNode, voutNode;
-  var elementMap = {};
-  var newElementMap = {};
-  var end1Node;
-  var element;
-
-
-  // var writer = new draw2d.io.json.Writer();
-  // writer.marshal(canvas, function (json) {
-    console.log(state);
-    state.json.forEach(item => {
-      if (item.type == "draw2d.Connection") {
-        conList.push(item);
-        //get both ends of the connection
-        var end1 = `${item.source.node}.${item.source.port}`
-        var end2 = `${item.target.node}.${item.target.port}`
-
-        //check if either end exists in the nodemap, create a new entry or add to existing entry
-        createNode = true;
-        for (i = 0; i < nodeMap.length; i++) {
-          if (nodeMap[i].includes(end1) && !nodeMap[i].includes(end2)) {
-            nodeMap[i].push(end2);
-            elementsOnNodes[i].push(item.target.node)
-            createNode = false;
-            end1Node = i;
-            break;
-          }
-          else if (!nodeMap[i].includes(end1) && nodeMap[i].includes(end2)) {
-            nodeMap[i].push(end1);
-            elementsOnNodes[i].push(item.source.node)
-            createNode = false;
-            end1Node = i;
-            break;
-          }
-        }
-        if (createNode) {
-          nodeMap.push([end1, end2])
-          elementsOnNodes.push([item.source.node, item.target.node])
-          end1Node = nodeMap.length - 1;
-        }
-        //Fixme - there needs to be some code here to merge nodes
-
-
-      } else {
-        //if its not a connection its an element
-        newElementMap[item.id] = {};
-        newElementMap[item.id]['value'] = 10;
-      }
-
-    });
-
-
-    //verify how ready the schematic is
-    schematicReadiness = {
-      vout: false,
-      vin: false,
-      gnd: false,
-    };
-    var tmp;
-    for (i = 0; i < elementsOnNodes.length; i++) {
-      if (elementsOnNodes[i].includes('vout')) {
-        schematicReadiness.vout = true;
-        //See which nodes are connected together
-        var crushedNodes = [i], zz, moreNodes, jj, kk, newNode, elementsOnThisNode = [];
-        zz = i;
-        moreNodes = [i];
-        elementsOnThisNode = [].concat(elementsOnThisNode + elementsOnNodes[i]);
-        while (moreNodes.length > 0) {
-          moreNodes = [];
-          newNode = moreNodes.pop();
-          //Search through the node for elements with two ports (starting with the node tied to vout)
-          for (jj = 0; jj < elementsOnNodes[i].length; jj++) {
-            if (elementsOnNodes[i][jj] == 'vout') tmp = i;
-            else if (elementsOnNodes[i][jj] == 'vin') tmp = i;
-            else if (elementsOnNodes[i][jj] == 'gnd') tmp = i;
-            else {
-              //found a two ported element. Add the node on the other end if it isn't already added.
-              for (kk = 0; kk < elementsOnNodes.length; kk++) {
-                if (!crushedNodes.includes(kk)) {
-                  crushedNodes.push(kk);
-                  moreNodes.push(kk);
-                  elementsOnThisNode = [].concat(elementsOnThisNode, elementsOnNodes[kk]);
-                }
-              }
-              moreNodes = 1;  //wtf does this line do!
-            }
-          }
-        }
-
-
-        if (elementsOnThisNode.includes('gnd')) schematicReadiness.gnd = true;
-        if (elementsOnThisNode.includes('vin')) schematicReadiness.vin = true;
-
-        break;
-      }
-    }
-
-
-    // console.log(json);
-    console.log('conlist', conList);
-    console.log('nodemap', nodeMap);
-    console.log('elements on node', elementsOnNodes);
-    console.log('all elements on this node', elementsOnThisNode);
-
-
-
-  // Build MNA array
-  if (schematicReadiness.vout && schematicReadiness.vin && schematicReadiness.gnd) {
-    // Create 2D modified nodal analysis array
-    var mnaMatrix = new Array(nodeMap.length);
-    for (i = 0; i < nodeMap.length; i++) mnaMatrix[i] = new Array(nodeMap.length).fill("0");
-    //create node map without gnd node. All nodes might need to shift
-    for (i = 0; i < elementsOnNodes.length; i++) {
-      if (elementsOnNodes[i].includes('gnd')) gndNode = i;
-    }
-    var nodeMapNoGnd = nodeMap;
-    var rem = nodeMapNoGnd.splice(gndNode, 1);
-    console.log('removed', rem);
-
-    // Step 1 - create map of every element and which node it connects too. Doing this here, after node map is complete and ground node is removed
-    for (i = 0; i < nodeMapNoGnd.length; i++) {
-      for (j = 0; j < nodeMapNoGnd[i].length; j++) {
-        element = nodeMapNoGnd[i][j].split('.')
-        if (element[0] in elementMap) elementMap[element[0]].push(i)
-        else elementMap[element[0]] = [i]
-      }
-    }
-    console.log('elementMap', elementMap);
-    voutNode = elementMap['vout'][0];
-    vinNode = elementMap['vin'][0];
-
-    // Step 2 - loop thru elementMap and start adding things to the MNA
-    for (const key2 in elementMap) {
-      if ((key2 != 'vin') && (key2 != 'vout') && (key2 != 'gnd')) {
-        //2.1 in the diagonal is the sum of all impedances connected to that node
-        for (j = 0; j < elementMap[key2].length; j++) {
-          mnaMatrix[elementMap[key2][j]][elementMap[key2][j]] += "+" + key2 + "^(-1)"
-        }
-        //2.2 elements connected between two nodes need to appear off the diagonals
-        if (elementMap[key2].length > 1) {
-          mnaMatrix[elementMap[key2][0]][elementMap[key2][1]] += "-" + key2 + "^(-1)"
-          mnaMatrix[elementMap[key2][1]][elementMap[key2][0]] += "-" + key2 + "^(-1)"
-        }
-      }
-    }
-    //2.3 Add a 1 in the bottom column indicating which node is Vin connected too
-    mnaMatrix[mnaMatrix.length - 1][vinNode] = '1';
-
-    //2.4 Add a 1 in the node connected to Vin to indicate that Iin flows into that node
-    mnaMatrix[vinNode][mnaMatrix.length - 1] = '1';
-
-    console.log('vin, vout and gnd node', vinNode, voutNode, gndNode);
-    console.log('mna ', mnaMatrix);
-
-    var nerdStrArr = [];
-    var nerdStr = "";
-    for (i = 0; i < mnaMatrix.length; i++) {
-      nerdStrArr.push('[' + mnaMatrix[i].join(',') + ']');
-    }
-    nerdStr = nerdStrArr.join(',');
-
-    console.log('nerdStr ', nerdStr);
-
-
-    //Using algebrite not nerdamer
-    // var t = "mna = ["+nerdStr+"]";
-    // console.log("t",t);
-    Algebrite.eval("mna = [" + nerdStr + "]");
-    Algebrite.eval("inv_mna = inv(mna)")
-    Algebrite.eval("inv_mna")
-    Algebrite.eval("mna_vo_vi = simplify(inv_mna[" + (voutNode + 1) + "][3])")
-    var y = Algebrite.run("printlatex(mna_vo_vi)");
-    console.log('Algebrite');
-    console.log(Algebrite.eval("mna").toString());
-    console.log(Algebrite.eval("inv_mna").toString());
-    console.log(Algebrite.eval("mna_vo_vi").toString());
-    console.log(y);
-    // console.log(MNA_vo_vi.text());
-
-    // renderPage();
-
-  }
-
-
-
-
-  return y;
-
-
-
-
 }
 
 ReactDOM.render(

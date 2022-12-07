@@ -22,13 +22,14 @@
 6) ~~Add vsource and gnd symbol~~
 7) ~~Add a checklist of items which need to be done before laplace is calculated~~
 8) ~~Build the MNA matrix~~
-9) solve the matrix and display the answer
+9) ~~solve the matrix and display the answer~~
 10) 
 - STOP - clean up the code! 
 - ~~Switch to algebrite -> done - remove nerdamer~~
-- Put the code into js modules
+- ~~Put the code into js modules~~
 - ~~Use Preact properly~~
-- Displaying latex nicely, 
+- ~~Displaying latex nicely~~
+- ~~Add capacitors~~
 - displaying frequency response
 - Clean up console logging
 - Load a preset schematic

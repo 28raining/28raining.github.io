@@ -13,6 +13,8 @@ export class View extends draw2d.Canvas {
         console.log("height, width",canvasHolder.offsetHeight,wrapperWidth)
 		super(id, wrapperWidth, canvasHolder.offsetHeight);
         this.rCounter = 0;
+        this.cCounter = 0;
+        this.lCounter = 0;
         this.elements = [];
         this.dropCb = dropCB;
 		// this.setScrollArea("#"+id);
@@ -37,7 +39,6 @@ export class View extends draw2d.Canvas {
     {
         console.log("yolo")
         var type = $(droppedDomNode).data("shape");
-        this.rCounter = this.rCounter + 1;
         // console.log(this.rCounter);
         // var figure = eval("new "+type+"();");
         
@@ -55,13 +56,15 @@ export class View extends draw2d.Canvas {
             e.createPort("hybrid",inputLocator);
             e.createPort("hybrid",outputLocator);
             e.id = `R${this.rCounter}`;
+            this.rCounter = this.rCounter + 1;
         } else if (type=="cap") {
             var e = new shapeCap({x:x, y:y});
             var inputLocator  = new draw2d.layout.locator.InputPortLocator();
             var outputLocator = new draw2d.layout.locator.OutputPortLocator();
             e.createPort("hybrid",inputLocator);
             e.createPort("hybrid",outputLocator);
-            e.id = `R${this.rCounter}`;
+            e.id = `C${this.cCounter}`;
+            this.cCounter = this.cCounter + 1;
         } else if (type=="vin") {
             var e = new shapeVin({x:x, y:y});
             var inputLocator  = new draw2d.layout.locator.InputPortLocator();

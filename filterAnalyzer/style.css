@@ -12,3 +12,5 @@
 .noPointerClass{
   pointer-events: none;
 }
+
+.katex { font-size: 3em !important; } 
