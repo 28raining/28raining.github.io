@@ -33,7 +33,7 @@ function readFromJsonBin(id) {
       const objBin = JSON.parse(req.responseText);
       console.log(req.responseText, objBin);
       schematic = objBin.record;
-      update_smith_chart();
+      updateFromOldState();
     }
   };
   req.open("GET", `https://api.jsonbin.io/v3/b/${id}/latest`, true);
@@ -183,42 +183,46 @@ function readFile() {
   reader.onload = function (event) {
 
     schematic = JSON.parse(event.target.result);
-    //check for old version of file
-    for (i = 1; i < schematic.length; i++) {
-      if (!(Array.isArray(schematic[i].abs))) {
-        schematic[i].abs = [schematic[i].abs];
-      }
-      if ('abs_bb_i' in schematic[i]) schematic[i].abs.push(schematic[i].abs_bb_i);
-      if (!(Array.isArray(schematic[i].unit))) {
-        schematic[i].unit = [schematic[i].unit];
-      }
-    }
-
-    //update freq units
-    var opts = domFreqSel.options;
-    for (var opt, j = 0; opt = opts[j]; j++) {
-      if (opt.value == freqUnitToText(schematic[0].freq_unit.multiplier)) {
-        domFreqSel.selectedIndex = j;
-        break;
-      }
-    }
-    opts = domSpanSel.options;
-    for (opt, j = 0; opt = opts[j]; j++) {
-      if (opt.value == freqUnitToText(schematic[0].span_unit.multiplier)) {
-        domSpanSel.selectedIndex = j;
-        break;
-      }
-    }
-
-    domFreq.value = Number(schematic[0].freq);
-    domSpan.value = Number(schematic[0].span);
-    domEr.value = Number(schematic[0].er);
-    zo = Number(schematic[0].zo);
-    domZo.value = zo;
     console.log("READING", schematic);
-    updateFromDom();
+    updateFromOldState()
   }
   reader.readAsText(file);
+}
+
+function updateFromOldState() {
+  //check for old version of file
+  for (i = 1; i < schematic.length; i++) {
+    if (!(Array.isArray(schematic[i].abs))) {
+      schematic[i].abs = [schematic[i].abs];
+    }
+    if ('abs_bb_i' in schematic[i]) schematic[i].abs.push(schematic[i].abs_bb_i);
+    if (!(Array.isArray(schematic[i].unit))) {
+      schematic[i].unit = [schematic[i].unit];
+    }
+  }
+
+  //update freq units
+  var opts = domFreqSel.options;
+  for (var opt, j = 0; opt = opts[j]; j++) {
+    if (opt.value == freqUnitToText(schematic[0].freq_unit.multiplier)) {
+      domFreqSel.selectedIndex = j;
+      break;
+    }
+  }
+  opts = domSpanSel.options;
+  for (opt, j = 0; opt = opts[j]; j++) {
+    if (opt.value == freqUnitToText(schematic[0].span_unit.multiplier)) {
+      domSpanSel.selectedIndex = j;
+      break;
+    }
+  }
+
+  domFreq.value = Number(schematic[0].freq);
+  domSpan.value = Number(schematic[0].span);
+  domEr.value = Number(schematic[0].er);
+  zo = Number(schematic[0].zo);
+  domZo.value = zo;
+  updateFromDom();
 }
 
 
