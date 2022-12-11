@@ -1,109 +1,114 @@
+function processCanvasState(canvasState) {
+  var newElementMap = {};
+  var elementsOnNodes = [];
+  var nodeMap = [];
+  var createNode;
+  var end1, end2, i;
+
+  console.log('processCanvasState', canvasState)
+  canvasState.forEach(item => {
+    if (item.type == "draw2d.Connection") {
+      //get both ends of the connection
+      end1 = `${item.source.node}.${item.source.port}`
+      end2 = `${item.target.node}.${item.target.port}`
+
+      //check if either end exists in the nodemap, create a new entry or add to existing entry
+      createNode = true;
+      for (i = 0; i < nodeMap.length; i++) {
+        if (nodeMap[i].includes(end1) && !nodeMap[i].includes(end2)) {
+          nodeMap[i].push(end2);
+          elementsOnNodes[i].push(item.target.node)
+          createNode = false;
+          break;
+        }
+        else if (!nodeMap[i].includes(end1) && nodeMap[i].includes(end2)) {
+          nodeMap[i].push(end1);
+          elementsOnNodes[i].push(item.source.node)
+          createNode = false;
+          break;
+        }
+      }
+      if (createNode) {
+        nodeMap.push([end1, end2])
+        elementsOnNodes.push([item.source.node, item.target.node])
+      }
+      //Fixme - there needs to be some code here to merge nodes
+
+    } else {
+      //if its not a connection its an element
+      newElementMap[item.id] = {};
+    }
+
+  });
+
+  console.log('newElementMap', newElementMap)
+
+  return [elementsOnNodes, nodeMap, newElementMap]
+
+}
+
+
 export function calculateMNA(canvasState, schematicReadiness) {
   var elementsOnNodes = [];
   var nodeMap = [];
-  var conList = [];
   var i, j;
-  var createNode;
   var vinNode, gndNode, voutNode;
   var elementMap = {};
   var newElementMap = {};
-  var end1Node;
   var element;
 
-  console.log(canvasState, schematicReadiness )
-  canvasState.forEach(item => {
-      if (item.type == "draw2d.Connection") {
-        conList.push(item);
-        //get both ends of the connection
-        var end1 = `${item.source.node}.${item.source.port}`
-        var end2 = `${item.target.node}.${item.target.port}`
+  [elementsOnNodes, nodeMap, newElementMap] = processCanvasState(canvasState);
 
-        //check if either end exists in the nodemap, create a new entry or add to existing entry
-        createNode = true;
-        for (i = 0; i < nodeMap.length; i++) {
-          if (nodeMap[i].includes(end1) && !nodeMap[i].includes(end2)) {
-            nodeMap[i].push(end2);
-            elementsOnNodes[i].push(item.target.node)
-            createNode = false;
-            end1Node = i;
-            break;
-          }
-          else if (!nodeMap[i].includes(end1) && nodeMap[i].includes(end2)) {
-            nodeMap[i].push(end1);
-            elementsOnNodes[i].push(item.source.node)
-            createNode = false;
-            end1Node = i;
-            break;
-          }
-        }
-        if (createNode) {
-          nodeMap.push([end1, end2])
-          elementsOnNodes.push([item.source.node, item.target.node])
-          end1Node = nodeMap.length - 1;
-        }
-        //Fixme - there needs to be some code here to merge nodes
-
-
-      } else {
-        //if its not a connection its an element
-        newElementMap[item.id] = {};
-        newElementMap[item.id]['value'] = 10;
-      }
-
-    });
-
-
-    //verify how ready the schematic is
-    schematicReadiness = {
-      vout: false,
-      vin: false,
-      gnd: false,
-    };
-    var tmp;
-    for (i = 0; i < elementsOnNodes.length; i++) {
-      if (elementsOnNodes[i].includes('vout')) {
-        schematicReadiness.vout = true;
-        //See which nodes are connected together
-        var crushedNodes = [i], zz, moreNodes, jj, kk, newNode, elementsOnThisNode = [];
-        zz = i;
-        moreNodes = [i];
-        elementsOnThisNode = [].concat(elementsOnThisNode + elementsOnNodes[i]);
-        while (moreNodes.length > 0) {
-          moreNodes = [];
-          newNode = moreNodes.pop();
-          //Search through the node for elements with two ports (starting with the node tied to vout)
-          for (jj = 0; jj < elementsOnNodes[i].length; jj++) {
-            if (elementsOnNodes[i][jj] == 'vout') tmp = i;
-            else if (elementsOnNodes[i][jj] == 'vin') tmp = i;
-            else if (elementsOnNodes[i][jj] == 'gnd') tmp = i;
-            else {
-              //found a two ported element. Add the node on the other end if it isn't already added.
-              for (kk = 0; kk < elementsOnNodes.length; kk++) {
-                if (!crushedNodes.includes(kk)) {
-                  crushedNodes.push(kk);
-                  moreNodes.push(kk);
-                  elementsOnThisNode = [].concat(elementsOnThisNode, elementsOnNodes[kk]);
-                }
+  //verify how ready the schematic is
+  schematicReadiness = {
+    vout: false,
+    vin: false,
+    gnd: false,
+  };
+  var tmp;
+  for (i = 0; i < elementsOnNodes.length; i++) {
+    if (elementsOnNodes[i].includes('vout')) {
+      schematicReadiness.vout = true;
+      //See which nodes are connected together
+      var crushedNodes = [i], zz, moreNodes, jj, kk, newNode, elementsOnThisNode = [];
+      zz = i;
+      moreNodes = [i];
+      elementsOnThisNode = [].concat(elementsOnThisNode + elementsOnNodes[i]);
+      while (moreNodes.length > 0) {
+        moreNodes = [];
+        newNode = moreNodes.pop();
+        //Search through the node for elements with two ports (starting with the node tied to vout)
+        for (jj = 0; jj < elementsOnNodes[i].length; jj++) {
+          if (elementsOnNodes[i][jj] == 'vout') tmp = i;
+          else if (elementsOnNodes[i][jj] == 'vin') tmp = i;
+          else if (elementsOnNodes[i][jj] == 'gnd') tmp = i;
+          else {
+            //found a two ported element. Add the node on the other end if it isn't already added.
+            for (kk = 0; kk < elementsOnNodes.length; kk++) {
+              if (!crushedNodes.includes(kk)) {
+                crushedNodes.push(kk);
+                moreNodes.push(kk);
+                elementsOnThisNode = [].concat(elementsOnThisNode, elementsOnNodes[kk]);
               }
-              moreNodes = 1;  //wtf does this line do!
             }
+            moreNodes = 1;  //wtf does this line do!
           }
         }
-
-
-        if (elementsOnThisNode.includes('gnd')) schematicReadiness.gnd = true;
-        if (elementsOnThisNode.includes('vin')) schematicReadiness.vin = true;
-
-        break;
       }
+
+
+      if (elementsOnThisNode.includes('gnd')) schematicReadiness.gnd = true;
+      if (elementsOnThisNode.includes('vin')) schematicReadiness.vin = true;
+
+      break;
     }
+  }
 
 
-    // console.log(json);
-    console.log('conlist', conList);
-    console.log('nodemap', nodeMap);
-    console.log('elements on node', elementsOnNodes);
-    console.log('all elements on this node', elementsOnThisNode);
+  // console.log(json);
+  console.log('nodemap', nodeMap);
+  console.log('elements on node', elementsOnNodes);
+  console.log('all elements on this node', elementsOnThisNode);
 
 
 
@@ -138,7 +143,7 @@ export function calculateMNA(canvasState, schematicReadiness) {
       if ((key2 != 'vin') && (key2 != 'vout') && (key2 != 'gnd')) {
         firstLetter = Array.from(key2)[0];
         if (firstLetter == 'R') laplaceElement = key2;
-        else laplaceElement = "1/(S*"+key2+")";
+        else laplaceElement = "1/(S*" + key2 + ")";
         console.log('CCC', firstLetter, laplaceElement);
 
         //2.1 in the diagonal is the sum of all impedances connected to that node
@@ -193,7 +198,7 @@ export function calculateMNA(canvasState, schematicReadiness) {
 
 
 
-  return [schematicReadiness, latexResult];
+  return [schematicReadiness, latexResult, newElementMap];
 
 
 

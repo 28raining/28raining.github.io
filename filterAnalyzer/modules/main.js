@@ -76,7 +76,7 @@ function SchematicComponents() {
 function Schematic() {
   return html`
   <div className="row" key="r124">
-    <div className="col-10" style=${{height:"300px"}} id="canvasHolder">
+    <div className="col" style=${{height:"300px"}} id="canvasHolder">
       <div id="canvas" className="bg-light border" style=${{position:'absolute'}} />
     </div>
 
@@ -154,22 +154,6 @@ function selectUnits (name) {
 }
 
 
-function e1 (props) {
-  
-  if (props.idxx >= props.length) return null
-  else {
-    return html`
-      <div className="input-group mt-1">
-        <span className="input-group-text">${props.el.name}</span>
-        <input  type="text" className="form-control" value="${props.el.value}" onChange=${(e) => props.onChange(e,props.idxx)} />
-        <select  value=${props.el.unit} className="form-select" onChange=${(e) => props.unitChange(e,props.idxx)}>
-          ${selectUnits(props.el.name)}
-        </select>
-      </div>
-    `
-
-  }
-}
 
 function createMarkup(latex) {
   return {__html: katex.renderToString(`${latex}`, {
@@ -179,6 +163,21 @@ function createMarkup(latex) {
 
 function MyComponent(latex) {
   return html`<div dangerouslySetInnerHTML=${createMarkup(latex)} />`
+}
+
+function e1 (props) {
+  if (props.idxx >= props.length) return null
+  else {
+    return html`
+      <div className="input-group mt-1">
+        <span className="input-group-text">${props.name}</span>
+        <input  type="text" className="form-control" value="${props.el.value}" onChange=${(e) => props.onChange(e,props.name)} />
+        <select  value=${props.el.unit} className="form-select" onChange=${(e) => props.unitChange(e,props.name)}>
+          ${selectUnits(props.name)}
+        </select>
+      </div>
+    `
+  }
 }
 
 function listElements (props) {
@@ -194,17 +193,19 @@ function listElements (props) {
     var elPerRow = 3;
     var r=[]
     var z;
-    for (z=0; z<props.e.length; z=z+elPerRow) {
+    var keys = Object.keys(props.e);
+    const elements = props.e;
+    for (z=0; z<keys.length; z=z+elPerRow) {
       r.push(html`
       <div className="row" key=row${z}>
         <div className="col" key=${z}>
-          <${e1} el=${props.e[z]} idxx=${z} length=${props.e.length} onChange=${props.onChange} unitChange=${props.unitChange} />
+          <${e1} name=${keys[z]} el=${elements[keys[z]]} idxx=${z} length=${keys.length} onChange=${props.onChange} unitChange=${props.unitChange} />
         </div>
         <div className="col" key=${z+1}>
-          <${e1} el=${props.e[z+1]} idxx=${z+1} length=${props.e.length} onChange=${props.onChange} unitChange=${props.unitChange} />
+          <${e1} name=${keys[z+1]} el=${elements[keys[z+1]]} idxx=${z+1} length=${keys.length} onChange=${props.onChange} unitChange=${props.unitChange} />
         </div>
         <div className="col" key=${z+2}>
-          <${e1} el=${props.e[z+2]} idxx=${z+2} length=${props.e.length} onChange=${props.onChange} unitChange=${props.unitChange} />
+          <${e1} name=${keys[z+2]} el=${elements[keys[z+2]]}idxx=${z+2} length=${keys.length} onChange=${props.onChange} unitChange=${props.unitChange} />
         </div>
       </div>`)
     }
@@ -228,53 +229,62 @@ class Game extends React.Component {
 
   //name it better
   handledropCb (a) {
-    console.log("dropCB", a, this.state);
-    const elements = this.state.elements.slice();
+    console.log("Drop call back does nothing");
+    // const elements = this.state.elements.slice();
 
-    var firstLetter = Array.from(a)[0];
-    if (firstLetter =='R') {
-      elements.push({
-        name: a,
-        value: 10,
-        unit: 'K',
-      });
-    } else {
-      elements.push({
-        name: a,
-        value: 1,
-        unit: 'p',
-      });
-    }
-    this.setState({
-        elements:elements
-    })
-    
   }
 
   handleCanvasChange (canvasState) {
     console.log("Inside handleCanvasChange");
     console.log(canvasState);
     var latexResult;
-    [this.schematicReadiness, latexResult] = calculateMNA(canvasState, this.schematicReadiness);
-    if (latexResult) {
-      console.log("latex",latexResult);
-      // console.log("latex", a);
-      this.setState({
-        latex: latexResult
-      })
+    var newElementMap;
+    var elements = this.state.elements;
+    [this.schematicReadiness, latexResult, newElementMap] = calculateMNA(canvasState, this.schematicReadiness);
+    console.log("latex",latexResult);
+
+    //add new elements
+    for (const key in newElementMap) {
+      if ((key=='gnd') || (key=='vout') || (key=='vin')) continue;
+      if (!(key in elements)) {
+        var firstLetter = Array.from(key)[0];
+        if (firstLetter =='R') {
+          elements[key] = {
+            value: 10,
+            unit: 'K',
+          };
+        } else {
+          elements[key] = {
+            value: 1,
+            unit: 'p',
+          };
+        }
+      }
     }
+
+    //remove old elements
+    for (const key in elements) {
+      if (!(key in newElementMap)) {
+        delete elements[key];
+      }
+    }
+
+    this.setState({
+      elements:elements,
+      latex: latexResult
+    })
   }
 
   componentDidMount() {
     // #after dom tree is updated
-    this.a = new init_draw2d((a) => {this.handledropCb(a)});
+    this.a = new init_draw2d((a) => this.handledropCb(a), (b) => this.handleCanvasChange(b));
     // pass this.tff as above
     this.a.addEvL(this.a.view, this.a.writer, (canvasState)=>this.handleCanvasChange(canvasState));
   }
 
   
   handleElChange(e,i) {
-    const elements = this.state.elements.slice();
+    const elements = this.state.elements;
     elements[i].value = e.target.value
     this.setState({
         elements:elements
@@ -282,7 +292,7 @@ class Game extends React.Component {
   }
   
   handleUnitChange(e,i) {
-    const elements = this.state.elements.slice();
+    const elements = this.state.elements;
     elements[i].unit = e.target.value
     this.setState({
         elements:elements

@@ -30,11 +30,12 @@
 - ~~Use Preact properly~~
 - ~~Displaying latex nicely~~
 - ~~Add capacitors~~
-- displaying frequency response
 - Clean up console logging
-- Load a preset schematic
+- Element selector shows whats on schematic
+- ~~Load a preset schematic~~
 - Launch the beta version on github
 10) Remove elements who aren't connected at both ends
+11) displaying frequency response
 
 
 
