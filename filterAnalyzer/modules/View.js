@@ -9,7 +9,7 @@ export class View extends draw2d.Canvas {
     wrapperWidth -=
       parseFloat(wrapperComputedStyle.paddingLeft) +
       parseFloat(wrapperComputedStyle.paddingRight)
-    console.log("height, width", canvasHolder.offsetHeight, wrapperWidth)
+    // console.log("height, width", canvasHolder.offsetHeight, wrapperWidth)
     super(id, wrapperWidth-2, canvasHolder.offsetHeight-2);
     this.rCounter = 0;
     this.cCounter = 0;

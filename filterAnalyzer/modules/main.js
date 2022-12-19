@@ -235,13 +235,11 @@ class Game extends React.Component {
   }
 
   handleCanvasChange (canvasState) {
-    console.log("Inside handleCanvasChange");
-    console.log(canvasState);
+    // console.log("Inside handleCanvasChange");
     var latexResult;
     var newElementMap;
     var elements = this.state.elements;
     [this.schematicReadiness, latexResult, newElementMap] = calculateMNA(canvasState, this.schematicReadiness);
-    console.log("latex",latexResult);
 
     //add new elements
     for (const key in newElementMap) {
