@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<script src="https://fred-wang.github.io/mathml.css/mspace.js"></script>
+<script>
+  // see https://github.com/fred-wang/mathml.css/pull/9
+  window.setTimeout(function () {
+    var link = document.head.querySelector('link[href="http://fred-wang.github.io/mathml.css/mathml.css"]');
+    if (link != null) {
+      link.href = 'https://fred-wang.github.io/mathml.css/mathml.css';
+    }
+  }, 300);
+</script>
+<script type="module">
+  import {
+    primeFactor,
+    nthRoot,
+    Expression,
+    toDecimalStringInternal,
+    NonSimplifiedExpression,
+    ExpressionParser,
+    Polynomial,
+    Matrix,
+    Condition
+  } from './index.js'
+  self.primeFactor = primeFactor;
+  self.nthRoot = nthRoot;
+  self.Expression = Expression;
+  self.toDecimalStringInternal = toDecimalStringInternal;
+  self.NonSimplifiedExpression = NonSimplifiedExpression;
+  self.ExpressionParser = ExpressionParser;
+  self.Polynomial = Polynomial;
+  self.Matrix = Matrix;
+  self.Condition = Condition;
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelector('form').onsubmit = function (event) {
+      event.preventDefault();
+      var sourceCode = document.querySelector('textarea').value;
+      eval(sourceCode);
+    };
+    document.querySelector('form').onsubmit(new Event('submit'));
+  });
+</script>
+<style>
+  textarea {
+    width: 100%;
+    height: 240px;
+  }
+  #output {
+    text-align: center; /* also fixed <mfrac> for mathml.css */
+  }
+</style>
+</head>
+<body>
+<form>
+<textarea wrap="off" autocapitalize="off" autocomplete="off">
+  var matrix = ExpressionParser.parse('{{1,2,3},{4,5,6},{7,8,9}}').matrix;
+
+  var eigenvalues = Expression.getEigenvalues(matrix);
+
+  var y = Expression.getFormaDeJordan(matrix, eigenvalues);
+
+  var po = {useMatrixContainer: false};
+  document.getElementById("output").innerHTML = "<math>" + new Expression.Matrix(matrix).toMathML(po) + "<mo>=</mo>" + new Expression.Matrix(y.P).toMathML(po) + "<mo>&times;</mo>" + new Expression.Matrix(y.J).toMathML(po) + "<mo>&times;</mo>" + new Expression.Matrix(y.P_INVERSED).toMathML(po) + "</math>";
+</textarea>
+<button type="submit">eval</button>
+<div id="output">
+</div>
+</form>
+
+You could also play with the API in the browser console.
+</body>
+</html>

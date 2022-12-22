@@ -1,0 +1,10 @@
+*.bak
+node_modules/**/*.md
+node_modules/**/*.json
+node_modules/**/*.html
+node_modules/**/*.css
+node_modules/**/*.yml
+node_modules/**/LICENSE
+node_modules/seedrandom/lib/*.*
+node_modules/seedrandom/coverage/**/*.*
+
