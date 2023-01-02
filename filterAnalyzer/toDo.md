@@ -5,6 +5,7 @@
 -- Add op-amps with R feedback
 -- Add user drawing capability
 -- Verify laplace is working by testing with big LC filter
+-- Fix the MathML renderere
 
 
 -- Below is done later, after laplace derivation is more thoroughly verified... --
@@ -45,3 +46,5 @@
 
 # Future ideas
 - Site to store tiny pieces of data. So this site can have memory and be severless. And smith chart site
+- A well documented, crowd sourced algebra library
+- A replacement for draw2D without jQuery

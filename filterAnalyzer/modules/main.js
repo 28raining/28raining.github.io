@@ -162,6 +162,9 @@ function createMarkup(latex) {
 }
 
 function MyComponent(latex) {
+  console.log('latex!', latex)
+  //FIXME - change latex for MathML
+  return html`<math>${latex}</math>`
   return html`<div dangerouslySetInnerHTML=${createMarkup(latex)} />`
 }
 

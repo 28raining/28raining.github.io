@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+
+  <script type="module">
+import Expression from './Expression.js';
+import './complex.js';
+import ExpressionParser from './ExpressionParser.js';
+import Polynomial from './Polynomial.js';
+import './polynomial-roots-finding.js';
+import './toMathML.js';
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelector('form').onsubmit = function (event) {
+        event.preventDefault();
+        var sourceCode = document.querySelector('textarea').value;
+        eval(sourceCode);
+      };
+      document.querySelector('form').onsubmit(new Event('submit'));
+    });
+  </script>
+</head>
+
+<body>
+  <form>
+    <textarea wrap="off" autocapitalize="off" autocomplete="off">
+  var matrix = ExpressionParser.parse('-1/(ab(-1/(ab)-1/(ac)-1/(bc)))-1/(ac(-1/(ab)-1/(ac)-1/(bc)))');  
+
+
+  document.getElementById("output").innerHTML = "<math>" + matrix.toString() + "</math>";
+</textarea>
+    <button type="submit">eval</button>
+    <div id="output">
+    </div>
+  </form>
+</body>
+
+</html>

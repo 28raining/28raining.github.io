@@ -1,3 +1,4 @@
+import simplify_algebra from './simplify_algebra.js'
 function processCanvasState(canvasState) {
   var newElementMap = {};
   // var elementsOnNodes = [];
@@ -224,12 +225,17 @@ export function calculateMNA(canvasState, schematicReadiness) {
     Algebrite.eval("mna_vo_vi_den = simplify(denominator(mna_vo_vi))")
     Algebrite.eval("mna_vo_vi_long = simplify(mna_vo_vi_num/mna_vo_vi_den)")
     console.log('vin node')
-    latexResult = Algebrite.run("printlatex(mna_vo_vi)");
+    // latexResult = Algebrite.run("printlatex(mna_vo_vi)");
     // console.log('Algebrite');
     // console.log(Algebrite.eval("mna").toString());
     console.log(Algebrite.eval("mna_vo_vi_num").toString());
     console.log(Algebrite.eval("mna_vo_vi_den").toString());
     console.log(Algebrite.eval("mna_vo_vi_long").toString());
+    var ggg = simplify_algebra(Algebrite.eval("mna_vo_vi").toString());
+    // console.log('ggg', ggg);
+    // Algebrite.eval("simplified = " + ggg);
+    // latexResult = Algebrite.run("printlatex(mna_vo_vi)");
+
     // console.log(Algebrite.eval("inv_mna").toString());
     // console.log(Algebrite.eval("mna_vo_vi").toString());
     // console.log(latexResult);
@@ -242,7 +248,7 @@ export function calculateMNA(canvasState, schematicReadiness) {
 
 
 
-  return [schematicReadiness, latexResult, newElementMap];
+  return [schematicReadiness, ggg, newElementMap];
 
 
 

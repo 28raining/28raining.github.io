@@ -1,0 +1,52 @@
+{
+  "author": {
+    "name": "Yaffle"
+  },
+  "bugs": {
+    "url": "https://github.com/Yaffle/Expression/issues"
+  },
+  "bundleDependencies": [],
+  "dependencies": {
+    "@yaffle/bigdecimal": "^1.0.26",
+    "bigint-gcd": "^1.0.19",
+    "js-big-integer": "^3.0.20",
+    "quadraticsievefactorization": "^1.0.44",
+    "seedrandom": "^3.0.5"
+  },
+  "deprecated": false,
+  "description": "A library to parse expressions, solve and simplify systems of linear equations, find eigenvalues and eigenvectors",
+  "homepage": "https://github.com/Yaffle/Expression#readme",
+  "keywords": [
+    "math",
+    "algebra",
+    "parser",
+    "expression",
+    "matrix",
+    "polynomial",
+    "factorization",
+    "symbolic-computation",
+    "cas",
+    "complex",
+    "eigenvectors",
+    "eigenvalues",
+    "equation solver",
+    "linear algebra",
+    "symbolic math",
+    "resultant",
+    "polynomial GCD",
+    "polynomial roots"
+  ],
+  "license": "ISC",
+  "main": "index.js",
+  "name": "@yaffle/expression",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yaffle/Expression.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "node ./post-install.js"
+  },
+  "type": "module",
+  "version": "0.0.38"
+}
