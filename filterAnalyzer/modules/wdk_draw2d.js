@@ -29,6 +29,9 @@ export class init_draw2d {
         return connection;
       }
     }));
+
+    this.view.installEditPolicy(new draw2d.policy.canvas.SnapToGridEditPolicy(16)); //each grid is a 16x16
+ 
   }
 
   addEvL (vw,wr,cb) {

@@ -37,42 +37,67 @@ export class View extends draw2d.Canvas {
   onDrop(droppedDomNode, x, y, shiftKey, ctrlKey) {
     var type = $(droppedDomNode).data("shape");
     this.addShapeToSchem(type, x, y);
-  }
+  }  
 
   addShapeToSchem(type, x, y) {
+
+    var MyInputPortLocator = draw2d.layout.locator.PortLocator.extend({
+      init:function(x,y){
+        this._super();
+        this.x = x;
+        this.y = y;
+      },
+      relocate:function(index, figure){
+          this.applyConsiderRotation(figure, this.x, this.y);
+      }
+    });
+
+
+    console.log(x, y)
+    x = 16 * Math.round(x/16);
+    y = 16 * Math.round(y/16);
+    console.log(x, y)
     if (type == "res") {
-      var e = new shapeRes({ x: x, y: y });
+      var e = new shapeRes({ x: x, y: y});
       var inputLocator = new draw2d.layout.locator.InputPortLocator();
       var outputLocator = new draw2d.layout.locator.OutputPortLocator();
       e.createPort("hybrid", inputLocator);
       e.createPort("hybrid", outputLocator);
       e.id = `R${this.rCounter}`;
+      e.add(new draw2d.shape.basic.Text({text:e.id, stroke:0}), new draw2d.layout.locator.TopLocator());
       this.rCounter = this.rCounter + 1;
     } else if (type == "cap") {
       var e = new shapeCap({ x: x, y: y });
-      var inputLocator = new draw2d.layout.locator.InputPortLocator();
-      var outputLocator = new draw2d.layout.locator.OutputPortLocator();
+      var inputLocator = new MyInputPortLocator(16,0);
+      var outputLocator = new MyInputPortLocator(16,48);
       e.createPort("hybrid", inputLocator);
       e.createPort("hybrid", outputLocator);
       e.id = `C${this.cCounter}`;
+      e.add(new draw2d.shape.basic.Text({text:e.id, stroke:0}), new draw2d.layout.locator.RightLocator());
       this.cCounter = this.cCounter + 1;
-    } else if (type == "vin") {
+    } else if (type == "ind") {
+      var e = new shapeInductor({ x: x, y: y});
+      var inputLocator = new MyInputPortLocator(0,16);
+      var outputLocator = new MyInputPortLocator(64,16);
+      e.createPort("hybrid", inputLocator);
+      e.createPort("hybrid", outputLocator);
+      e.id = `L${this.rCounter}`;
+      e.add(new draw2d.shape.basic.Text({text:e.id, stroke:0}), new draw2d.layout.locator.TopLocator());
+      this.lCounter = this.lCounter + 1;    } else if (type == "vin") {
       var e = new shapeVin({ x: x, y: y });
-      var inputLocator = new draw2d.layout.locator.InputPortLocator();
-      var outputLocator = new draw2d.layout.locator.OutputPortLocator();
-      // e.createPort("hybrid",inputLocator);
+      var outputLocator = new MyInputPortLocator(16,0);
       e.createPort("hybrid", outputLocator);
       e.id = `vin`;
     } else if (type == "gnd") {
       var e = new shapeGnd({ x: x, y: y });
       // var inputLocator  = new draw2d.layout.locator.InputPortLocator();
-      var outputLocator = new draw2d.layout.locator.OutputPortLocator();
+      var outputLocator = new MyInputPortLocator(16,0);
       // e.createPort("hybrid",inputLocator);
       e.createPort("hybrid", outputLocator);
       e.id = `gnd`;
     } else if (type == "vout") {
       var e = new shapeVout({ x: x, y: y });
-      var inputLocator = new draw2d.layout.locator.InputPortLocator();
+      var inputLocator = new MyInputPortLocator(0,16);
       e.createPort("hybrid", inputLocator);
       // e.createPort("hybrid",outputLocator);
       e.id = `vout`;
@@ -80,8 +105,9 @@ export class View extends draw2d.Canvas {
 
     this.dropCb(e.id);
 
-    // e.resizeable = false;
-    e.keepAspectRatio = true;
+    e.resizeable = false;
+    // e.keepAspectRatio = true;
+    console.log(e);
     // e.width = 50;
 
     var command = new draw2d.command.CommandAdd(this, e, x, y);

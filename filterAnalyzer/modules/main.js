@@ -66,6 +66,7 @@ function SchematicComponents() {
     <div className="col" >
         <div key="1" data-shape="res" className="btn btn-primary draw2d_droppable" title="dragdrop the table into the canvas..">Resistor</div>
         <div key="2" data-shape="cap" className="btn btn-primary draw2d_droppable" title="dragdrop the table into the canvas..">Capacitor</div>
+        <div key="2" data-shape="ind" className="btn btn-primary draw2d_droppable" title="dragdrop the table into the canvas..">Inductor</div>
         <div key="3" data-shape="vin" className="btn btn-primary draw2d_droppable" title="dragdrop the table into the canvas..">Input voltage</div>
         <div key="4" data-shape="gnd" className="btn btn-primary draw2d_droppable" title="dragdrop the table into the canvas..">GND</div>
         <div key="5" data-shape="vout" className="btn btn-primary draw2d_droppable" title="dradrop the table into the canvas..">Vout</div>
@@ -105,16 +106,17 @@ function FreqResponse() {
 
 function TransformResults(props) {
 
-  return html`
+  var z= html`
     <div className="row">
       <div className="col">
         <div className="row text-center">
           <h3>Laplace</h3>
         </div>
         <div className="row">
-          <div id="math">
             The answer you provided is: ${MyComponent(props.latex)}
-          </div>
+        </div>
+        <div className="row">
+            The answer you provided is: ${MyComponentOLD(props.deleteMeLatex)}
         </div>
       </div>
       <div className="col">
@@ -132,6 +134,8 @@ function TransformResults(props) {
       </div>
     </div>
   `
+  // console.log(z);
+  return z;
 }
 
 function selectUnits (name) {
@@ -161,11 +165,21 @@ function createMarkup(latex) {
   })};
 }
 
-function MyComponent(latex) {
-  console.log('latex!', latex)
-  //FIXME - change latex for MathML
-  return html`<math>${latex}</math>`
+
+function MyComponentOLD(latex) {
   return html`<div dangerouslySetInnerHTML=${createMarkup(latex)} />`
+}
+function MyComponent(latex) {
+  // console.log('latex!', latex)
+  var z = `<math>${latex}</math>`;
+  // var zz = htmlToElement(z);
+  // console.log(z);
+  // return [zz];
+  // return html`<math>${latex}</math>`;
+  // //FIXME - change latex for MathML
+  // return html`<math>${latex}</math>`
+  return html`<div dangerouslySetInnerHTML=${{__html: z}} />`
+  // return html`<div dangerouslySetInnerHTML=${createMarkup(latex)} />`
 }
 
 function e1 (props) {
@@ -221,7 +235,8 @@ class Game extends React.Component {
     super(props);
     this.state = {
       elements: [],
-      latex: null
+      latex: null,
+      deleteMeLatex: null
     };
     this.schematicReadiness = {
       vout: false,
@@ -239,10 +254,10 @@ class Game extends React.Component {
 
   handleCanvasChange (canvasState) {
     // console.log("Inside handleCanvasChange");
-    var latexResult;
+    var latexResult, deleteMeLatex;
     var newElementMap;
     var elements = this.state.elements;
-    [this.schematicReadiness, latexResult, newElementMap] = calculateMNA(canvasState, this.schematicReadiness);
+    [this.schematicReadiness, latexResult, newElementMap, deleteMeLatex] = calculateMNA(canvasState, this.schematicReadiness);
 
     //add new elements
     for (const key in newElementMap) {
@@ -272,7 +287,8 @@ class Game extends React.Component {
 
     this.setState({
       elements:elements,
-      latex: latexResult
+      latex: latexResult,
+      deleteMeLatex: deleteMeLatex
     })
   }
 
@@ -322,7 +338,7 @@ class Game extends React.Component {
           <${Schematic} key="schem"/>
           <${SchematicVal} key="schemVal" schematicReadiness=${this.schematicReadiness}/>
           <${listElements} e=${this.state.elements} key="valueList" onChange=${(e,i) => this.handleElChange(e,i)} unitChange=${(e,i) => this.handleUnitChange(e,i)}/>
-          <${TransformResults} name="World" key="TransformResults" latex=${this.state.latex} />
+          <${TransformResults} name="World" key="TransformResults" latex=${this.state.latex} deleteMeLatex=${this.state.deleteMeLatex} />
           <${FreqResponse}  key="FreqResponse"/>
         </div>
       </div>

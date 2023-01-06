@@ -35,11 +35,13 @@
 - ~~Element selector shows whats on schematic~~
 - ~~Load a preset schematic~~
 - ~~Launch the beta version on github~~
-10) Fix R-C-R-C laplace result
+10) ~~Fix R-C-R-C laplace result~~ It works!
+10) ~~Fix R//C-R//C laplace result~~ It works!
 11) Add option to rotate components
 12) Fix component port location, and make drawings nicer...
+13) Use Draw2D grid
 13) Make draggable things into images, not text boxes
-14) Laplace use subscript in number
+14) ~~Laplace use subscript in number~~
 11) displaying frequency response
 
 

@@ -184,6 +184,7 @@ export function calculateMNA(canvasState, schematicReadiness) {
       if ((key2 != 'vin') && (key2 != 'vout') && (key2 != 'gnd')) {
         firstLetter = Array.from(key2)[0];
         if (firstLetter == 'R') laplaceElement = key2;
+        else if (firstLetter == 'L') laplaceElement = "(S*" + key2 + ")";
         else laplaceElement = "1/(S*" + key2 + ")";
 
         //2.1 in the diagonal is the sum of all impedances connected to that node
@@ -203,9 +204,9 @@ export function calculateMNA(canvasState, schematicReadiness) {
     //2.4 Add a 1 in the node connected to Vin to indicate that Iin flows into that node
     mnaMatrix[vinNode][mnaMatrix.length - 1] = '1';
 
-    console.log('elementMap', elementMap);
-    console.log('vin, vout and gnd node', vinNode, voutNode, gndNode);
-    console.log('mna ', mnaMatrix);
+    // console.log('elementMap', elementMap);
+    // console.log('vin, vout and gnd node', vinNode, voutNode, gndNode);
+    // console.log('mna ', mnaMatrix);
 
     var nerdStrArr = [];
     var nerdStr = "";
@@ -220,17 +221,17 @@ export function calculateMNA(canvasState, schematicReadiness) {
     Algebrite.eval("mna = [" + nerdStr + "]");
     Algebrite.eval("inv_mna = inv(mna)")
     Algebrite.eval("inv_mna")
-    Algebrite.eval("mna_vo_vi = (inv_mna[" + (voutNode + 1) + "][" + (mnaMatrix.length) + "])")
-    Algebrite.eval("mna_vo_vi_num = simplify(numerator(mna_vo_vi))")
-    Algebrite.eval("mna_vo_vi_den = simplify(denominator(mna_vo_vi))")
-    Algebrite.eval("mna_vo_vi_long = simplify(mna_vo_vi_num/mna_vo_vi_den)")
-    console.log('vin node')
-    // latexResult = Algebrite.run("printlatex(mna_vo_vi)");
+    Algebrite.eval("mna_vo_vi = simplify(inv_mna[" + (voutNode + 1) + "][" + (mnaMatrix.length) + "])")
+    // Algebrite.eval("mna_vo_vi_num = simplify(numerator(mna_vo_vi))")
+    // Algebrite.eval("mna_vo_vi_den = simplify(denominator(mna_vo_vi))")
+    // Algebrite.eval("mna_vo_vi_long = simplify(mna_vo_vi_num/mna_vo_vi_den)")
+    // console.log('vin node')
+    latexResult = Algebrite.run("printlatex(mna_vo_vi)");
     // console.log('Algebrite');
     // console.log(Algebrite.eval("mna").toString());
-    console.log(Algebrite.eval("mna_vo_vi_num").toString());
-    console.log(Algebrite.eval("mna_vo_vi_den").toString());
-    console.log(Algebrite.eval("mna_vo_vi_long").toString());
+    // console.log(Algebrite.eval("mna_vo_vi_num").toString());
+    // console.log(Algebrite.eval("mna_vo_vi_den").toString());
+    // console.log(Algebrite.eval("mna_vo_vi_long").toString());
     var ggg = simplify_algebra(Algebrite.eval("mna_vo_vi").toString());
     // console.log('ggg', ggg);
     // Algebrite.eval("simplified = " + ggg);
@@ -248,7 +249,7 @@ export function calculateMNA(canvasState, schematicReadiness) {
 
 
 
-  return [schematicReadiness, ggg, newElementMap];
+  return [schematicReadiness, ggg, newElementMap, latexResult];
 
 
 

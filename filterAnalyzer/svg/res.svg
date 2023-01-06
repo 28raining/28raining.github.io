@@ -1,3 +1,3 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 131 72">
-  <path fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M15 5 5 35M15 5l20 60M55 5l20 60M95 5l20 60M55 5 35 65M95 5 75 65m50-30-10 30" pointer-events="stroke"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" x="4">
+          <path stroke-linecap="round" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M13,5l-8,32m8,-32l16,64m16,-64l16,64m16,-64l16,64m-48,-64l-16,64m48,-64l-16,64m40,-32l-8,32"/>
+        </svg>
