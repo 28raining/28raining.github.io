@@ -10,8 +10,10 @@ export default function simplify_algebra_x(expr) {
     // console.log("i'm here!", expr,  z);
     var matrix = ExpressionParser.parse(z);  
     var t = matrix.toString();
+    var t2 = t.replace(/([a-zA-RT-Z]+)_([0-9]*)/g,"$1$2");   //Swap R_0 for R0 so this new library can consume it //not S
+
     // console.log(matrix.toMathML())
     // var zz = t.replace(/([a-zA-Z]+)_([0-9]*)/g,"$1$2")
     // var matrix = ExpressionParser.parse('-1/(ab(-1/(ab)-1/(ac)-1/(bc)))-1/(ac(-1/(ab)-1/(ac)-1/(bc)))');  
-    return matrix.toMathML();
+    return [t2, matrix.toMathML()];
 }

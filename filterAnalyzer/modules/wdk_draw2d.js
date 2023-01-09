@@ -7,11 +7,12 @@ export class init_draw2d {
     // var app = new example.Application();
     // Draw2D setup
     this.writer = new draw2d.io.json.Writer();
-    this.view    = new View("canvas", (a) => {dropCb(a)});
+    this.view    = new View("canvas", (a,b) => {dropCb(a,b)});
 
     // var reader = new draw2d.io.json.Reader();
     // reader.unmarshal(this.view, startupSchematic);
     this.view.loadSchematic();
+    //The first load needs to trigger the calculateTF function
     this.writer.marshal(this.view, function (json) {
       handleCanvasChange(json);
     });
@@ -31,7 +32,14 @@ export class init_draw2d {
     }));
 
     this.view.installEditPolicy(new draw2d.policy.canvas.SnapToGridEditPolicy(16)); //each grid is a 16x16
+
+    this.view.installEditPolicy(new draw2d.policy.canvas.SingleSelectionPolicy());
  
+  }
+
+  reUpdateCanvas (canvasState) {
+    startupSchematic = canvasState;
+    this.view.loadSchematic();
   }
 
   addEvL (vw,wr,cb) {
@@ -40,7 +48,7 @@ export class init_draw2d {
       if (e.isPostChangeEvent()) {
         wr.marshal(vw, function (json) {
           // console.log('some change', json)
-          cb(json);
+          cb(json, () => this.reUpdateCanvas());
         });
       }
     });

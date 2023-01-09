@@ -15,34 +15,47 @@
 
 
 # Draw2D
-1) ~~Add a resistor shape to toolbar~~
-2) ~~Add capacitor shape to toolbar~~
-3) ~~allow drag + drop + connect~~
-4) ~~extract connection map?~~
-5) ~~remove all the other unuesd gubbins (port to main site)~~
-6) ~~Add vsource and gnd symbol~~
-7) ~~Add a checklist of items which need to be done before laplace is calculated~~
-8) ~~Build the MNA matrix~~
-9) ~~solve the matrix and display the answer~~
-10) 
-- STOP - clean up the code! 
-- ~~Switch to algebrite -> done - remove nerdamer~~
-- ~~Put the code into js modules~~
-- ~~Use Preact properly~~
-- ~~Displaying latex nicely~~
-- ~~Add capacitors~~
-- ~~Clean up console logging~~
-- ~~Element selector shows whats on schematic~~
-- ~~Load a preset schematic~~
-- ~~Launch the beta version on github~~
-10) ~~Fix R-C-R-C laplace result~~ It works!
-10) ~~Fix R//C-R//C laplace result~~ It works!
-11) Add option to rotate components
-12) Fix component port location, and make drawings nicer...
-13) Use Draw2D grid
-13) Make draggable things into images, not text boxes
-14) ~~Laplace use subscript in number~~
-11) displaying frequency response
+- [x] Add a resistor shape to toolbar
+- [x] Add capacitor shape to toolbar
+- [x] allow drag + drop + connect
+- [x] extract connection map?
+- [x] remove all the other unuesd gubbins (port to main site)
+- [x] Add vsource and gnd symbol
+- [x] Add a checklist of items which need to be done before laplace is calculated
+- [x] Build the MNA matrix
+- [x] solve the matrix and display the answer
+#### STOP - clean up the code! 
+- [x] Switch to algebrite -> done - remove nerdamer
+- [x] Put the code into js modules
+- [x] Use Preact properly
+- [x] Displaying latex nicely
+- [x] Add capacitors
+- [x] Clean up console logging
+- [x] Element selector shows whats on schematic
+- [x] Load a preset schematic
+- [x] Launch the beta version on github
+- [x] Fix R-C-R-C laplace result It works!
+- [x] Fix R//C-R//C laplace result It works!
+- [x] Fix component port location, and make drawings nicer...
+- [x] Use Draw2D grid
+- [x] Laplace use subscript in number
+#### Plotly
+- [x] add min-to-max frequency range
+- [x] Update when user changes value or unit
+- [x] Use units 
+- Add a hold button
+- [x] Add x-y cursors
+- Make graph background transparent
+- [x] Prevent user adding multiple Vin or Vout
+- [x] Stop it crashing when user drags multiple elements
+#### Remaining
+- [ ] Add color switcher in top bar
+- [ ] Separate page into those nice boxes each with shadow
+- [ ] Add comments section
+- [ ] Make draggable things into images, not text boxes
+- [ ] Add option to rotate components
+- [ ] displaying frequency response
+- [ ] Add an op-amp 
 
 
 

@@ -232,7 +232,10 @@ export function calculateMNA(canvasState, schematicReadiness) {
     // console.log(Algebrite.eval("mna_vo_vi_num").toString());
     // console.log(Algebrite.eval("mna_vo_vi_den").toString());
     // console.log(Algebrite.eval("mna_vo_vi_long").toString());
-    var ggg = simplify_algebra(Algebrite.eval("mna_vo_vi").toString());
+    var resString, resMathML;
+    [resString, resMathML] = simplify_algebra(Algebrite.eval("mna_vo_vi").toString());
+
+
     // console.log('ggg', ggg);
     // Algebrite.eval("simplified = " + ggg);
     // latexResult = Algebrite.run("printlatex(mna_vo_vi)");
@@ -246,10 +249,10 @@ export function calculateMNA(canvasState, schematicReadiness) {
 
   }
 
+  console.log('bp2', resString)
 
 
-
-  return [schematicReadiness, ggg, newElementMap, latexResult];
+  return [schematicReadiness, resMathML, newElementMap, latexResult, resString];
 
 
 
