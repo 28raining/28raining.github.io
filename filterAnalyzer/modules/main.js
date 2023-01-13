@@ -408,7 +408,7 @@ class Game extends React.Component {
 
   handleCanvasChange(canvasState) {
     // console.log("Inside handleCanvasChange");
-    // console.log(canvasState);
+    console.log(canvasState);
     var latexResult, deleteMeLatex;
     var newElementMap;
     var elements = this.state.elements;
@@ -417,7 +417,7 @@ class Game extends React.Component {
 
     //add new elements
     for (const key in newElementMap) {
-      if ((key == 'gnd') || (key == 'vout') || (key == 'vin')) continue;
+      if ((key == 'gnd') || (key == 'vout') || (key == 'vin') || (key == 'op')) continue;
       if (!(key in elements)) {
         var firstLetter = Array.from(key)[0];
         if (firstLetter == 'R') {
@@ -558,8 +558,8 @@ class Game extends React.Component {
     // Update the DOM
     return html`
       <${navBar} title="ONLINE ELECTRONIC CIRCUIT LAPLACE SOLVER" key="navBar"/>
-      <div className="w-100 p-3 bg-green">
-        <div className="container-xl">
+      <div className="w-100 p-3 bg-green" key="wrapper">
+        <div className="container-xl" key="topContainer">
           <${SchematicComponents} key="schemComp"/>
           <${Schematic} key="schem"/>
           <${SchematicVal} key="schemVal" schematicReadiness=${this.schematicReadiness}/>

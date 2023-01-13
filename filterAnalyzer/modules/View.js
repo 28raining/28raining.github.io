@@ -45,7 +45,7 @@ export class View extends draw2d.Canvas {
   }
 
   addShapeToSchem(type, x, y) {
-    console.log(type, x, y)
+    // console.log(type, x, y)
 
     var MyInputPortLocator = draw2d.layout.locator.PortLocator.extend({
       init:function(x,y){

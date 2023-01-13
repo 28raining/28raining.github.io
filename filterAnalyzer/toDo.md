@@ -43,19 +43,25 @@
 - [x] add min-to-max frequency range
 - [x] Update when user changes value or unit
 - [x] Use units 
-- Add a hold button
 - [x] Add x-y cursors
-- Make graph background transparent
 - [x] Prevent user adding multiple Vin or Vout
 - [x] Stop it crashing when user drags multiple elements
 #### Remaining
+- [ ] Add a hold button
+- [ ] Make graph background transparent
 - [ ] Add color switcher in top bar
 - [ ] Separate page into those nice boxes each with shadow
 - [ ] Add comments section
 - [ ] Make draggable things into images, not text boxes
 - [ ] Add option to rotate components
-- [ ] displaying frequency response
-- [ ] Add an op-amp 
+- [x] displaying frequency response
+- [ ] Add an op-amp -> done a lot of this already
+- [ ] the element map has an array of port connections. That needs to go in a specific order, so later we know which op amp port is which
+- [ ] Move sanity checking into processCanvasState function, add all components fully connected?
+- [ ] processCanvasState() must also remove nodes that aren't connected to vout (it's already removing elements)
+- [ ] device can't connect to itself?
+- [ ] have a separate array just to hold op amps
+- [ ] Create object of elements, connect each end to a new node. Then delete elements who aren't fully connected, optimize the nodes, and remove nodes that don't have a path to vout
 
 
 

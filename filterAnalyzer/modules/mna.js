@@ -1,4 +1,13 @@
 import simplify_algebra from './simplify_algebra.js'
+
+function arrayContains (list1, item) {
+  return list1.findIndex((elem) => (elem.el == item.el) && (elem.port == item.port))
+}
+
+function includesElement (list1, item) {
+  return list1.findIndex((elem) => (elem.el == item))
+}
+
 function processCanvasState(canvasState) {
   var newElementMap = {};
   // var elementsOnNodes = [];
@@ -6,19 +15,27 @@ function processCanvasState(canvasState) {
   var createNode;
   var end1, end2, i, j, k;
   var optimized;
+  var idx;
+  var cnt;
+  var firstLetter;
 
 
   //Create a new node for each component
   canvasState.forEach(item => {
     if (item.type == "draw2d.Connection") {
       //get both ends of the connection
-      end1 = `${item.source.node}.${item.source.port}`
-      end2 = `${item.target.node}.${item.target.port}`
-      nodeMap.push([end1, end2])
+      // end1 = `${item.source.node}.${item.source.port}`
+      // end2 = `${item.target.node}.${item.target.port}`
+      nodeMap.push([{el: item.source.node, port: item.source.port}, {el: item.target.node, port: item.target.port}])
       // console.log(end1, end2);
     } else {
       //if its not a connection its an element
-      newElementMap[item.id] = {};
+      firstLetter = Array.from(item.id)[0];
+      //cnt is how many connections it's expected
+      if ((firstLetter=='L') || (firstLetter=='R') || (firstLetter=='C')) cnt = 2;
+      else if (firstLetter=='o') cnt = 3;
+      else cnt = 1;
+      newElementMap[item.id] = {cnt: cnt};
     }
   });
 
@@ -29,13 +46,17 @@ function processCanvasState(canvasState) {
       for (i = 0; i < nodeMap.length; i++) {
         for (j = 0; j < nodeMap[i].length; j++) {
           for (k = i+1; k < nodeMap.length; k++) {
-            if (nodeMap[k].includes(nodeMap[i][j])) {
+            // console.log('looking for ',nodeMap[i][j], ' inside ', nodeMap[k])
+            // if (nodeMap[k].includes(nodeMap[i][j])) {
+            idx = arrayContains(nodeMap[k], nodeMap[i][j])
+            if (idx >= 0) {
+              // console.log('common node')
               optimized = true;
               //Before concat with K, must remove the element that is about to be duplicated
-              const index = nodeMap[k].indexOf(nodeMap[i][j]);
-              if (index > -1) { // only splice array when item is found
-                nodeMap[k].splice(index, 1); // 2nd parameter means remove one item only
-              }
+              // const index = nodeMap[k].indexOf(nodeMap[i][j]);
+              // if (index > -1) { // only splice array when item is found
+                nodeMap[k].splice(idx, 1); // 2nd parameter means remove one item only
+              // }
               nodeMap[i] = nodeMap[i].concat(nodeMap[k]);
               nodeMap.splice(k, 1);
               break loop1;
@@ -45,50 +66,56 @@ function processCanvasState(canvasState) {
       }
   } while (optimized==true);
 
-  //     //check if either end exists in the nodemap, create a new entry or add to existing entry
-  //     createNode = true;
-  //     for (i = 0; i < nodeMap.length; i++) {
-  //       if (nodeMap[i].includes(end1) && !nodeMap[i].includes(end2)) {
-  //         nodeMap[i].push(end2);
-  //         createNode = false;
-  //         break;
-  //       }
-  //       else if (!nodeMap[i].includes(end1) && nodeMap[i].includes(end2)) {
-  //         nodeMap[i].push(end1);
-  //         createNode = false;
-  //         break;
-  //       }
-  //     }
-  //     if (createNode) {
-  //       nodeMap.push([end1, end2])
-  //     }
-  //     //Fixme - there needs to be some code here to merge nodes
-
-  //   } else {
-  //     //if its not a connection its an element
-  //     newElementMap[item.id] = {};
-  //   }
-
-  // });
-
-  var elementsOnNodes =[];
-  var t;
+  //loop thru nodemap and remove elements which don't have both ports connected
   for (i = 0; i < nodeMap.length; i++) {
-    elementsOnNodes[i] = [];
     for (j = 0; j < nodeMap[i].length; j++) {
-      t = nodeMap[i][j].split('.')
-      elementsOnNodes[i].push(t[0])
+      newElementMap[nodeMap[i][j].el].cnt -= 1;
     }
   }
+  for (const key in newElementMap) {
+    if(newElementMap[key].cnt > 0) {
+      console.log('removing', key)
+      //element must be removed!
+      for (i = 0; i < nodeMap.length; i++) {
+        for (j = 0; j < nodeMap[i].length; j++) {
+          do {
+            cnt = includesElement(nodeMap[i], key)
+            if (cnt>=0) nodeMap[i].splice(cnt,1)
+          } while (cnt >= 0)
+          // cnt = includesElement(nodeMap[i], key)
+          // newElementMap[nodeMap[i][j].el].cnt -= 1;
+        }
+      }
+      delete newElementMap[key]
+    }
+  }
+  console.log(newElementMap);
+
+  //remove 2-port and 3-port elements that aren't fully connected
+  //FIXME - here
+  //[x]1 - Change nodemap to an array of object. Kind of dumb to have to keep splitting
+  //[x]1a - remove elementsOnNodes
+  //[x]2 - create a counter array and count occurances of each element
+  //[x]3 - loop thru count array and remove anything which isn't 2 or 3
+
+  //list of elements on nodes, not specifying port
+  // var elementsOnNodes = [];
+  // var t;
+  // for (i = 0; i < nodeMap.length; i++) {
+  //   elementsOnNodes[i] = [];
+  //   for (j = 0; j < nodeMap[i].length; j++) {
+  //     t = nodeMap[i][j]['el']
+  //     elementsOnNodes[i].push(t)
+  //   }
+  // }
   // console.log('newElementMap', newElementMap)
 
-  return [elementsOnNodes, nodeMap, newElementMap]
+  return [nodeMap, newElementMap]
 
 }
 
 
 export function calculateMNA(canvasState, schematicReadiness) {
-  var elementsOnNodes = [];
   var nodeMap = [];
   var i, j;
   var vinNode, gndNode, voutNode;
@@ -97,8 +124,8 @@ export function calculateMNA(canvasState, schematicReadiness) {
   var element;
   var latexResult = null;
 
-  [elementsOnNodes, nodeMap, newElementMap] = processCanvasState(canvasState);
-  console.log("bp1",  elementsOnNodes, nodeMap, newElementMap)
+  [nodeMap, newElementMap] = processCanvasState(canvasState);
+  console.log("bp1", nodeMap, newElementMap)
 
   //verify how ready the schematic is
   // All this code is just for that! Can't it be done later, for free? //FIXME
@@ -109,29 +136,30 @@ export function calculateMNA(canvasState, schematicReadiness) {
     gnd: false,
   };
   var tmp;
-  for (i = 0; i < elementsOnNodes.length; i++) {
-    if (elementsOnNodes[i].includes('vout')) {
+  for (i = 0; i < nodeMap.length; i++) {
+    // if (elementsOnNodes[i].includes('vout')) {
+    if (includesElement(nodeMap[i], 'vout') >= 0) {
       schematicReadiness.vout = true;
       //See which nodes are connected together
       var crushedNodes = [i], zz, moreNodes, jj, kk, newNode, elementsOnThisNode = [];
       zz = i;
       moreNodes = [i];
-      elementsOnThisNode = [].concat(elementsOnThisNode + elementsOnNodes[i]);
+      elementsOnThisNode = [].concat(elementsOnThisNode + nodeMap[i]);
       while (moreNodes.length > 0) {
         moreNodes = [];
         newNode = moreNodes.pop();
         //Search through the node for elements with two ports (starting with the node tied to vout)
-        for (jj = 0; jj < elementsOnNodes[i].length; jj++) {
-          if (elementsOnNodes[i][jj] == 'vout') tmp = i;
-          else if (elementsOnNodes[i][jj] == 'vin') tmp = i;
-          else if (elementsOnNodes[i][jj] == 'gnd') tmp = i;
+        for (jj = 0; jj < nodeMap[i].length; jj++) {
+          if (nodeMap[i][jj].el == 'vout') tmp = i;
+          else if (nodeMap[i][jj].el == 'vin') tmp = i;
+          else if (nodeMap[i][jj].el == 'gnd') tmp = i;
           else {
             //found a two ported element. Add the node on the other end if it isn't already added.
-            for (kk = 0; kk < elementsOnNodes.length; kk++) {
+            for (kk = 0; kk < nodeMap.length; kk++) {
               if (!crushedNodes.includes(kk)) {
                 crushedNodes.push(kk);
                 moreNodes.push(kk);
-                elementsOnThisNode = [].concat(elementsOnThisNode, elementsOnNodes[kk]);
+                elementsOnThisNode = [].concat(elementsOnThisNode, nodeMap[kk]);
               }
             }
             moreNodes = 1;  //wtf does this line do!
@@ -140,8 +168,8 @@ export function calculateMNA(canvasState, schematicReadiness) {
       }
 
 
-      if (elementsOnThisNode.includes('gnd')) schematicReadiness.gnd = true;
-      if (elementsOnThisNode.includes('vin')) schematicReadiness.vin = true;
+      if (includesElement(elementsOnThisNode, 'gnd') >= 0) schematicReadiness.gnd = true;
+      if (includesElement(elementsOnThisNode, 'vin') >= 0) schematicReadiness.vin = true;
 
       break;
     }
@@ -157,22 +185,24 @@ export function calculateMNA(canvasState, schematicReadiness) {
 
   // Build MNA array
   if (schematicReadiness.vout && schematicReadiness.vin && schematicReadiness.gnd) {
+    var numOpAmps=0;
+    for(const key in newElementMap) if (Array.from(key)[0] == 'o') numOpAmps+=1;
     // Create 2D modified nodal analysis array
-    var mnaMatrix = new Array(nodeMap.length);
-    for (i = 0; i < nodeMap.length; i++) mnaMatrix[i] = new Array(nodeMap.length).fill("0");
+    var mnaMatrix = new Array(nodeMap.length + numOpAmps);
+    for (i = 0; i < mnaMatrix.length; i++) mnaMatrix[i] = new Array(mnaMatrix.length).fill("0");
     //create node map without gnd node. All nodes might need to shift
-    for (i = 0; i < elementsOnNodes.length; i++) {
-      if (elementsOnNodes[i].includes('gnd')) gndNode = i;
+    for (i = 0; i < nodeMap.length; i++) {
+      if (includesElement(nodeMap[i], 'gnd') >= 0) gndNode = i;
     }
     var nodeMapNoGnd = nodeMap;
-    var rem = nodeMapNoGnd.splice(gndNode, 1);
+    nodeMapNoGnd.splice(gndNode, 1);  //removes the ground node so MNA is arranged properly
 
     // Step 1 - create map of every element and which node it connects too. Doing this here, after node map is complete and ground node is removed
     for (i = 0; i < nodeMapNoGnd.length; i++) {
       for (j = 0; j < nodeMapNoGnd[i].length; j++) {
-        element = nodeMapNoGnd[i][j].split('.')
-        if (element[0] in elementMap) elementMap[element[0]].push(i)
-        else elementMap[element[0]] = [i]
+        element = nodeMapNoGnd[i][j]['el']
+        if (element in elementMap) elementMap[element].push(i)
+        else elementMap[element] = [i]
       }
     }
     voutNode = elementMap['vout'][0];
@@ -181,7 +211,7 @@ export function calculateMNA(canvasState, schematicReadiness) {
     // Step 2 - loop thru elementMap and start adding things to the MNA
     var laplaceElement, firstLetter;
     for (const key2 in elementMap) {
-      if ((key2 != 'vin') && (key2 != 'vout') && (key2 != 'gnd')) {
+      if ((key2 != 'vin') && (key2 != 'vout') && (key2 != 'gnd') && (key2 != 'op')) {
         firstLetter = Array.from(key2)[0];
         if (firstLetter == 'R') laplaceElement = key2;
         else if (firstLetter == 'L') laplaceElement = "(S*" + key2 + ")";
@@ -198,15 +228,28 @@ export function calculateMNA(canvasState, schematicReadiness) {
         }
       }
     }
-    //2.3 Add a 1 in the bottom column indicating which node is Vin connected too
-    mnaMatrix[mnaMatrix.length - 1][vinNode] = '1';
+    //2.3 Add a 1 in the bottom row indicating which node is Vin connected too
+    mnaMatrix[mnaMatrix.length - 1 - numOpAmps][vinNode] = '1';
 
     //2.4 Add a 1 in the node connected to Vin to indicate that Iin flows into that node
-    mnaMatrix[vinNode][mnaMatrix.length - 1] = '1';
+    mnaMatrix[vinNode][mnaMatrix.length - 1 - numOpAmps] = '1';
 
-    // console.log('elementMap', elementMap);
+    //2.5 For each op-amp add some 1's. It says that 2 nodes are equal to each other, and that 1 node has a new ideal current source
+    numOpAmps = 0;
+    for(const key in elementMap) {
+      if (Array.from(key)[0] == 'o') {
+        numOpAmps = numOpAmps + 1;
+        console.log("bp3",numOpAmps,key,elementMap[key] )
+        mnaMatrix[nodeMapNoGnd.length + numOpAmps][elementMap[key][0]] = '-1';
+        mnaMatrix[nodeMapNoGnd.length + numOpAmps][elementMap[key][1]] = '1';
+        mnaMatrix[elementMap[key][2]][nodeMapNoGnd.length + numOpAmps] = '1';
+      }
+    }
+
+
+    console.log('elementMap', elementMap);
     // console.log('vin, vout and gnd node', vinNode, voutNode, gndNode);
-    // console.log('mna ', mnaMatrix);
+    console.log('mna ', mnaMatrix);
 
     var nerdStrArr = [];
     var nerdStr = "";
