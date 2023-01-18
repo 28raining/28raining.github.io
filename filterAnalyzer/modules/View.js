@@ -1,4 +1,5 @@
 import { state } from './main.js'
+import { SelectionMenuPolicy } from './wdk_draw2d.js'
 
 export class View extends draw2d.Canvas {
 
@@ -10,7 +11,7 @@ export class View extends draw2d.Canvas {
       parseFloat(wrapperComputedStyle.paddingLeft) +
       parseFloat(wrapperComputedStyle.paddingRight)
     // console.log("height, width", canvasHolder.offsetHeight, wrapperWidth)
-    super(id, wrapperWidth-2, canvasHolder.offsetHeight-2);
+    super(id, wrapperWidth - 2, canvasHolder.offsetHeight - 2);
     this.rCounter = 0;
     this.cCounter = 0;
     this.lCounter = 0;
@@ -37,7 +38,7 @@ export class View extends draw2d.Canvas {
   onDrop(droppedDomNode, x, y, shiftKey, ctrlKey) {
     var type = $(droppedDomNode).data("shape");
     this.addShapeToSchem(type, x, y);
-  }  
+  }
 
   addToSchematic(e) {
     var command = new draw2d.command.CommandAdd(this, e, this.x, this.y);
@@ -48,74 +49,88 @@ export class View extends draw2d.Canvas {
     // console.log(type, x, y)
 
     var MyInputPortLocator = draw2d.layout.locator.PortLocator.extend({
-      init:function(x,y){
+      init: function (x, y) {
         this._super();
         this.x = x;
         this.y = y;
       },
-      relocate:function(index, figure){
-          this.applyConsiderRotation(figure, this.x, this.y);
+      relocate: function (index, figure) {
+        var parent = figure.getParent();
+        var rotAngle = parent.getRotationAngle();
+
+        if (rotAngle > 0) {
+          // var newX = 
+          figure.setPosition( this.y, this.x);
+        } else {
+          figure.setPosition( this.x, this.y);
+        }
+        // this.applyConsiderRotation(figure, this.x, this.y);
       }
     });
 
 
     // console.log(x, y)
-    x = 16 * Math.round(x/16);
-    y = 16 * Math.round(y/16);
+    x = 16 * Math.round(x / 16);
+    y = 16 * Math.round(y / 16);
+    var locator;
     // console.log(x, y)
     if (type == "res") {
-      var e = new shapeRes({ x: x, y: y});
-      var inputLocator = new draw2d.layout.locator.InputPortLocator();
-      var outputLocator = new draw2d.layout.locator.OutputPortLocator();
+      var e = new shapeRes({ x: x, y: y });
+      var inputLocator = new MyInputPortLocator(0, 16);
+      var outputLocator = new MyInputPortLocator(48, 16);
       e.createPort("hybrid", inputLocator);
       e.createPort("hybrid", outputLocator);
       e.id = `R${this.rCounter}`;
-      e.add(new draw2d.shape.basic.Text({text:e.id, stroke:0}), new draw2d.layout.locator.TopLocator());
+      e.add(new draw2d.shape.basic.Text({ text: e.id, stroke: 0 }), new draw2d.layout.locator.TopLocator());
       this.rCounter = this.rCounter + 1;
+      e.installEditPolicy(new SelectionMenuPolicy());
     } else if (type == "cap") {
       var e = new shapeCap({ x: x, y: y });
-      var inputLocator = new MyInputPortLocator(16,0);
-      var outputLocator = new MyInputPortLocator(16,48);
+      var inputLocator = new MyInputPortLocator(16, 0);
+      var outputLocator = new MyInputPortLocator(16, 48);
       e.createPort("hybrid", inputLocator);
       e.createPort("hybrid", outputLocator);
       e.id = `C${this.cCounter}`;
-      e.add(new draw2d.shape.basic.Text({text:e.id, stroke:0}), new draw2d.layout.locator.RightLocator());
+      e.add(new draw2d.shape.basic.Text({ text: e.id, stroke: 0 }), new draw2d.layout.locator.RightLocator());
       this.cCounter = this.cCounter + 1;
+      e.installEditPolicy(new SelectionMenuPolicy());
     } else if (type == "ind") {
-      var e = new shapeInductor({ x: x, y: y});
-      var inputLocator = new MyInputPortLocator(0,16);
-      var outputLocator = new MyInputPortLocator(64,16);
+      var e = new shapeInductor({ x: x, y: y });
+      var inputLocator = new MyInputPortLocator(-1, 16);
+      var outputLocator = new MyInputPortLocator(65, 16);
       e.createPort("hybrid", inputLocator);
       e.createPort("hybrid", outputLocator);
       e.id = `L${this.lCounter}`;
-      e.add(new draw2d.shape.basic.Text({text:e.id, stroke:0}), new draw2d.layout.locator.TopLocator());
-      this.lCounter = this.lCounter + 1;    } else if (type == "vin") {
+      e.add(new draw2d.shape.basic.Text({ text: e.id, stroke: 0 }), new draw2d.layout.locator.TopLocator());
+      this.lCounter = this.lCounter + 1;
+      e.installEditPolicy(new SelectionMenuPolicy());
+    } else if (type == "vin") {
       var e = new shapeVin({ x: x, y: y });
-      var outputLocator = new MyInputPortLocator(16,0);
+      var outputLocator = new MyInputPortLocator(16, 0);
       e.createPort("hybrid", outputLocator);
       e.id = `vin`;
     } else if (type == "gnd") {
       var e = new shapeGnd({ x: x, y: y });
       // var inputLocator  = new draw2d.layout.locator.InputPortLocator();
-      var outputLocator = new MyInputPortLocator(16,0);
+      var outputLocator = new MyInputPortLocator(16, 0);
       // e.createPort("hybrid",inputLocator);
       e.createPort("hybrid", outputLocator);
       e.id = `gnd`;
     } else if (type == "vout") {
       var e = new shapeVout({ x: x, y: y });
-      var inputLocator = new MyInputPortLocator(0,16);
+      var inputLocator = new MyInputPortLocator(0, 16);
       e.createPort("hybrid", inputLocator);
       // e.createPort("hybrid",outputLocator);
       e.id = `vout`;
     } else if (type == "op") {
       var e = new shapeOpamp({ x: x, y: y });
-      var inputALocator = new MyInputPortLocator(0,32);
-      var inputBLocator = new MyInputPortLocator(0,64);
-      var outputLocator = new MyInputPortLocator(64,48);
+      var inputALocator = new MyInputPortLocator(0, 32);
+      var inputBLocator = new MyInputPortLocator(0, 64);
+      var outputLocator = new MyInputPortLocator(64, 48);
       e.createPort("hybrid", inputALocator);
       e.createPort("hybrid", inputBLocator);
       e.createPort("hybrid", outputLocator);
-      e.id = `op`;
+      e.id = `op0`;
     } else exit('You gave a bad type: ', type)
 
     this.x = x;

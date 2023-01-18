@@ -26336,6 +26336,7 @@ _packages2.default.layout.locator.PortLocator = _packages2.default.layout.locato
       m.scale(ratio, 1 / ratio, halfW, halfH);
     }
 
+		console.log('setting it', x, y, parent.getId())
     port.setPosition(m.x(x, y), m.y(x, y));
   }
 });

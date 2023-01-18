@@ -53,15 +53,21 @@
 - [ ] Separate page into those nice boxes each with shadow
 - [ ] Add comments section
 - [ ] Make draggable things into images, not text boxes
-- [ ] Add option to rotate components
+- [x] Add option to rotate components
 - [x] displaying frequency response
-- [ ] Add an op-amp -> done a lot of this already
-- [ ] the element map has an array of port connections. That needs to go in a specific order, so later we know which op amp port is which
-- [ ] Move sanity checking into processCanvasState function, add all components fully connected?
-- [ ] processCanvasState() must also remove nodes that aren't connected to vout (it's already removing elements)
+- [x] Add an op-amp -> done a lot of this already
+- [x] the element map has an array of port connections. That needs to go in a specific order, so later we know which op amp port is which
+- [x] Move sanity checking into processCanvasState function, add all components fully connected?
+- [x] processCanvasState() must also remove nodes that aren't connected to vout (it's already removing elements)
 - [ ] device can't connect to itself?
-- [ ] have a separate array just to hold op amps
-- [ ] Create object of elements, connect each end to a new node. Then delete elements who aren't fully connected, optimize the nodes, and remove nodes that don't have a path to vout
+- [x] have a separate array just to hold op amps
+- [x] Create object of elements, connect each end to a new node. Then delete elements who aren't fully connected, optimize the nodes, and remove nodes that don't have a path to vout
+- [ ] Zoom in and out
+- [x] Every element to show in value selector
+- [ ] Reset graph when schematic is not good
+- [ ] Undo and redo buttons
+- [ ] Stop it crashing if algebrite can't solve it
+- [x] Show graph on load
 
 
 
@@ -69,3 +75,5 @@
 - Site to store tiny pieces of data. So this site can have memory and be severless. And smith chart site
 - A well documented, crowd sourced algebra library
 - A replacement for draw2D without jQuery
+-- fix rotation
+-- be supported

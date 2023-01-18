@@ -13,19 +13,6 @@ export var state = {
 }; //Current state
 var debug = {}; //Enable debug
 
-function schematicValidator(props) {
-  // console.log(element, schematicReadiness[element]);
-  if (props.ready) var color = "success"
-  else var color = "danger"
-  return html`
-  <div className="col">
-    <div className="d-grid gap-2">
-      <span className="badge bg-${color}">${props.name} connected</span>
-    </div>
-  </div>
-  `
-}
-
 function navBar(props) {
   return html`
     <div className="w-100 p-3 bg-navy text-white">
@@ -41,35 +28,78 @@ function navBar(props) {
 
 function SchematicComponents() {
   return html`
-  <div className="row">
+  <div className="row py-1">
     <div className="col" >
-        <div key="1" data-shape="res" className="btn btn-primary draw2d_droppable" title="dragdrop the table into the canvas..">Resistor</div>
-        <div key="2" data-shape="cap" className="btn btn-primary draw2d_droppable" title="dragdrop the table into the canvas..">Capacitor</div>
-        <div key="3" data-shape="ind" className="btn btn-primary draw2d_droppable" title="dragdrop the table into the canvas..">Inductor</div>
-        <div key="4" data-shape="vin" className="btn btn-primary draw2d_droppable" title="dragdrop the table into the canvas..">Input voltage</div>
-        <div key="5" data-shape="gnd" className="btn btn-primary draw2d_droppable" title="dragdrop the table into the canvas..">GND</div>
-        <div key="6" data-shape="vout" className="btn btn-primary draw2d_droppable" title="dradrop the table into the canvas..">Vout</div>
-        <div key="7" data-shape="op" className="btn btn-primary draw2d_droppable" title="dradrop the table into the canvas..">OpAmp</div>
+      <div className="d-grid gap-2" >
+          <div key="1" data-shape="res" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic..">resistor</div>
+      </div>
+    </div>
+    <div className="col" >
+      <div className="d-grid gap-2" >
+          <div key="2" data-shape="cap" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic..">capacitor</div>
+      </div>
+    </div>
+    <div className="col" >
+    <div className="d-grid gap-2" >
+
+        <div key="3" data-shape="ind" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic..">inductor</div>
+    </div>
+    </div>
+    <div className="col" >
+    <div className="d-grid gap-2" >
+
+        <div key="4" data-shape="vin" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic..">input voltage</div>
+    </div>
+    </div>
+    <div className="col" >
+    <div className="d-grid gap-2" >
+
+        <div key="5" data-shape="gnd" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic..">gnd</div>
+    </div>
+    </div>
+    <div className="col" >
+    <div className="d-grid gap-2" >
+
+        <div key="6" data-shape="vout" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic..">vout</div>
+    </div>
+    </div>
+    <div className="col" >
+    <div className="d-grid gap-2" >
+
+        <div key="7" data-shape="op" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic..">op-amp</div>
+    </div>
     </div>
   </div>
   `
 }
 function Schematic() {
   return html`
-  <div className="row" key="r124">
-    <div className="col" style=${{ height: "300px" }} id="canvasHolder">
+  <div className="row py-1" key="r124">
+    <div className="col" style=${{ height: "512px" }} id="canvasHolder">
       <div id="canvas" className="bg-light border" style=${{ position: 'absolute' }} />
     </div>
 
   </div>
   `
 }
+
+function schematicValidator(props) {
+  if (props.ready) var color = "success"
+  else var color = "danger"
+  return html`
+  <div className="col">
+    <div className="d-grid gap-2">
+      <span className="badge bg-${color}">${props.name}</span>
+    </div>
+  </div>
+  `
+}
 function SchematicVal(props) {
   return html`
-  <div className="row">
-        <${schematicValidator} name="vout" key="vout" ready=${props.schematicReadiness['vout']} />
-        <${schematicValidator} name="vin" key="vin" ready=${props.schematicReadiness['vin']} />
-        <${schematicValidator} name="gnd" key="gnd" ready=${props.schematicReadiness['gnd']} />
+  <div className="row py-1">
+        <${schematicValidator} name="vout connected" key="vout" ready=${props.schematicReadiness['vout']} />
+        <${schematicValidator} name="vin connected" key="vin" ready=${props.schematicReadiness['vin']} />
+        <${schematicValidator} name="gnd connected" key="gnd" ready=${props.schematicReadiness['gnd']} />
   </div>
   `
 }
@@ -86,8 +116,8 @@ function FreqResponse() {
 
 function createGraph(el) {
   Plotly.newPlot(el, [{
-    x: [1, 2, 3, 4, 5],
-    y: [1, 2, 4, 8, 16]
+    x: [0],
+    y: [0]
     // x: freq,
     // y: mag
   }], {
@@ -106,7 +136,10 @@ function createGraph(el) {
 }
 
 function updateGraph(el, freq, mag) {
+  // console.log('thinking about it')
   if (el) {
+    // console.log('doing it', freq, mag)
+
     Plotly.react(el, [{
       // x: [1, 2, 3, 4, 5],
       // y: [1, 2, 4, 8, 16]
@@ -139,24 +172,15 @@ function TransformResults(props) {
     <div className="row">
       <div className="col">
         <div className="row text-center">
-          <h3>Laplace</h3>
+          <h3>Laplace Transform</h3>
         </div>
-        <div className="row">
+        <div className="row text-center">
             ${MyComponent(props.latex)}
         </div>
-
       </div>
       <div className="col">
         <div className="row text-center">
           <h3>Bilinear Transform</h3>
-        </div>
-      </div>
-      <div className="col">
-        <div className="row text-center">
-          <h3>State Space</h3>
-        </div>
-        <div className="row">
-          <p>Coming soon, maybe...</p>
         </div>
       </div>
     </div>
@@ -202,7 +226,6 @@ function createMarkup(latex) {
   };
 }
 
-
 function MyComponentOLD(latex) {
   return html`<div dangerouslySetInnerHTML=${createMarkup(latex)} />`
 }
@@ -229,12 +252,14 @@ function MyComponent(latex) {
 function e1(props) {
   if (props.idxx >= props.length) return null
   else {
+    var name = props.keys[props.idxx];
+    var el = props.elements[name];
     return html`
       <div className="input-group mt-1">
-        <span className="input-group-text">${props.name}</span>
-        <input  type="text" className="form-control" value="${props.el.value}" onChange=${(e) => props.onChange(e, props.name)} />
-        <select  value=${props.el.unit} className="form-select" onChange=${(e) => props.unitChange(e, props.name)}>
-          ${selectUnits(props.name)}
+        <span className="input-group-text">${name}</span>
+        <input  type="text" className="form-control" value="${el.value}" onChange=${(e) => props.onChange(e, name)} />
+        <select  value=${el.unit} className="form-select" onChange=${(e) => props.unitChange(e, name)}>
+          ${selectUnits(name)}
         </select>
       </div>
     `
@@ -244,29 +269,35 @@ function e1(props) {
 function listElements(props) {
   if (Object.keys(props.e).length === 0) {
     return html`
-      <div className="row py-3">
+      <div className="row py-1">
         <div className="col text-center">
           <div className="row"><p>Drag components from the top onto the schematic</p></div>
         </div>
       </div>`
   }
 
-  var elPerRow = 3;
+  var elPerRow = 5;
   var r = []
   var z;
   var keys = Object.keys(props.e);
   const elements = props.e;
   for (z = 0; z < keys.length; z = z + elPerRow) {
     r.push(html`
-      <div className="row" key=row${z}>
+      <div className="row py-1" key=row${z}>
         <div className="col" key=${z}>
-          <${e1} name=${keys[z]} el=${elements[keys[z]]} idxx=${z} length=${keys.length} onChange=${props.onChange} unitChange=${props.unitChange} />
+          <${e1} keys=${keys} elements=${elements} idxx=${z} length=${keys.length} onChange=${props.onChange} unitChange=${props.unitChange} />
         </div>
         <div className="col" key=${z + 1}>
-          <${e1} name=${keys[z + 1]} el=${elements[keys[z + 1]]} idxx=${z + 1} length=${keys.length} onChange=${props.onChange} unitChange=${props.unitChange} />
+          <${e1} keys=${keys} elements=${elements} idxx=${z + 1} length=${keys.length} onChange=${props.onChange} unitChange=${props.unitChange} />
         </div>
         <div className="col" key=${z + 2}>
-          <${e1} name=${keys[z + 2]} el=${elements[keys[z + 2]]}idxx=${z + 2} length=${keys.length} onChange=${props.onChange} unitChange=${props.unitChange} />
+          <${e1} keys=${keys} elements=${elements} idxx=${z + 2} length=${keys.length} onChange=${props.onChange} unitChange=${props.unitChange} />
+        </div>
+        <div className="col" key=${z + 3}>
+          <${e1} keys=${keys} elements=${elements} idxx=${z + 3} length=${keys.length} onChange=${props.onChange} unitChange=${props.unitChange} />
+        </div>
+        <div className="col" key=${z + 5}>
+          <${e1} keys=${keys} elements=${elements} idxx=${z + 5} length=${keys.length} onChange=${props.onChange} unitChange=${props.unitChange} />
         </div>
       </div>`)
   }
@@ -279,7 +310,7 @@ function FreqResponseControllers(props) {
   <div className="row">
     <div className="col" key=fmin>
       <div className="input-group mt-1">
-        <span className="input-group-text">Fmin</span>
+        <span className="input-group-text">f<sub>min</sub></span>
         <input  type="text" className="form-control" value="${props.fminValue}" onChange=${(e) => props.onChange(e, 'fmin')} />
         <select  value=${props.fminUnit} className="form-select" onChange=${(e) => props.unitChange(e, 'fmin')}>
           ${selectUnits('f')}
@@ -289,7 +320,7 @@ function FreqResponseControllers(props) {
 
     <div className="col" key=fmax>
       <div className="input-group mt-1">
-        <span className="input-group-text">fmax</span>
+        <span className="input-group-text">f<sub>max</sub></span>
         <input  type="text" className="form-control" value="${props.fmaxValue}" onChange=${(e) => props.onChange(e, 'fmax')} />
         <select  value=${props.fmaxUnit} className="form-select" onChange=${(e) => props.unitChange(e, 'fmax')}>
           ${selectUnits('f')}
@@ -331,12 +362,17 @@ class Game extends React.Component {
         value: 100,
         unit: 'G'
       },
+      schematicReadiness : {
+        vout: false,
+        vin: false,
+        gnd: false,
+      }
     };
-    this.schematicReadiness = {
-      vout: false,
-      vin: false,
-      gnd: false,
-    };
+    // this.schematicReadiness = {
+    //   vout: false,
+    //   vin: false,
+    //   gnd: false,
+    // };
     this.TESTER = null;
     this.freq = [];
     this.mag = [];
@@ -364,10 +400,12 @@ class Game extends React.Component {
   }
 
   schematicReady () {
-    return (this.schematicReadiness.vout && this.schematicReadiness.vin && this.schematicReadiness.gnd);
+    return (this.state.schematicReadiness.vout && this.state.schematicReadiness.vin && this.state.schematicReadiness.gnd);
   }
 
   calculateTF() {
+    // console.log(this.schematicReady())
+    // console.log(this.state.schematicReadiness.vout,this.state.schematicReadiness.vin,this.state.schematicReadiness.gnd)
     if (!this.schematicReady()) return;
     // console.log(this.state)
     //Convert algebra result into a numerical result
@@ -408,16 +446,17 @@ class Game extends React.Component {
 
   handleCanvasChange(canvasState) {
     // console.log("Inside handleCanvasChange");
-    console.log(canvasState);
+    // console.log(canvasState);
     var latexResult, deleteMeLatex;
     var newElementMap;
     var elements = this.state.elements;
-    [this.schematicReadiness, latexResult, newElementMap, deleteMeLatex, this.resString] = calculateMNA(canvasState, this.schematicReadiness);
+    var schematicReadiness;
+    [schematicReadiness, latexResult, newElementMap, deleteMeLatex, this.resString] = calculateMNA(canvasState);
     this.state.elOnSchematic = newElementMap;
 
     //add new elements
     for (const key in newElementMap) {
-      if ((key == 'gnd') || (key == 'vout') || (key == 'vin') || (key == 'op')) continue;
+      if ((key == 'gnd') || (key == 'vout') || (key == 'vin') || (key[0] == 'o')) continue;
       if (!(key in elements)) {
         var firstLetter = Array.from(key)[0];
         if (firstLetter == 'R') {
@@ -451,10 +490,11 @@ class Game extends React.Component {
     this.setState({
       elements: elements,
       latex: latexResult,
-      deleteMeLatex: deleteMeLatex
-    })
+      deleteMeLatex: deleteMeLatex,
+      schematicReadiness: schematicReadiness
+    }, () => this.calculateTF());
 
-    this.calculateTF();
+    // this.calculateTF();
   
     //check canvas for any vertex that are not snapped to the grid
     // var updateCanvas = false;
@@ -486,7 +526,7 @@ class Game extends React.Component {
     this.a.addEvL(this.a.view, this.a.writer, (canvasState) => this.handleCanvasChange(canvasState));
     this.TESTER = document.getElementById('tester');
     createGraph(this.TESTER);
-    updateGraph(this.TESTER, this.freq, this.mag)
+    // updateGraph(this.TESTER, this.freq, this.mag)
   }
 
 
@@ -558,15 +598,21 @@ class Game extends React.Component {
     // Update the DOM
     return html`
       <${navBar} title="ONLINE ELECTRONIC CIRCUIT LAPLACE SOLVER" key="navBar"/>
-      <div className="w-100 p-3 bg-green" key="wrapper">
+      <div className="w-100 p-2 bg-green" key="wrapper">
         <div className="container-xl" key="topContainer">
-          <${SchematicComponents} key="schemComp"/>
-          <${Schematic} key="schem"/>
-          <${SchematicVal} key="schemVal" schematicReadiness=${this.schematicReadiness}/>
-          <${listElements} e=${this.state.elements} key="valueList" onChange=${(e, i) => this.handleElChange(e, i)} unitChange=${(e, i) => this.handleUnitChange(e, i)}/>
-          <${TransformResults} name="World" key="TransformResults" latex=${this.state.latex} deleteMeLatex=${this.state.deleteMeLatex} />
-          <${FreqResponse}  key="FreqResponse"/>
-          <${FreqResponseControllers}  key="FreqResponseControllers" fminValue=${this.state.fmin.value} fminUnit=${this.state.fmin.unit} fmaxValue=${this.state.fmax.value} fmaxUnit=${this.state.fmax.unit}  onChange=${(e, i) => this.handleElChange(e, i)} unitChange=${(e, i) => this.handleUnitChange(e, i)} />
+          <div className="row shadow-sm rounded bg-white my-2 py-1" id="schematic">
+            <${SchematicComponents} key="schemComp"/>
+            <${Schematic} key="schem"/>
+            <${SchematicVal} key="schemVal" schematicReadiness=${this.state.schematicReadiness}/>
+            <${listElements} e=${this.state.elements} key="valueList" onChange=${(e, i) => this.handleElChange(e, i)} unitChange=${(e, i) => this.handleUnitChange(e, i)}/>
+          </div>
+          <div className="row shadow-sm rounded bg-white my-2 py-1" id="schematic">
+            <${TransformResults} name="World" key="TransformResults" latex=${this.state.latex} deleteMeLatex=${this.state.deleteMeLatex} />
+          </div>
+          <div className="row shadow-sm rounded bg-white my-2 py-1" id="schematic">
+           <${FreqResponse}  key="FreqResponse"/>
+           <${FreqResponseControllers}  key="FreqResponseControllers" fminValue=${this.state.fmin.value} fminUnit=${this.state.fmin.unit} fmaxValue=${this.state.fmax.value} fmaxUnit=${this.state.fmax.unit}  onChange=${(e, i) => this.handleElChange(e, i)} unitChange=${(e, i) => this.handleUnitChange(e, i)} />
+          </div>
         </div>
       </div>
       `;
