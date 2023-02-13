@@ -93,7 +93,7 @@ function processCanvasState(canvasState) {
   var nodeVin, nodeVout, nodeGnd;
   var connectedNodes = [];
   var node;
-  for (i = 0; i < nodeMap.length; i++) if (includesElement(nodeMap[i], 'vout') >= 0) connectedNodes = [i];
+  for (i = 0; i < nodeMap.length; i++) if (includesElement(nodeMap[i], 'xvout') >= 0) connectedNodes = [i];
   i = 0;
   while (i < connectedNodes.length) {
     node = connectedNodes[i];
@@ -114,26 +114,32 @@ function processCanvasState(canvasState) {
     vout: false,
     vin: false,
     gnd: false,
+    solvable: false,
   };
-  for (z = 0; z < nodeMap.length; z++) {
-    if (includesElement(nodeMap[z], 'vout') >= 0) if (connectedNodes.includes(z)) schematicReadiness.vout = true;
-    if (includesElement(nodeMap[z], 'vin') >= 0)  if (connectedNodes.includes(z)) schematicReadiness.vin = true;
-    if (includesElement(nodeMap[z], 'gnd') >= 0)  if (connectedNodes.includes(z)) schematicReadiness.gnd = true;
-  }
 
   //Create a node map used for mna. Dosen't include non-connected nodes, and doesn't include the ground node
   var mnaNodeMap = [];
   for (const node of connectedNodes) {
     if (includesElement(nodeMap[node], 'gnd') < 0) mnaNodeMap.push(nodeMap[node]);
+    else schematicReadiness.gnd = true;
   }
 
+  
+  for (z = 0; z < mnaNodeMap.length; z++) {
+    if (includesElement(mnaNodeMap[z], 'xvout') >= 0) schematicReadiness.vout = true;
+    if (includesElement(mnaNodeMap[z], 'vin') >= 0)  schematicReadiness.vin = true;
+    // if (includesElement(mnaNodeMap[z], 'gnd') >= 0)  schematicReadiness.gnd = true;
+  }
+  
+  // console.log(mnaNodeMap, schematicReadiness);
 
 
 
 
   // console.log('usedElements', usedElements)
+  // console.log('allElements', allElements)
   // console.log('vout node', nodeMap)
-  // console.log('vout connectedNodes', connectedNodes)
+  // console.log('schematicReadiness', schematicReadiness)
 
   return [mnaNodeMap, usedElements, connectedNodes, schematicReadiness, allElements]
 
@@ -155,55 +161,6 @@ export function calculateMNA(canvasState) {
 
   [nodeMap, usedElements, connectedNodes, schematicReadiness, allElements] = processCanvasState(canvasState);
   // console.log("bp1", nodeMap, usedElements)
-
-  //verify how ready the schematic is
-  // All this code is just for that! Can't it be done later, for free? //FIXME
-
-  // schematicReadiness = {
-  //   vout: false,
-  //   vin: false,
-  //   gnd: false,
-  // };
-  // var tmp;
-  // for (i = 0; i < nodeMap.length; i++) {
-  //   // if (elementsOnNodes[i].includes('vout')) {
-  //   if (includesElement(nodeMap[i], 'vout') >= 0) {
-  //     schematicReadiness.vout = true;
-  //     //See which nodes are connected together
-  //     var crushedNodes = [i], zz, moreNodes, jj, kk, newNode, elementsOnThisNode = [];
-  //     zz = i;
-  //     moreNodes = [i];
-  //     elementsOnThisNode = [].concat(elementsOnThisNode + nodeMap[i]);
-  //     while (moreNodes.length > 0) {
-  //       moreNodes = [];
-  //       newNode = moreNodes.pop();
-  //       //Search through the node for elements with two ports (starting with the node tied to vout)
-  //       for (jj = 0; jj < nodeMap[i].length; jj++) {
-  //         if (nodeMap[i][jj].el == 'vout') tmp = i;
-  //         else if (nodeMap[i][jj].el == 'vin') tmp = i;
-  //         else if (nodeMap[i][jj].el == 'gnd') tmp = i;
-  //         else {
-  //           //found a two ported element. Add the node on the other end if it isn't already added.
-  //           for (kk = 0; kk < nodeMap.length; kk++) {
-  //             if (!crushedNodes.includes(kk)) {
-  //               crushedNodes.push(kk);
-  //               moreNodes.push(kk);
-  //               elementsOnThisNode = [].concat(elementsOnThisNode, nodeMap[kk]);
-  //             }
-  //           }
-  //           moreNodes = 1;  //wtf does this line do!
-  //         }
-  //       }
-  //     }
-
-
-  //     if (includesElement(elementsOnThisNode, 'gnd') >= 0) schematicReadiness.gnd = true;
-  //     if (includesElement(elementsOnThisNode, 'vin') >= 0) schematicReadiness.vin = true;
-
-  //     break;
-  //   }
-  // }
-
 
   // console.log(json);
   // console.log('nodemap', nodeMap);
@@ -243,14 +200,14 @@ export function calculateMNA(canvasState) {
         }
       }
     }
-    voutNode = elementMap['vout'][0];
+    voutNode = elementMap['xvout'][0];
     vinNode = elementMap['vin'][0];
 
     // Step 2 - loop thru elementMap and start adding things to the MNA
     var laplaceElement, firstLetter;
     for (const key2 in elementMap) {
       letters = Array.from(key2);
-      if ((letters[0] != 'v') && (letters[0] != 'g') && (letters[0] != 'o')) {
+      if ((letters[0] != 'v') && (letters[0] != 'g') && (letters[0] != 'o') && (letters[0] != 'x')) {
         firstLetter = Array.from(key2)[0];
         if (firstLetter == 'R') laplaceElement = key2;
         else if (firstLetter == 'L') laplaceElement = "(S*" + key2 + ")";
@@ -310,26 +267,28 @@ export function calculateMNA(canvasState) {
       nerdStrArr.push('[' + mnaMatrix[i].join(',') + ']');
     }
     nerdStr = nerdStrArr.join(',');
+    // console.log(mnaMatrix);
 
 
     //Using algebrite not nerdamer
     Algebrite.eval("clearall");
     Algebrite.eval("mna = [" + nerdStr + "]");
-    Algebrite.eval("inv_mna = inv(mna)")
-    Algebrite.eval("inv_mna")
-    Algebrite.eval("mna_vo_vi = simplify(inv_mna[" + (voutNode + 1) + "][" + (mnaMatrix.length-numOpAmps) + "])")
-    // Algebrite.eval("mna_vo_vi_num = simplify(numerator(mna_vo_vi))")
-    // Algebrite.eval("mna_vo_vi_den = simplify(denominator(mna_vo_vi))")
-    // Algebrite.eval("mna_vo_vi_long = simplify(mna_vo_vi_num/mna_vo_vi_den)")
-    // console.log('vin node')
-    latexResult = Algebrite.run("printlatex(mna_vo_vi)");
-    // console.log('Algebrite');
-    // console.log(Algebrite.eval("mna_vo_vi").toString());
-    // console.log(Algebrite.eval("mna_vo_vi_num").toString());
-    // console.log(Algebrite.eval("mna_vo_vi_den").toString());
-    // console.log(Algebrite.eval("mna_vo_vi_long").toString());
-    var resString, resMathML;
-    [resString, resMathML] = simplify_algebra(Algebrite.eval("mna_vo_vi").toString());
+    try {
+      Algebrite.eval("inv_mna = inv(mna)")
+      Algebrite.eval("inv_mna")
+      Algebrite.eval("mna_vo_vi = simplify(inv_mna[" + (voutNode + 1) + "][" + (mnaMatrix.length-numOpAmps) + "])")
+      Algebrite.eval("bilinear = subst((2/T)*(Z-1)/(Z+1),S,mna_vo_vi)")
+      // latexResult = Algebrite.run("printlatex(mna_vo_vi)");
+      console.log(Algebrite.eval("bilinear").toString());
+      var resString, resMathML;
+      [resString, resMathML] = simplify_algebra(Algebrite.eval("mna_vo_vi").toString());
+      schematicReadiness.solvable = true;
+    } catch {
+      schematicReadiness.solvable = false;
+      resMathML = "<mtext>Schematic currently invalid</mtext>"
+    }
+
+
 
 
     // console.log('ggg', ggg);
@@ -343,6 +302,9 @@ export function calculateMNA(canvasState) {
 
     // renderPage();
 
+  } else {
+    resMathML = "<mtext>Schematic currently invalid</mtext>"
+    schematicReadiness.solvable = false;
   }
 
   // console.log('bp2', resString)

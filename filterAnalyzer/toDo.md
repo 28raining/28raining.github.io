@@ -47,27 +47,32 @@
 - [x] Prevent user adding multiple Vin or Vout
 - [x] Stop it crashing when user drags multiple elements
 #### Remaining
-- [ ] Add a hold button
-- [ ] Make graph background transparent
-- [ ] Add color switcher in top bar
-- [ ] Separate page into those nice boxes each with shadow
-- [ ] Add comments section
-- [ ] Make draggable things into images, not text boxes
+- [x] Make draggable things into images, not text boxes
 - [x] Add option to rotate components
 - [x] displaying frequency response
 - [x] Add an op-amp -> done a lot of this already
 - [x] the element map has an array of port connections. That needs to go in a specific order, so later we know which op amp port is which
 - [x] Move sanity checking into processCanvasState function, add all components fully connected?
 - [x] processCanvasState() must also remove nodes that aren't connected to vout (it's already removing elements)
-- [ ] device can't connect to itself?
+- [x] device can't connect to itself?
 - [x] have a separate array just to hold op amps
 - [x] Create object of elements, connect each end to a new node. Then delete elements who aren't fully connected, optimize the nodes, and remove nodes that don't have a path to vout
-- [ ] Zoom in and out
 - [x] Every element to show in value selector
-- [ ] Reset graph when schematic is not good
-- [ ] Undo and redo buttons
-- [ ] Stop it crashing if algebrite can't solve it
+- [x] Reset graph when schematic is not good
+- [x] Stop it crashing if algebrite can't solve it
 - [x] Show graph on load
+- [x] Undo and redo buttons
+- [ ] Add a hold button
+- [x] Separate page into those nice boxes each with shadow
+- [x] Add comments section
+- [x] On graph add x, y labels
+ 
+# Kind of buggy - will look at in the future
+- [ ] Zoom in and out
+
+# Might do in the future
+- [ ] Make graph background transparent
+- [ ] Add color switcher in top bar
 
 
 

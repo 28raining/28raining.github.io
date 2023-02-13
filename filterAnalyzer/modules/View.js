@@ -1,5 +1,13 @@
-import { state } from './main.js'
 import { SelectionMenuPolicy } from './wdk_draw2d.js'
+
+const connectionDefault = {
+  type: "draw2d.Connection",
+  router: "draw2d.layout.connection.InteractiveManhattanConnectionRouter",
+  color: 'black',
+  outlineColor: 'black',
+  outlineStroke: 1,
+  stroke: 3
+}
 
 export class View extends draw2d.Canvas {
 
@@ -12,12 +20,14 @@ export class View extends draw2d.Canvas {
       parseFloat(wrapperComputedStyle.paddingRight)
     // console.log("height, width", canvasHolder.offsetHeight, wrapperWidth)
     super(id, wrapperWidth - 2, canvasHolder.offsetHeight - 2);
+    // super(id, 2500, 2500);
     this.rCounter = 0;
     this.cCounter = 0;
     this.lCounter = 0;
     this.elements = [];
     this.dropCb = dropCB;
-    // this.setScrollArea("#"+id);
+    // this.viewsetScrollArea("#canvas");
+    // this.setScrollArea("#canvas");
   }
 
 
@@ -72,7 +82,6 @@ export class View extends draw2d.Canvas {
     // console.log(x, y)
     x = 16 * Math.round(x / 16);
     y = 16 * Math.round(y / 16);
-    var locator;
     // console.log(x, y)
     if (type == "res") {
       var e = new shapeRes({ x: x, y: y });
@@ -116,12 +125,12 @@ export class View extends draw2d.Canvas {
       // e.createPort("hybrid",inputLocator);
       e.createPort("hybrid", outputLocator);
       e.id = `gnd`;
-    } else if (type == "vout") {
+    } else if (type == "xvout") {
       var e = new shapeVout({ x: x, y: y });
       var inputLocator = new MyInputPortLocator(0, 16);
       e.createPort("hybrid", inputLocator);
       // e.createPort("hybrid",outputLocator);
-      e.id = `vout`;
+      e.id = `xvout`;
     } else if (type == "op") {
       var e = new shapeOpamp({ x: x, y: y });
       var inputALocator = new MyInputPortLocator(0, 32);
@@ -131,7 +140,7 @@ export class View extends draw2d.Canvas {
       e.createPort("hybrid", inputBLocator);
       e.createPort("hybrid", outputLocator);
       e.id = `op0`;
-    } else exit('You gave a bad type: ', type)
+    } else console.log('ERROR: You gave a bad type: ', type)
 
     this.x = x;
     this.y = y;
@@ -153,27 +162,89 @@ export class View extends draw2d.Canvas {
 
 
 
-  loadSchematic() {
+  loadSchematic(startupSchematic) {
+    // var connections = []
+    // startupSchematic.forEach(item => {
+    //   if (item.type == "draw2d.Connection") {
+    //     connections.push(item);
+    //     //handle this later
+    //   } else {
+    //     var type;
+    //     var firstLetter = Array.from(item.id)[0];
+    //     if (firstLetter == 'R') type = "res"
+    //     else if (firstLetter == 'C') type = "cap"
+    //     else if (firstLetter == 'L') type = "ind"
+    //     else if (firstLetter == 'g') type = "gnd"
+    //     else if (item.id == 'vin') type = "vin"
+    //     else if (item.id == 'vout') type = "vout"
+
+    //     this.addShapeToSchem(type, item.x, item.y);
+    //   }
+    // });
+
+    // connections.push({
+    //   type: "draw2d.Connection",
+    //   source: {node: 'C0', port: 'hybrid0'},
+    //   target: {node: 'vout', port: 'hybrid0'},
+    //   router: "draw2d.layout.connection.InteractiveManhattanConnectionRouter",
+    //   color: 'black',
+    //   outlineColor: 'black',
+    //   outlineStroke: 1,
+    //   stroke: 3
+    // })
+
+    this.clear();
+    this.rCounter = 0;
+    this.cCounter = 0;
+    this.lCounter = 0;
+    console.log('cleared, now adding this', startupSchematic);
+
     var connections = []
+    var id=0;
     startupSchematic.forEach(item => {
-      if (item.type == "draw2d.Connection") {
-        connections.push(item);
-        //handle this later
+      if (item.type == "connection") {
+        var newConn = {...connectionDefault};
+        newConn.source = item.source;
+        newConn.target = item.target;
+        // newConn.id = id;
+        connections.push(newConn);
+        id = id + 1;
       } else {
         var type;
-        var firstLetter = Array.from(item.id)[0];
+        var firstLetter = item.firstLetter;
         if (firstLetter == 'R') type = "res"
         else if (firstLetter == 'C') type = "cap"
         else if (firstLetter == 'L') type = "ind"
         else if (firstLetter == 'g') type = "gnd"
-        else if (item.id == 'vin') type = "vin"
-        else if (item.id == 'vout') type = "vout"
+        else if (firstLetter == 'v') type = "vin"
+        else if (firstLetter == 'x') type = "xvout"
+        // console.log(item, type)
 
         this.addShapeToSchem(type, item.x, item.y);
       }
     });
+
+    // console.log(connections);
+ 
     var reader = new draw2d.io.json.Reader();
     reader.unmarshal(this, connections);
+
+    // var writer = new draw2d.io.json.Writer();
+    // writer.marshal(canvas, function(json){
+    //   cb(json);
+    // });
+    // wr.marshal(vw, function (json) {
+    //   console.log('some change', json)
+    //   cb(json);
+    // });
+
+    // this.fireEvent('isPostChangeEvent');
+    // this.fireEvent('onisPostChangeEvent');
+    // this.fireEvent('onIsPostChangeEvent');
+    // this.fireEvent('change');
+    // this.fireEvent('Change');
+    // this.fireEvent('onChange');
+    // this.fireEvent("figure:add");
   }
 };
 

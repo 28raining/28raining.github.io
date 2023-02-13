@@ -1,4 +1,3 @@
-import { state } from './main.js'
 import { View } from './View.js'
 
 export class init_draw2d {
@@ -8,10 +7,12 @@ export class init_draw2d {
     // Draw2D setup
     this.writer = new draw2d.io.json.Writer();
     this.view = new View("canvas", (a, b) => { dropCb(a, b) });
+    // this.view.setScrollArea("#canvas");
 
     // var reader = new draw2d.io.json.Reader();
     // reader.unmarshal(this.view, startupSchematic);
-    this.view.loadSchematic();
+    this.view.loadSchematic(startupSchematic);
+    // this.handleCanvasChange = () => handleCanvasChange();
     //The first load needs to trigger the calculateTF function
     this.writer.marshal(this.view, function (json) {
       handleCanvasChange(json);
@@ -34,12 +35,17 @@ export class init_draw2d {
     this.view.installEditPolicy(new draw2d.policy.canvas.SnapToGridEditPolicy(16)); //each grid is a 16x16
 
     this.view.installEditPolicy(new draw2d.policy.canvas.SingleSelectionPolicy());
+    // this.view.setScrollArea("#canvas");
+    // this.view.setZoom(this.view.getZoom()*0.7,true);
 
   }
 
-  reUpdateCanvas(canvasState) {
-    startupSchematic = canvasState;
-    this.view.loadSchematic();
+  reUpdateCanvas(canvasState, handleCanvasChange) {
+    // startupSchematic = canvasState;
+    this.view.loadSchematic(canvasState);
+    this.writer.marshal(this.view, function (json) {
+      handleCanvasChange(json);
+    });
   }
 
   addEvL(vw, wr, cb) {
@@ -47,8 +53,8 @@ export class init_draw2d {
     vw.getCommandStack().addEventListener(function (e) {
       if (e.isPostChangeEvent()) {
         wr.marshal(vw, function (json) {
-          // console.log('some change', json)
-          cb(json, () => this.reUpdateCanvas());
+          console.log('some change', json)
+          cb(json);
         });
       }
     });
@@ -75,7 +81,7 @@ export var SelectionMenuPolicy = draw2d.policy.figure.SelectionPolicy.extend({
    * @param {boolean} isPrimarySelection
    */
   onSelect: function (canvas, figure, isPrimarySelection) {
-    console.log('11111')
+    // console.log('11111')
     this._super(canvas, figure, isPrimarySelection);
 
     if (this.overlay === null) {

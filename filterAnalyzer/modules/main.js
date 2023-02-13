@@ -1,17 +1,10 @@
 import React from "https://unpkg.com/es-react@latest/dev/react.js";
 import ReactDOM from "https://unpkg.com/es-react@latest/dev/react-dom.js";
-import PropTypes from "https://unpkg.com/es-react@latest/dev/prop-types.js";
-import htm from "https://unpkg.com/htm@latest?module";
+// import PropTypes from "https://unpkg.com/es-react@latest/dev/prop-types.js";
+import htm from "../js/htm.js";
 import { init_draw2d } from './wdk_draw2d.js'
 import { calculateMNA } from './mna.js'
 const html = htm.bind(React.createElement);
-
-// Three global variables
-export var state = {
-  json: [],
-  elements: {},
-}; //Current state
-var debug = {}; //Enable debug
 
 function navBar(props) {
   return html`
@@ -21,10 +14,48 @@ function navBar(props) {
           <div className="col-10">
             <h4 className="mb-0"><strong>${props.title}</strong></h4>
           </div>
+          <div className="col-1">
+            <button type="button" className="btn btn-secondary" onClick=${(e) => props.onClickUndo(e)}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"></path>
+                <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"></path>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>`
 }
+
+//redo button
+{/* <div className="col-1">
+  <button type="button" className="btn btn-secondary">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+      <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"></path>
+      <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"></path>
+    </svg>
+  </button>
+</div> */}
+
+function Comments() {
+  return html`
+  <giscus-widget
+      repo="28raining/28raining.github.io"
+      repo-id="MDEwOlJlcG9zaXRvcnkxMjcyMzY4NjM="
+      category-id="DIC_kwDOB5V6_84CUAVa"
+      mapping="pathname"
+      strict="0"
+      reactions-enabled="0"
+      emit-metadata="0"
+      input-position="top"
+      theme="light"
+      lang="en"
+      loading="lazy"
+      >
+  </giscus-widget>
+`
+}
+
 
 function SchematicComponents() {
   return html`
@@ -40,43 +71,38 @@ function SchematicComponents() {
       </div>
     </div>
     <div className="col" >
-    <div className="d-grid gap-2" >
-
-        <div key="3" data-shape="ind" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic..">inductor</div>
-    </div>
-    </div>
-    <div className="col" >
-    <div className="d-grid gap-2" >
-
-        <div key="4" data-shape="vin" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic..">input voltage</div>
-    </div>
+      <div className="d-grid gap-2" >
+          <div key="3" data-shape="ind" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic..">inductor</div>
+      </div>
     </div>
     <div className="col" >
-    <div className="d-grid gap-2" >
-
-        <div key="5" data-shape="gnd" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic..">gnd</div>
-    </div>
-    </div>
-    <div className="col" >
-    <div className="d-grid gap-2" >
-
-        <div key="6" data-shape="vout" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic..">vout</div>
-    </div>
+      <div className="d-grid gap-2" >
+          <div key="7" data-shape="op" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic..">op-amp</div>
+      </div>
     </div>
     <div className="col" >
-    <div className="d-grid gap-2" >
-
-        <div key="7" data-shape="op" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic..">op-amp</div>
+      <div className="d-grid gap-2" >
+          <div key="4" data-shape="vin" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic..">voltage input</div>
+      </div>
+    </div>
+    <div className="col" >
+      <div className="d-grid gap-2" >
+        <div key="6" data-shape="xvout" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic..">voltage probe</div>
+      </div>
+    </div>
+    <div className="col" >
+      <div className="d-grid gap-2" >
+          <div key="5" data-shape="gnd" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic..">gnd</div>
+      </div>
     </div>
     </div>
-  </div>
   `
 }
 function Schematic() {
   return html`
   <div className="row py-1" key="r124">
     <div className="col" style=${{ height: "512px" }} id="canvasHolder">
-      <div id="canvas" className="bg-light border" style=${{ position: 'absolute' }} />
+      <div id="canvas" className="bg-light border" style=${{ position: 'absolute', overflow: 'auto', width:'2500', height:'2500' }} />
     </div>
 
   </div>
@@ -100,6 +126,7 @@ function SchematicVal(props) {
         <${schematicValidator} name="vout connected" key="vout" ready=${props.schematicReadiness['vout']} />
         <${schematicValidator} name="vin connected" key="vin" ready=${props.schematicReadiness['vin']} />
         <${schematicValidator} name="gnd connected" key="gnd" ready=${props.schematicReadiness['gnd']} />
+        <${schematicValidator} name="solvable" key="solvable" ready=${props.schematicReadiness['solvable']} />
   </div>
   `
 }
@@ -114,25 +141,32 @@ function FreqResponse() {
       `
 }
 
+// tickformat: "$.2s", // want to show B instead of G for billions
+var plotlyLayout = {
+  xaxis: {
+    showspikes:true,
+    type: 'log',
+    autorange: true,
+    tickformat: ".2s",
+    title: 'frequency (Hz)'
+  },
+  yaxis: {
+    showspikes:true,
+    title: 'amplitude (dB)'
+
+  },
+  hovermode:"y unified",
+  autosize: true,
+  margin: { t: 0 }
+}
+
 function createGraph(el) {
   Plotly.newPlot(el, [{
     x: [0],
     y: [0]
     // x: freq,
     // y: mag
-  }], {
-    xaxis: {
-      showspikes:true,
-      type: 'log',
-      autorange: true
-    },
-    yaxis: {
-      showspikes:true,
-    },
-    hovermode:"y unified",
-    autosize: true,
-    margin: { t: 0 }
-  });
+  }], plotlyLayout);
 }
 
 function updateGraph(el, freq, mag) {
@@ -145,18 +179,7 @@ function updateGraph(el, freq, mag) {
       // y: [1, 2, 4, 8, 16]
       x: freq,
       y: mag
-    }], {
-      xaxis: {
-        showspikes:true,
-        type: 'log',
-        autorange: true
-      },
-      yaxis: {
-        showspikes:true,
-      },
-      autosize: true,
-      margin: { t: 0 }
-    });
+    }], plotlyLayout);
   }
 }
 
@@ -169,16 +192,17 @@ function TransformResults(props) {
   // </div>
 
   var z = html`
-    <div className="row">
-      <div className="col">
+
+    <div className="row my-2 py-1">
+      <div className="col shadow-sm rounded bg-white me-2">
         <div className="row text-center">
           <h3>Laplace Transform</h3>
         </div>
-        <div className="row text-center">
+        <div className="row text-center fs-3 py-2">
             ${MyComponent(props.latex)}
         </div>
       </div>
-      <div className="col">
+      <div className="col shadow-sm rounded bg-white ms-2">
         <div className="row text-center">
           <h3>Bilinear Transform</h3>
         </div>
@@ -218,17 +242,17 @@ function selectUnits(name) {
 
 
 
-function createMarkup(latex) {
-  return {
-    __html: katex.renderToString(`${latex}`, {
-      throwOnError: false
-    })
-  };
-}
+// function createMarkup(latex) {
+//   return {
+//     __html: katex.renderToString(`${latex}`, {
+//       throwOnError: false
+//     })
+//   };
+// }
 
-function MyComponentOLD(latex) {
-  return html`<div dangerouslySetInnerHTML=${createMarkup(latex)} />`
-}
+// function MyComponentOLD(latex) {
+//   return html`<div dangerouslySetInnerHTML=${createMarkup(latex)} />`
+// }
 function MyComponent(latex) {
   // console.log('latex!', latex)
   var z = `<math>
@@ -296,8 +320,8 @@ function listElements(props) {
         <div className="col" key=${z + 3}>
           <${e1} keys=${keys} elements=${elements} idxx=${z + 3} length=${keys.length} onChange=${props.onChange} unitChange=${props.unitChange} />
         </div>
-        <div className="col" key=${z + 5}>
-          <${e1} keys=${keys} elements=${elements} idxx=${z + 5} length=${keys.length} onChange=${props.onChange} unitChange=${props.unitChange} />
+        <div className="col" key=${z + 4}>
+          <${e1} keys=${keys} elements=${elements} idxx=${z + 4} length=${keys.length} onChange=${props.onChange} unitChange=${props.unitChange} />
         </div>
       </div>`)
   }
@@ -343,82 +367,69 @@ function unitStrToVal(unit) {
   if (unit == 'G') return 1e9;
   if (unit == 'T') return 1e12;
   if (unit == '') return 1
-  console.log("You used a unit I don't know about... ", unit)
+  console.log("You used a unit I don't know about ", unit)
 }
 
 class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      elements: [],
+      history: [
+        {
+          elements: {},
+          fmin: {
+            value: 1,
+            unit: 'K'
+          },
+          fmax: {
+            value: 100,
+            unit: 'G'
+          },
+          schematic:startupSchematic
+        }
+      ],
       latex: null,
       deleteMeLatex: null,
       elOnSchematic: [],
-      fmin: {
-        value: 1,
-        unit: 'K'
-      },
-      fmax: {
-        value: 100,
-        unit: 'G'
-      },
       schematicReadiness : {
         vout: false,
         vin: false,
         gnd: false,
+        solvable: false,
       }
     };
-    // this.schematicReadiness = {
-    //   vout: false,
-    //   vin: false,
-    //   gnd: false,
-    // };
+
     this.TESTER = null;
     this.freq = [];
     this.mag = [];
     this.resString = null;
-  }
-
-  //name it better
-  handledropCb(a, addToSchematic) {
-    // console.log("Drop call back does nothing");
-    // console.log("Elements on schematic before this drop are: ", this.state.elOnSchematic, 'element ur dropping is', a);
-
-
-    //prevent user from having 2x vin or 2x vout elements
-    if ((a.id == 'vout') || (a.id == 'vin')) {
-      // console.log(this.state.elOnSchematic)
-      if (a.id in this.state.elOnSchematic) {
-        // console.log('denied');
-        return;
-      }
-    }
-    addToSchematic(a);
-    // return true;
-    // const elements = this.state.elements.slice();
-
+    this.preventNewState = false;
   }
 
   schematicReady () {
-    return (this.state.schematicReadiness.vout && this.state.schematicReadiness.vin && this.state.schematicReadiness.gnd);
+    // const current = this.state.history[history.length - 1];
+    // console.log(this.state.schematicReadiness, this.state.schematicReadiness.vout && this.state.schematicReadiness.vin && this.state.schematicReadiness.gnd && this.state.schematicReadiness.solvable)
+    return (this.state.schematicReadiness.vout && this.state.schematicReadiness.vin && this.state.schematicReadiness.gnd && this.state.schematicReadiness.solvable);
   }
 
   calculateTF() {
+    const current = this.state.history[this.state.history.length - 1];
     // console.log(this.schematicReady())
-    // console.log(this.state.schematicReadiness.vout,this.state.schematicReadiness.vin,this.state.schematicReadiness.gnd)
-    if (!this.schematicReady()) return;
-    // console.log(this.state)
+    if (!this.schematicReady()) {
+      // console.log('thhhhh')
+      updateGraph(this.TESTER, [], []);
+      return;
+    } 
     //Convert algebra result into a numerical result
     this.freq = [];
     this.mag = [];
     var scaler;
     var test = this.resString;
     var rep;
-    // console.log(this.state.elements)
-    for (const key in this.state.elements) {
-      scaler = unitStrToVal(this.state.elements[key].unit);
+    for (const key in current.elements) {
+      scaler = unitStrToVal(current.elements[key].unit);
       rep = RegExp(key, 'g')
-      test = test.replace(rep, this.state.elements[key].value * scaler);
+      test = test.replace(rep, current.elements[key].value * scaler);
     }
     // console.log(test, rep)
 
@@ -427,8 +438,8 @@ class Game extends React.Component {
     const re2 = /\^/gi;
     var res = test.replace(re2, "**");
 
-    var fmin = this.state.fmin.value * unitStrToVal(this.state.fmin.unit);
-    var fmax = this.state.fmax.value * unitStrToVal(this.state.fmax.unit);
+    var fmin = current.fmin.value * unitStrToVal(current.fmin.unit);
+    var fmax = current.fmax.value * unitStrToVal(current.fmax.unit);
     var fstepdB_20 = Math.log10(fmax/fmin) / 100
     var fstep = 10**fstepdB_20;
     // console.log(fmin, fmax, fstep)
@@ -444,19 +455,41 @@ class Game extends React.Component {
     updateGraph(this.TESTER, this.freq, this.mag)
   }
 
+  //name it better
+  handledropCb(a, addToSchematic) {
+
+    //prevent user from having 2x vin or 2x vout elements
+    if ((a.id == 'xvout') || (a.id == 'vin')) {
+      if (a.id in this.state.elOnSchematic) {
+        console.log('prevented')
+        return;
+      }
+    }
+    addToSchematic(a);
+
+  }
+
   handleCanvasChange(canvasState) {
+    if (canvasState.length == 0) {
+      console.log('schematic has been emptied')
+      return;
+    }
     // console.log("Inside handleCanvasChange");
-    // console.log(canvasState);
+    var current = JSON.parse(JSON.stringify(this.state.history[this.state.history.length - 1]));
+
     var latexResult, deleteMeLatex;
     var newElementMap;
-    var elements = this.state.elements;
+    var elements = current.elements;
     var schematicReadiness;
     [schematicReadiness, latexResult, newElementMap, deleteMeLatex, this.resString] = calculateMNA(canvasState);
     this.state.elOnSchematic = newElementMap;
 
+    var schematicState = [];
+
     //add new elements
+    //handle the parameter input
     for (const key in newElementMap) {
-      if ((key == 'gnd') || (key == 'vout') || (key == 'vin') || (key[0] == 'o')) continue;
+      if ((key == 'gnd') || (key == 'xvout') || (key == 'vin') || (key[0] == 'o')) continue;
       if (!(key in elements)) {
         var firstLetter = Array.from(key)[0];
         if (firstLetter == 'R') {
@@ -486,16 +519,54 @@ class Game extends React.Component {
     }
 
 
+    //build up a simplified schematic state
+    canvasState.forEach(item => {
+      if (item.type == "draw2d.Connection") {
+        // newConn.source = item.source,
+        // target: {node: 'vout', port: 'hybrid0'},
+        schematicState.push({
+          type: 'connection',
+          source: item.source,
+          target: item.target          
+        });
+        //handle this later
+      } else {
+        var firstLetter = Array.from(item.id)[0];
+        schematicState.push({
+          type: 'component',
+          firstLetter: firstLetter,
+          x: item.x,
+          y: item.y
+        })
 
-    this.setState({
-      elements: elements,
-      latex: latexResult,
-      deleteMeLatex: deleteMeLatex,
-      schematicReadiness: schematicReadiness
-    }, () => this.calculateTF());
+        // this.addShapeToSchem(type, item.x, item.y);
+      }
+    });
 
-    // this.calculateTF();
-  
+    console.log('schstate', schematicState);
+ 
+
+    // console.log('newElementMap', newElementMap, elements)
+    current.elements = elements;
+    current.schematic = schematicState;
+
+    console.log(schematicReadiness);
+
+    if (this.preventNewState) {
+      this.setState({
+        latex: latexResult,
+        deleteMeLatex: deleteMeLatex,
+        schematicReadiness: schematicReadiness
+      }, this.calculateTF);
+    } else {
+      this.setState({
+        history: this.state.history.concat([current]),
+        latex: latexResult,
+        deleteMeLatex: deleteMeLatex,
+        schematicReadiness: schematicReadiness
+      }, this.calculateTF);
+    }
+    
     //check canvas for any vertex that are not snapped to the grid
     // var updateCanvas = false;
     // for (const item in canvasState) {
@@ -531,88 +602,87 @@ class Game extends React.Component {
 
 
   handleElChange(e, i) {
+    var current = JSON.parse(JSON.stringify(this.state.history[this.state.history.length - 1]));
+
     if (i == 'fmin') {
-      this.setState({
-        fmin: {
-          value: e.target.value,
-          unit: this.state.fmin.unit
-        }
-      }, () => this.calculateTF());
+      current.fmin.value = e.target.value;
     } else if (i == 'fmax') {
-      this.setState({
-        fmax: {
-          value: e.target.value,
-          unit: this.state.fmax.unit
-        }
-      }, () => this.calculateTF());
+      current.fmax.value = e.target.value;
     } else {
-      const elements = this.state.elements;
-      elements[i].value = e.target.value
-      this.setState({
-        elements: elements
-      }, () => this.calculateTF());
+      current.elements[i].value = e.target.value
     }
-    // console.log(this.state);
-    // this.calculateTF();
+
+    this.setState({
+      history: this.state.history.concat([current])
+    }, this.calculateTF);
   }
 
   handleUnitChange(e, i) {
+    var current = JSON.parse(JSON.stringify(this.state.history[this.state.history.length - 1]));
+
     if (i == 'fmin') {
-      this.setState({
-        fmin: {
-          unit: e.target.value,
-          value: this.state.fmin.value
-        }
-      }, () => this.calculateTF());
+        current.fmin.unit = e.target.value;
     } else if (i == 'fmax') {
-      this.setState({
-        fmax: {
-          unit: e.target.value,
-          value: this.state.fmax.value
-        }
-      }, () => this.calculateTF());
+      current.fmax.unit = e.target.value;
     } else {
-      const elements = this.state.elements;
-      elements[i].unit = e.target.value
-      this.setState({
-        elements: elements
-      }, () => this.calculateTF());
+      current.elements[i].unit = e.target.value
     }
-    // console.log(this.state);
-    // this.calculateTF();
+
+    this.setState({
+      history: this.state.history.concat([current])
+    }, this.calculateTF);
   }
+
+  handleUndo() {
+    if (this.state.history.length > 2) {
+      var a = this.state.history.pop();
+      
+      console.log('here', this.state.history, a)
+      this.preventNewState = true;
+      this.state.elOnSchematic = {};
+      // this.a = new init_draw2d((a, b) => this.handledropCb(a, b), (b) => this.handleCanvasChange(b));
+
+      this.a.reUpdateCanvas(this.state.history[this.state.history.length - 1].schematic, (b) => this.handleCanvasChange(b));
+      this.preventNewState = false;
+      this.setState({
+        history: this.state.history
+      });
+      console.log("111");
+    }
+  }
+
+
 
 
 
   render() {
+    const current = this.state.history[this.state.history.length - 1];
+    console.log(this.state)
 
     // // Use state (variable containing all user inputs) to do MNA (modified nodal analysis)
     // 
 
-    // const classes = `header ${
-    //   for (const key in state.elements) {
-    //     objEditor += '<div className="col">'+key+'</div>';
-    //   }
-    // }`;
-
     // Update the DOM
     return html`
-      <${navBar} title="ONLINE ELECTRONIC CIRCUIT LAPLACE SOLVER" key="navBar"/>
+      <${navBar} title="ONLINE ELECTRONIC CIRCUIT LAPLACE SOLVER" key="navBar" onClickUndo=${(e) => this.handleUndo(e)}/>
       <div className="w-100 p-2 bg-green" key="wrapper">
         <div className="container-xl" key="topContainer">
           <div className="row shadow-sm rounded bg-white my-2 py-1" id="schematic">
-            <${SchematicComponents} key="schemComp"/>
-            <${Schematic} key="schem"/>
-            <${SchematicVal} key="schemVal" schematicReadiness=${this.state.schematicReadiness}/>
-            <${listElements} e=${this.state.elements} key="valueList" onChange=${(e, i) => this.handleElChange(e, i)} unitChange=${(e, i) => this.handleUnitChange(e, i)}/>
+            <div className="col">
+              <${SchematicComponents} key="schemComp"/>
+              <${Schematic} key="schem"/>
+              <${SchematicVal} key="schemVal" schematicReadiness=${this.state.schematicReadiness}/>
+              <${listElements} e=${current.elements} key="valueList" onChange=${(e, i) => this.handleElChange(e, i)} unitChange=${(e, i) => this.handleUnitChange(e, i)}/>
+            </div>
           </div>
-          <div className="row shadow-sm rounded bg-white my-2 py-1" id="schematic">
             <${TransformResults} name="World" key="TransformResults" latex=${this.state.latex} deleteMeLatex=${this.state.deleteMeLatex} />
-          </div>
           <div className="row shadow-sm rounded bg-white my-2 py-1" id="schematic">
-           <${FreqResponse}  key="FreqResponse"/>
-           <${FreqResponseControllers}  key="FreqResponseControllers" fminValue=${this.state.fmin.value} fminUnit=${this.state.fmin.unit} fmaxValue=${this.state.fmax.value} fmaxUnit=${this.state.fmax.unit}  onChange=${(e, i) => this.handleElChange(e, i)} unitChange=${(e, i) => this.handleUnitChange(e, i)} />
+            <div className="col">
+            <${FreqResponse}  key="FreqResponse"/>
+            <${FreqResponseControllers}  key="FreqResponseControllers" fminValue=${current.fmin.value} fminUnit=${current.fmin.unit} fmaxValue=${current.fmax.value} fmaxUnit=${current.fmax.unit}  onChange=${(e, i) => this.handleElChange(e, i)} unitChange=${(e, i) => this.handleUnitChange(e, i)} />
+            </div>
           </div>
+          <${Comments} key='comments' />
         </div>
       </div>
       `;
@@ -640,7 +710,6 @@ class Game extends React.Component {
       // MathJax.startup.document.updateDocument();
     }
 
-    //Update plotly
 
   }
 }
