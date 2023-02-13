@@ -53,7 +53,7 @@ export class init_draw2d {
     vw.getCommandStack().addEventListener(function (e) {
       if (e.isPostChangeEvent()) {
         wr.marshal(vw, function (json) {
-          console.log('some change', json)
+          // console.log('some change', json)
           cb(json);
         });
       }
