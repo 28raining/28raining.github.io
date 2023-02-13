@@ -279,7 +279,7 @@ export function calculateMNA(canvasState) {
       Algebrite.eval("mna_vo_vi = simplify(inv_mna[" + (voutNode + 1) + "][" + (mnaMatrix.length-numOpAmps) + "])")
       Algebrite.eval("bilinear = subst((2/T)*(Z-1)/(Z+1),S,mna_vo_vi)")
       // latexResult = Algebrite.run("printlatex(mna_vo_vi)");
-      console.log(Algebrite.eval("bilinear").toString());
+      // console.log(Algebrite.eval("bilinear").toString());
       var resString, resMathML;
       [resString, resMathML] = simplify_algebra(Algebrite.eval("mna_vo_vi").toString());
       schematicReadiness.solvable = true;
@@ -287,6 +287,15 @@ export function calculateMNA(canvasState) {
       schematicReadiness.solvable = false;
       resMathML = "<mtext>Schematic currently invalid</mtext>"
     }
+
+    var discard, bilinearMathML;
+    try {
+      [discard, bilinearMathML] = simplify_algebra(Algebrite.eval("bilinear").toString());
+    } catch {
+      bilinearMathML = "<mtext>Having trouble calculating bilinear transform</mtext>"
+    }
+
+
 
 
 
@@ -304,13 +313,14 @@ export function calculateMNA(canvasState) {
 
   } else {
     resMathML = "<mtext>Schematic currently invalid</mtext>"
+    bilinearMathML = "<mtext>Schematic currently invalid</mtext>"
     schematicReadiness.solvable = false;
   }
 
   // console.log('bp2', resString)
 
 
-  return [schematicReadiness, resMathML, allElements, latexResult, resString];
+  return [schematicReadiness, resMathML, allElements, latexResult, resString, bilinearMathML];
 
 
 

@@ -189,25 +189,16 @@ function updateGraph(el, freq, mag) {
 
 function TransformResults(props) {
 
-  // Old latex
-  //   <div className="row">
-  //   The answer you provided is: ${MyComponentOLD(props.deleteMeLatex)}
-  // </div>
 
   var z = html`
 
-    <div className="row my-2 py-1">
-      <div className="col shadow-sm rounded bg-white me-2">
+    <div className="row my-2 py-1 shadow-sm rounded bg-white me-2">
+      <div className="col">
         <div className="row text-center">
-          <h3>Laplace Transform</h3>
+          <h3>${props.title} Transform</h3>
         </div>
         <div className="row text-center fs-3 py-2">
             ${MyComponent(props.latex)}
-        </div>
-      </div>
-      <div className="col shadow-sm rounded bg-white ms-2">
-        <div className="row text-center">
-          <h3>Bilinear Transform</h3>
         </div>
       </div>
     </div>
@@ -244,18 +235,6 @@ function selectUnits(name) {
 }
 
 
-
-// function createMarkup(latex) {
-//   return {
-//     __html: katex.renderToString(`${latex}`, {
-//       throwOnError: false
-//     })
-//   };
-// }
-
-// function MyComponentOLD(latex) {
-//   return html`<div dangerouslySetInnerHTML=${createMarkup(latex)} />`
-// }
 function MyComponent(latex) {
   // console.log('latex!', latex)
   var z = `<math>
@@ -378,7 +357,7 @@ function centerSchematic (schem) {
   // var wrapperComputedStyle = window.getComputedStyle(canvasHolder, null);
   var wrapperWidth = canvasHolder.clientWidth - 26;
   var wrapperHeight = canvasHolder.offsetHeight;
-  var centerX = (wrapperWidth-16) / 2;
+  var centerX = (wrapperWidth-64) / 2;
   var centerY = (wrapperHeight-128) / 2;
   console.log(centerX,centerY);
   var minX=0;
@@ -429,7 +408,7 @@ class Game extends React.Component {
         }
       ],
       latex: null,
-      deleteMeLatex: null,
+      bilinearMathML: null,
       elOnSchematic: [],
       schematicReadiness : {
         vout: false,
@@ -517,11 +496,11 @@ class Game extends React.Component {
     // console.log("Inside handleCanvasChange");
     var current = JSON.parse(JSON.stringify(this.state.history[this.state.history.length - 1]));
 
-    var latexResult, deleteMeLatex;
+    var latexResult, deleteMeLatex, bilinearMathML;
     var newElementMap;
     var elements = current.elements;
     var schematicReadiness;
-    [schematicReadiness, latexResult, newElementMap, deleteMeLatex, this.resString] = calculateMNA(canvasState);
+    [schematicReadiness, latexResult, newElementMap, deleteMeLatex, this.resString, bilinearMathML] = calculateMNA(canvasState);
     this.state.elOnSchematic = newElementMap;
 
     var schematicState = [];
@@ -595,14 +574,14 @@ class Game extends React.Component {
     if (this.preventNewState) {
       this.setState({
         latex: latexResult,
-        deleteMeLatex: deleteMeLatex,
+        bilinearMathML: bilinearMathML,
         schematicReadiness: schematicReadiness
       }, this.calculateTF);
     } else {
       this.setState({
         history: this.state.history.concat([current]),
         latex: latexResult,
-        deleteMeLatex: deleteMeLatex,
+        bilinearMathML: bilinearMathML,
         schematicReadiness: schematicReadiness
       }, this.calculateTF);
     }
@@ -716,13 +695,14 @@ class Game extends React.Component {
               <${listElements} e=${current.elements} key="valueList" onChange=${(e, i) => this.handleElChange(e, i)} unitChange=${(e, i) => this.handleUnitChange(e, i)}/>
             </div>
           </div>
-            <${TransformResults} name="World" key="TransformResults" latex=${this.state.latex} deleteMeLatex=${this.state.deleteMeLatex} />
+          <${TransformResults} name="World" key="TransformResults" title="Laplace" latex=${this.state.latex} bilinearMathML=${this.state.bilinearMathML} />
           <div className="row shadow-sm rounded bg-white my-2 py-1" id="schematic">
             <div className="col">
             <${FreqResponse}  key="FreqResponse"/>
             <${FreqResponseControllers}  key="FreqResponseControllers" fminValue=${current.fmin.value} fminUnit=${current.fmin.unit} fmaxValue=${current.fmax.value} fmaxUnit=${current.fmax.unit}  onChange=${(e, i) => this.handleElChange(e, i)} unitChange=${(e, i) => this.handleUnitChange(e, i)} />
             </div>
           </div>
+          <${TransformResults} name="World" key="TransformResultsBilin" title="Bilinear" latex=${this.state.bilinearMathML}/>
           <${Comments} key='comments' />
         </div>
       </div>
