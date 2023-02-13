@@ -192,7 +192,7 @@ function TransformResults(props) {
 
   var z = html`
 
-    <div className="row my-2 py-1 shadow-sm rounded bg-white me-2">
+    <div className="row my-2 py-1 shadow-sm rounded bg-white">
       <div className="col">
         <div className="row text-center">
           <h3>${props.title} Transform</h3>
