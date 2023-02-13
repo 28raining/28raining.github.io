@@ -1,7 +1,7 @@
 import { View } from './View.js'
 
 export class init_draw2d {
-  constructor(dropCb, handleCanvasChange) {
+  constructor(dropCb, handleCanvasChange, schematic) {
     var routerToUse = new draw2d.layout.connection.InteractiveManhattanConnectionRouter();
     // var app = new example.Application();
     // Draw2D setup
@@ -11,7 +11,7 @@ export class init_draw2d {
 
     // var reader = new draw2d.io.json.Reader();
     // reader.unmarshal(this.view, startupSchematic);
-    this.view.loadSchematic(startupSchematic);
+    this.view.loadSchematic(schematic);
     // this.handleCanvasChange = () => handleCanvasChange();
     //The first load needs to trigger the calculateTF function
     this.writer.marshal(this.view, function (json) {

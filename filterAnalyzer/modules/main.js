@@ -1,5 +1,7 @@
-import React from "https://unpkg.com/es-react@latest/dev/react.js";
-import ReactDOM from "https://unpkg.com/es-react@latest/dev/react-dom.js";
+// import React from "https://unpkg.com/es-react@latest/dev/react.js";
+// import ReactDOM from "https://unpkg.com/es-react@latest/dev/react-dom.js";
+import React from "https://unpkg.com/es-react@latest/react.js";
+import ReactDOM from "https://unpkg.com/es-react@latest/react-dom.js";
 // import PropTypes from "https://unpkg.com/es-react@latest/dev/prop-types.js";
 import htm from "../js/htm.js";
 import { init_draw2d } from './wdk_draw2d.js'
@@ -43,7 +45,8 @@ function Comments() {
       repo="28raining/28raining.github.io"
       repo-id="MDEwOlJlcG9zaXRvcnkxMjcyMzY4NjM="
       category-id="DIC_kwDOB5V6_84CUAVa"
-      mapping="pathname"
+      mapping="number"
+      term="1"
       strict="0"
       reactions-enabled="0"
       emit-metadata="0"
@@ -370,6 +373,43 @@ function unitStrToVal(unit) {
   console.log("You used a unit I don't know about ", unit)
 }
 
+function centerSchematic (schem) {
+  var canvasHolder = document.getElementById('canvasHolder');
+  // var wrapperComputedStyle = window.getComputedStyle(canvasHolder, null);
+  var wrapperWidth = canvasHolder.clientWidth - 26;
+  var wrapperHeight = canvasHolder.offsetHeight;
+  var centerX = (wrapperWidth-16) / 2;
+  var centerY = (wrapperHeight-128) / 2;
+  console.log(centerX,centerY);
+  var minX=0;
+  var maxX=0;
+  var minY=0;
+  var maxY=0;
+  //find min and max x coordinates
+  schem.forEach(item => {
+    if (item.type != "connection") {
+      if ((minX==0) || (item.x < minX)) minX = item.x;
+      if ((maxX==0) || (item.x > maxX)) maxX = item.x;
+      if ((minY==0) || (item.y < minY)) minY = item.y;
+      if ((maxY==0) || (item.y > maxY)) maxY = item.y;
+    }
+  });
+  var schemX = (maxX+minX)/2.0;
+  var schemY = (maxY+minY)/2.0;
+  if ((centerX < schemX) || (centerY < schemY)) return schem;
+  var xShift = 16 * Math.round((centerX - schemX)/16);
+  var yShift = 16 * Math.round((centerY - schemY)/16);
+  schem.forEach(item => {
+    if (item.type != "connection") {
+      item.x = item.x + xShift;
+      item.y = item.y + yShift;
+    }
+  });
+  console.log(xShift, yShift, maxX, minX, schem);
+  return schem;
+
+}
+
 class Game extends React.Component {
   constructor(props) {
     super(props);
@@ -543,14 +583,14 @@ class Game extends React.Component {
       }
     });
 
-    console.log('schstate', schematicState);
+    // console.log('schstate', schematicState);
  
 
     // console.log('newElementMap', newElementMap, elements)
     current.elements = elements;
     current.schematic = schematicState;
 
-    console.log(schematicReadiness);
+    // console.log(schematicReadiness);
 
     if (this.preventNewState) {
       this.setState({
@@ -591,8 +631,10 @@ class Game extends React.Component {
   }
 
   componentDidMount() {
+    var current = this.state.history[this.state.history.length - 1];
+    centerSchematic(current.schematic);
     // #after dom tree is updated
-    this.a = new init_draw2d((a, b) => this.handledropCb(a, b), (b) => this.handleCanvasChange(b));
+    this.a = new init_draw2d((a, b) => this.handledropCb(a, b), (b) => this.handleCanvasChange(b), current.schematic);
     // pass this.tff as above
     this.a.addEvL(this.a.view, this.a.writer, (canvasState) => this.handleCanvasChange(canvasState));
     this.TESTER = document.getElementById('tester');
@@ -640,7 +682,6 @@ class Game extends React.Component {
       console.log('here', this.state.history, a)
       this.preventNewState = true;
       this.state.elOnSchematic = {};
-      // this.a = new init_draw2d((a, b) => this.handledropCb(a, b), (b) => this.handleCanvasChange(b));
 
       this.a.reUpdateCanvas(this.state.history[this.state.history.length - 1].schematic, (b) => this.handleCanvasChange(b));
       this.preventNewState = false;
@@ -657,7 +698,7 @@ class Game extends React.Component {
 
   render() {
     const current = this.state.history[this.state.history.length - 1];
-    console.log(this.state)
+    // console.log(this.state)
 
     // // Use state (variable containing all user inputs) to do MNA (modified nodal analysis)
     // 
