@@ -699,7 +699,7 @@ class Game extends React.Component {
         <div className="container-xl" key="topContainer">
           <div className="row">
             <div className="col">
-              <p>This free online circuit solver tool can calculate the transfer function of circuits built from resistors, capacitors, inductors and op-amps. The user can quickly explore different topologies and find their Laplace transform</p>
+              <p className="my-0">This free online circuit solver tool can calculate the transfer function of circuits built from resistors, capacitors, inductors and op-amps. The user can quickly explore different topologies and find their Laplace transform</p>
             </div>
           </div>
           <div className="row shadow-sm rounded bg-lightgreen my-2 py-1" id="schematic">
