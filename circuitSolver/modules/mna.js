@@ -74,7 +74,7 @@ function processCanvasState(canvasState) {
   for (const key in allElements) {
     if (allElements[key].cnt > 0) {
       //element must be removed!
-      console.log('removing', key)
+      // console.log('removing', key)
       for (i = 0; i < nodeMap.length; i++) {
         for (j = 0; j < nodeMap[i].length; j++) {
           do {

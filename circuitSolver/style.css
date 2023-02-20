@@ -1,0 +1,35 @@
+.bg-navy {
+  background-color: rgb(37, 50, 64);
+}
+.bg-green {
+  background-color: rgb(184, 255, 241)
+}
+.bg-lightgreen {
+  background-color: rgb(231 255 250);
+}
+.schemHover:hover {
+  background-color: rgb(133, 203, 247);
+  cursor: pointer;
+}
+
+.noPointerClass{
+  pointer-events: none;
+}
+
+.katex { font-size: 3em !important; } 
+
+.bi {
+  display: inline-block;
+  vertical-align: -.125em;
+  fill: currentcolor;
+}
+
+.draw2d_InputPort {
+  fill: #F7F7F7;
+  stroke: #d7d7d7;
+}
+
+.draw2d_OutputPort {
+  fill: #F7F7F7;
+  stroke: #d7d7d7;
+}

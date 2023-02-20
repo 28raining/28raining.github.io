@@ -62,7 +62,6 @@
 - [x] Stop it crashing if algebrite can't solve it
 - [x] Show graph on load
 - [x] Undo and redo buttons
-- [ ] Add a hold button
 - [x] Separate page into those nice boxes each with shadow
 - [x] Add comments section
 - [x] On graph add x, y labels
@@ -71,6 +70,7 @@
 - [ ] Zoom in and out
 
 # Might do in the future
+- [ ] Add a hold button
 - [ ] Make graph background transparent
 - [ ] Add color switcher in top bar
 

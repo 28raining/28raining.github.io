@@ -13,16 +13,25 @@ function navBar(props) {
     <div className="w-100 p-3 bg-navy text-white">
       <div className="container-xl">
         <div className="row">
-          <div className="col-10">
+          <div className="col">
             <h4 className="mb-0"><strong>${props.title}</strong></h4>
           </div>
           <div className="col-1">
-            <button type="button" className="btn btn-secondary" onClick=${(e) => props.onClickUndo(e)}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <button type="button" className="btn btn-secondary py-0" title="undo" onClick=${(e) => props.onClickUndo(e)}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" className="bi">
                 <path d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"></path>
                 <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"></path>
               </svg>
             </button>
+          </div>
+          <div className="col d-grid d-md-flex justify-content-md-end">
+            <a className="btn btn-light py-0" title="home" href="../">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi" viewBox="0 0 16 16">
+                <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.707 1.5ZM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5 5 5Z"/>
+              </svg>
+            </a>
+            <a className="btn btn-light mx-1 py-0" href="../smith_chart" title="Go to the smith chart tool">Smith Chart</a>
+            <a className="btn btn-light py-0" href="../circuitSolver" title="Go to the circuit solver tool">Circuit Solver</a>
           </div>
         </div>
       </div>
@@ -49,6 +58,7 @@ function Comments() {
       term="1"
       strict="0"
       reactions-enabled="0"
+      data-reactions-enabled="0"
       emit-metadata="0"
       input-position="top"
       theme="light"
@@ -192,7 +202,7 @@ function TransformResults(props) {
 
   var z = html`
 
-    <div className="row my-2 py-1 shadow-sm rounded bg-white">
+    <div className="row my-2 py-1 shadow-sm rounded bg-lightgreen">
       <div className="col">
         <div className="row text-center">
           <h3>${props.title} Transform</h3>
@@ -684,10 +694,10 @@ class Game extends React.Component {
 
     // Update the DOM
     return html`
-      <${navBar} title="ONLINE ELECTRONIC CIRCUIT LAPLACE SOLVER" key="navBar" onClickUndo=${(e) => this.handleUndo(e)}/>
+      <${navBar} title="ONLINE CIRCUIT SOLVER" key="navBar" onClickUndo=${(e) => this.handleUndo(e)}/>
       <div className="w-100 p-2 bg-green" key="wrapper">
         <div className="container-xl" key="topContainer">
-          <div className="row shadow-sm rounded bg-white my-2 py-1" id="schematic">
+          <div className="row shadow-sm rounded bg-lightgreen my-2 py-1" id="schematic">
             <div className="col">
               <${SchematicComponents} key="schemComp"/>
               <${Schematic} key="schem"/>
@@ -696,7 +706,7 @@ class Game extends React.Component {
             </div>
           </div>
           <${TransformResults} name="World" key="TransformResults" title="Laplace" latex=${this.state.latex} bilinearMathML=${this.state.bilinearMathML} />
-          <div className="row shadow-sm rounded bg-white my-2 py-1" id="schematic">
+          <div className="row shadow-sm rounded bg-lightgreen my-2 py-1" id="schematic">
             <div className="col">
             <${FreqResponse}  key="FreqResponse"/>
             <${FreqResponseControllers}  key="FreqResponseControllers" fminValue=${current.fmin.value} fminUnit=${current.fmin.unit} fmaxValue=${current.fmax.value} fmaxUnit=${current.fmax.unit}  onChange=${(e, i) => this.handleElChange(e, i)} unitChange=${(e, i) => this.handleUnitChange(e, i)} />
@@ -707,31 +717,6 @@ class Game extends React.Component {
         </div>
       </div>
       `;
-
-    if (y) {
-
-      //
-      //  Get the MathML input string, and clear any previous output
-      //
-      var output = document.getElementById('math');
-      output.innerHTML = '';
-      //
-      //  Convert the MathMl to an HTML node and append it to the output
-      //
-
-
-      // var ztex = nerdamer.convertToLaTeX(MNA_vo_vi.text());
-      // output.appendChild(MathJax.tex2svg(ztex.toString()));
-      output.appendChild(MathJax.tex2svg(y));
-      //
-      //  Then update the document to include the adjusted CSS for the
-      //    content of the new equation.
-      //
-      // MathJax.startup.document.clear();
-      // MathJax.startup.document.updateDocument();
-    }
-
-
   }
 }
 
