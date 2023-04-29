@@ -139,7 +139,9 @@ export class View extends draw2d.Canvas {
       e.createPort("hybrid", inputALocator);
       e.createPort("hybrid", inputBLocator);
       e.createPort("hybrid", outputLocator);
-      e.id = `op0`;
+      e.id = `op${this.opCounter}`;
+      this.opCounter = this.opCounter + 1;
+      
     } else console.log('ERROR: You gave a bad type: ', type)
 
     this.x = x;
@@ -197,6 +199,7 @@ export class View extends draw2d.Canvas {
     this.rCounter = 0;
     this.cCounter = 0;
     this.lCounter = 0;
+    this.opCounter = 0;
     console.log('cleared, now adding this', startupSchematic);
 
     var connections = []

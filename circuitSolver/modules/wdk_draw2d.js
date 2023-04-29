@@ -35,8 +35,6 @@ export class init_draw2d {
     this.view.installEditPolicy(new draw2d.policy.canvas.SnapToGridEditPolicy(16)); //each grid is a 16x16
 
     this.view.installEditPolicy(new draw2d.policy.canvas.SingleSelectionPolicy());
-    // this.view.setScrollArea("#canvas");
-    // this.view.setZoom(this.view.getZoom()*0.7,true);
 
   }
 

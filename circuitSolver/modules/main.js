@@ -369,7 +369,7 @@ function centerSchematic (schem) {
   var wrapperHeight = canvasHolder.offsetHeight;
   var centerX = (wrapperWidth-64) / 2;
   var centerY = (wrapperHeight-128) / 2;
-  console.log(centerX,centerY);
+  // console.log(centerX,centerY);
   var minX=0;
   var maxX=0;
   var minY=0;
@@ -394,7 +394,7 @@ function centerSchematic (schem) {
       item.y = item.y + yShift;
     }
   });
-  console.log(xShift, yShift, maxX, minX, schem);
+  // console.log(xShift, yShift, maxX, minX, schem);
   return schem;
 
 }

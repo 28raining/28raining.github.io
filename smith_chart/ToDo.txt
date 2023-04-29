@@ -13,3 +13,12 @@ DONE: -deal with blank line at end of input
 
 //TODO - A big improvement here would be to separate out the impedance calculation and arc drawing. It should calculate impedances, then calculate points along the arc
 //also could use a complex number function for all the math
+
+1 - Add arrows / sliders next to the values for small tweaking of the numbers
+2 - In custom impedance markers, also show the reflection Coefficient and VSWR
+
+--draw2d issues
+- grid no scroll
+- can't connect ports together
+- can't select stuff
+- select multiple and drag
