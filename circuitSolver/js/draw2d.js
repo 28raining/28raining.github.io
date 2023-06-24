@@ -2504,6 +2504,8 @@ function build(opts) {
 		}
 
 		this.onclick = function() {
+			// console.log('wdk bp 08a')
+
 			window.open(this.getHrefAttribute().value);
 		}
 
@@ -6748,7 +6750,7 @@ _packages2.default.Canvas = Class.extend(
   init: function init(canvasId, width, height) {
     var _this = this;
 
-    this.setScrollArea(document.body);
+    this.setScrollArea(window);
     this.canvasId = canvasId;
     this.html = $("#" + canvasId);
     this.html.css({ "cursor": "default" });
@@ -7013,12 +7015,16 @@ _packages2.default.Canvas = Class.extend(
     // Catch the click event and route them to the canvas hook
     //
     this.html.on("click", function (event) {
+			// console.log('wdk bp 05')
+			
       event = _this._getEvent(event);
-
+			
       // fire only the click event if we didn't move the mouse (drag&drop)
       //
       if (_this.mouseDownX === event.clientX || _this.mouseDownY === event.clientY) {
+				// console.log('wdk bp 07')
         var pos = _this.fromDocumentToCanvasCoordinate(event.clientX, event.clientY);
+				// console.log('wdk bp 08', pos)
         _this.onClick(pos.x, pos.y, event.shiftKey, event.ctrlKey);
       }
     });
@@ -7394,6 +7400,9 @@ _packages2.default.Canvas = Class.extend(
    * @returns {draw2d.geo.Point} The coordinate in relation to the canvas [0,0] position
    */
   fromDocumentToCanvasCoordinate: function fromDocumentToCanvasCoordinate(x, y) {
+		var finalY =  (y - this.getAbsoluteY() + this.getScrollTop()) * this.zoomFactor
+		// console.log('wdk bp31', y,)
+		// console.log('wdk bp31 slow', `mouse y: ${y}, final y:${finalY}, abs: ${this.getAbsoluteY()}, scroll: ${this.getScrollTop()}`)
     return new _packages2.default.geo.Point((x - this.getAbsoluteX() + this.getScrollLeft()) * this.zoomFactor, (y - this.getAbsoluteY() + this.getScrollTop()) * this.zoomFactor);
   },
 
@@ -7484,6 +7493,7 @@ _packages2.default.Canvas = Class.extend(
    * @returns {Number} the top scroll offset of the cnavas.
    **/
   getScrollTop: function getScrollTop() {
+		// console.log('wdk bp41', this)
     return this.getScrollArea().scrollTop();
   },
 
@@ -7952,6 +7962,8 @@ _packages2.default.Canvas = Class.extend(
    * @returns {draw2d.Figure}
    **/
   getBestFigure: function getBestFigure(x, y, blacklist, whitelist) {
+		// console.log('wdk bp 10', x, y, blacklist, whitelist)
+// 
     if (!Array.isArray(blacklist)) {
       if (blacklist) blacklist = [blacklist];else blacklist = [];
     }
@@ -8029,6 +8041,9 @@ _packages2.default.Canvas = Class.extend(
     //  run reverse to aware the z-oder of the figures
     for (var _i2 = this.figures.getSize() - 1; _i2 >= 0; _i2--) {
       var figure = this.figures.get(_i2);
+			if (figure.id == 'xvout') {
+			// console.log('wdk bp12',figure.id, figure.hitTest(x, Math.abs(y)), x, y, figure.x, figure.y, figure);	//it's at x=688, y=112. Mouse is at 685,112
+			}
       // check first a children of the figure
       //
       checkRecursive(figure.children);
@@ -8215,7 +8230,10 @@ _packages2.default.Canvas = Class.extend(
   onClick: function onClick(x, y, shiftKey, ctrlKey) {
     // check if a figure has been hit
     //
+		// console.log('wdk bp 09')
+		
     var figure = this.getBestFigure(x, y);
+		// console.log('wdk bp 10', figure)
 
     this.fireEvent("click", {
       figure: figure,
@@ -11589,6 +11607,7 @@ _packages2.default.Figure = Class.extend(
    * @returns {Boolean}
    */
   hitTest: function hitTest(iX, iY, corona) {
+		// console.log('wdk bp20', iX, iY);
     if (typeof corona === "number") {
       return this.getBoundingBox().scale(corona, corona).hitTest(iX, iY);
     }
@@ -13246,6 +13265,8 @@ _packages2.default.Port = _packages2.default.shape.basic.Circle.extend(
    * @returns {Boolean}
    */
   hitTest: function hitTest(iX, iY, corona) {
+		// console.log('wdk bp21');
+
     var x = this.getAbsoluteX() - this.coronaWidth - this.getWidth() / 2;
     var y = this.getAbsoluteY() - this.coronaWidth - this.getHeight() / 2;
     var iX2 = x + this.getWidth() + this.coronaWidth * 2;
@@ -20069,6 +20090,8 @@ _packages2.default.geo.Rectangle = _packages2.default.geo.Point.extend(
    * @returns {Boolean}
    */
   hitTest: function hitTest(iX, iY) {
+		// console.log('wdk bp26', iX, iY, this.x, this.y, this.id);
+
     if (iX instanceof _packages2.default.geo.Point) {
       iY = iX.y;
       iX = iX.x;
@@ -32132,7 +32155,9 @@ _packages2.default.policy.canvas.SingleSelectionPolicy = _packages2.default.poli
    * @since 3.0.0
    */
   onClick: function onClick(figure, mouseX, mouseY, shiftKey, ctrlKey) {
+		// console.log('wdk bp 01')
     if (figure !== null) {
+			// console.log('wdk bp 02')
       figure.fireEvent("click", {
         figure: figure,
         x: mouseX,
@@ -34570,6 +34595,8 @@ _packages2.default.policy.connection.ComposedConnectionCreatePolicy = _packages2
     },
 
     onClick: function onClick() {
+			// console.log('wdk bp 03')
+
         var _arg = arguments;
         this.policies.forEach(function (p) {
             p.onClick.apply(p, _arg);
@@ -39934,6 +39961,8 @@ _packages2.default.shape.basic.GhostVertexResizeHandle = _packages2.default.shap
    * @template
    */
   onClick: function onClick() {
+		// console.log('wdk bp 04')
+
     var cmd = new _packages2.default.command.CommandAddVertex(this.owner, this.precursorIndex + 1, this.getAbsoluteX() + this.getWidth() / 2, this.getAbsoluteY() + this.getHeight() / 2);
     this.getCanvas().getCommandStack().execute(cmd);
   },
@@ -40800,6 +40829,7 @@ _packages2.default.shape.basic.Label = _packages2.default.SetFigure.extend(
    * @returns {Boolean}
    */
   hitTest: function hitTest(x, y, corona) {
+		// console.log('wdk bp23');
 
     // apply a simple bounding box test if the label isn'T rotated
     //
@@ -41942,6 +41972,8 @@ _packages2.default.shape.basic.Line = _packages2.default.Figure.extend(
    * @returns {Boolean}
    **/
   hitTest: function hitTest(px, py) {
+		// console.log('wdk bp24');
+
     return _packages2.default.shape.basic.Line.hit(this.corona + this.stroke, this.start.x, this.start.y, this.end.x, this.end.y, px, py);
   },
 
@@ -43550,6 +43582,8 @@ _packages2.default.shape.basic.PolyLine = _packages2.default.shape.basic.Line.ex
    * @returns {Boolean}
    **/
   hitTest: function hitTest(px, py) {
+		// console.log('wdk bp25');
+
     return this.hitSegment(px, py) !== null;
   },
 

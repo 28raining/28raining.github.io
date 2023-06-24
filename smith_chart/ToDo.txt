@@ -22,3 +22,11 @@ DONE: -deal with blank line at end of input
 - can't connect ports together
 - can't select stuff
 - select multiple and drag
+
+
+[-] - Move calculateMNA into a useMemo - not worth it for now
+[x] Move bilinear into a click-button - it's adding 80+ms of time each render
+[x] Toast if user tries to add 2 v sources
+[x] - Toast after copying latex for example viewing page. Make MathML viewer and direct there
+[x] - tooltips
+[x] - fix issue when current is connected directly to vout thru 1 resistor
