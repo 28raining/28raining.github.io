@@ -1,37 +1,37 @@
 var startupSchematic =[
         {
             "type": "component",
-            "firstLetter": "v",
+            "id": "vin",
             "x": 128,
             "y": 144
         },
         {
             "type": "component",
-            "firstLetter": "L",
+            "id": "L0",
             "x": 192,
             "y": 80
         },
         {
             "type": "component",
-            "firstLetter": "R",
+            "id": "R0",
             "x": 352,
             "y": 80
         },
         {
             "type": "component",
-            "firstLetter": "C",
+            "id": "C0",
             "x": 416,
             "y": 112
         },
         {
             "type": "component",
-            "firstLetter": "g",
+            "id": "gnd",
             "x": 416,
             "y": 192
         },
         {
             "type": "component",
-            "firstLetter": "x",
+            "id": "xvout",
             "x": 352,
             "y": 16
         },

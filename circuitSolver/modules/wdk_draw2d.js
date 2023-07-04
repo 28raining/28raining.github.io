@@ -12,7 +12,6 @@ export class init_draw2d {
     // var reader = new draw2d.io.json.Reader();
     // reader.unmarshal(this.view, startupSchematic);
     this.view.loadSchematic(schematic);
-    // this.handleCanvasChange = () => handleCanvasChange();
     //The first load needs to trigger the calculateTF function
     this.writer.marshal(this.view, function (json) {
       handleCanvasChange(json);

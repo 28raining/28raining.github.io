@@ -47,7 +47,7 @@ function Toasts({ toastMxVIsource, toastCopiedLatex, toastCopiedMathML }) {
           <strong className="me-auto">Warning</strong>
           <button type="button" className="btn-close" data-bs-dismiss="toast"></button>
         </div>
-        <div className="toast-body">You can only have one Voltage Source or Current Source. Also only one voltage probe</div>
+        <div className="toast-body">You can only have one Voltage Source or Current Source. Also only one voltage probe, and one current probe</div>
       </div>
 
       <div id="liveToast" className="toast bg-success text-white" role="alert" ref=${toastCopiedLatex}>
@@ -55,7 +55,7 @@ function Toasts({ toastMxVIsource, toastCopiedLatex, toastCopiedMathML }) {
           <strong className="me-auto">Copied to clipboard</strong>
           <button type="button" className="btn-close" data-bs-dismiss="toast"></button>
         </div>
-        <div className="toast-body">Copied to your clipboard. Here's a free online latex editor: https://latexeditor.lagrida.com/</div>
+        <div className="toast-body">Copied to your clipboard. Here's a free online latex editor: <a className="text-white" href="https://latexeditor.lagrida.com/" target="_blank">https://latexeditor.lagrida.com/</a></div>
       </div>
 
       <div id="liveToast" className="toast bg-success text-white" role="alert" ref=${toastCopiedMathML}>
@@ -63,7 +63,7 @@ function Toasts({ toastMxVIsource, toastCopiedLatex, toastCopiedMathML }) {
           <strong className="me-auto">Copied to clipboard</strong>
           <button type="button" className="btn-close" data-bs-dismiss="toast"></button>
         </div>
-        <div className="toast-body">Copied to your clipboard. Here's a free online MathML editor: https://codepen.io/bqlou/pen/yOgbmb</div>
+        <div className="toast-body">Copied to your clipboard. Here's a free online MathML editor: <a className="text-white" href="https://codepen.io/bqlou/pen/yOgbmb" target="_blank">https://codepen.io/bqlou/pen/yOgbmb</a></div>
       </div>
     </div>
   `;
@@ -94,42 +94,128 @@ function SchematicComponents() {
     <div className="row py-1">
       <div className="col">
         <div className="d-grid gap-2">
-          <div key="1" data-shape="res" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic.." data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Drag onto the schematic">resistor</div>
+          <div
+            key="1"
+            data-shape="res"
+            className="btn btn-primary draw2d_droppable py-0"
+            title="drag element onto the schematic.."
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            data-bs-title="Drag onto the schematic">
+            resistor
+          </div>
         </div>
       </div>
       <div className="col">
         <div className="d-grid gap-2">
-          <div key="2" data-shape="cap" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic.." data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Drag onto the schematic">capacitor</div>
+          <div
+            key="2"
+            data-shape="cap"
+            className="btn btn-primary draw2d_droppable py-0"
+            title="drag element onto the schematic.."
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            data-bs-title="Drag onto the schematic">
+            capacitor
+          </div>
         </div>
       </div>
       <div className="col">
         <div className="d-grid gap-2">
-          <div key="3" data-shape="ind" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic.." data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Drag onto the schematic">inductor</div>
+          <div
+            key="3"
+            data-shape="ind"
+            className="btn btn-primary draw2d_droppable py-0"
+            title="drag element onto the schematic.."
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            data-bs-title="Drag onto the schematic">
+            inductor
+          </div>
         </div>
       </div>
       <div className="col">
         <div className="d-grid gap-2">
-          <div key="7" data-shape="op" className="btn btn-primary draw2d_droppable py-0" title="drag element onto the schematic.." data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Drag onto the schematic">op-amp</div>
+          <div
+            key="7"
+            data-shape="op"
+            className="btn btn-primary draw2d_droppable py-0"
+            title="drag element onto the schematic.."
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            data-bs-title="Drag onto the schematic">
+            op-amp
+          </div>
         </div>
       </div>
       <div className="col">
         <div className="d-grid gap-2">
-          <div key="4" data-shape="vin" className="btn btn-info draw2d_droppable py-0" title="drag element onto the schematic.." data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Drag onto the schematic">voltage input</div>
+          <div
+            key="4"
+            data-shape="vin"
+            className="btn btn-info draw2d_droppable py-0"
+            title="drag element onto the schematic.."
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            data-bs-title="Drag onto the schematic">
+            voltage input
+          </div>
         </div>
       </div>
       <div className="col">
         <div className="d-grid gap-2">
-          <div key="4" data-shape="iin" className="btn btn-info draw2d_droppable py-0" title="drag element onto the schematic.." data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Drag onto the schematic">current input</div>
+          <div
+            key="4"
+            data-shape="iin"
+            className="btn btn-info draw2d_droppable py-0"
+            title="drag element onto the schematic.."
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            data-bs-title="Drag onto the schematic">
+            current input
+          </div>
         </div>
       </div>
       <div className="col">
         <div className="d-grid gap-2">
-          <div key="6" data-shape="xvout" className="btn btn-warning draw2d_droppable py-0" title="drag element onto the schematic.." data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Drag onto the schematic">voltage probe</div>
+          <div
+            key="6"
+            data-shape="xvout"
+            className="btn btn-warning draw2d_droppable py-0"
+            title="drag element onto the schematic.."
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            data-bs-title="Drag onto the schematic">
+            voltage prb
+          </div>
         </div>
       </div>
       <div className="col">
         <div className="d-grid gap-2">
-          <div key="5" data-shape="gnd" className="btn btn-danger draw2d_droppable py-0" title="drag element onto the schematic.." data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Drag onto the schematic">gnd</div>
+          <div
+            key="6"
+            data-shape="iprobe"
+            className="btn btn-warning draw2d_droppable py-0"
+            title="drag element onto the schematic.."
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            data-bs-title="Drag onto the schematic">
+            current prb
+          </div>
+        </div>
+      </div>
+      <div className="col">
+        <div className="d-grid gap-2">
+          <div
+            key="5"
+            data-shape="gnd"
+            className="btn btn-danger draw2d_droppable py-0"
+            title="drag element onto the schematic.."
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            data-bs-title="Drag onto the schematic">
+            gnd
+          </div>
         </div>
       </div>
     </div>
@@ -231,50 +317,66 @@ function updateGraph(el, freq, mag) {
 }
 
 function TransformResults(props) {
-  const mathMlString = `<math><mfrac><mrow><mi>V</mi><mn>o</mn></mrow><mrow><mi>${props.iinOrVin == "vin" ? "V" : "I"}</mi><mn>i</mn></mrow></mfrac><mo>=</mo>${
+  // console.log(props)
+  const mathMlString = `<math>${props.chosen == 'vo' ? `<mfrac><mrow><mi>V</mi><mn>o</mn></mrow><mrow><mi>${props.iinOrVin == "vin" ? "V" : "I"}</mi><mn>i</mn></mrow></mfrac>` : `<msub><mi>I</mi><mn>prb0</mn></msub>` }<mo>=</mo>${
     props.latex
   }</math>`;
   var z = html`
-    <div key="top" className="row my-2 py-1 shadow-sm rounded bg-lightgreen">
-      <div key="c1" className="col-12">
-        <div key="r1" className="row text-center">
+    <div key="c1" className="col-12">
+      <div key="r1" className="row">
+        <div key="title" className="col-6 text-start">
           <h3>${props.title} Transform</h3>
         </div>
-        <div key="r2" className="row text-center fs-3 py-2">
-          ${props.latex || props.title == "Laplace"
-            ? html` <div key="c1" className="col-10">${MyComponent(mathMlString)}</div>
-                <div key="c2" className="col-2">
-                  <div key="c3" className="d-grid gap-1">
-                    <button
-                      type="button"
-                      className="btn btn-outline-primary py-0"
-                      onClick=${() => {
-                        const newLatex = MathML2LaTeX.convert(mathMlString);
-                        navigator.clipboard.writeText(newLatex);
-                        props.copiedToast.show();
-                      }}>
-                      Copy LATEX
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-outline-primary py-0"
-                      onClick=${() => {
-                        navigator.clipboard.writeText(mathMlString);
-                        props.copiedToastML.show();
-                      }}>
-                      Copy MathML
-                    </button>
-                  </div>
-                </div>`
-            : html`<button
-                type="button"
-                className="btn btn-outline-primary py-0"
-                onClick=${() => {
-                  props.handleRequestBilin();
-                }}>
-                Calculate bilinear transform
-              </button>`}
+        <div key="select" className="col-6 text-end">
+          <div className="form-check form-check-inline">
+            <input key="radio" className="form-check-input" type="radio" name="${`${props.title}inlineRadioOptions`}" value="vo" checked=${props.chosen == 'vo'} onChange=${(e) => props.handlePlotChange(e)} />
+            <label key="lable" className="form-check-label">${props.iinOrVin == "vin" ? "Vo/Vi" : "Vo/Ii"}</label>
+          </div>
+          ${props.iprbList.map(Y => {
+          return html`
+                    <div className="form-check form-check-inline" key="iprb${Y}">
+            <input key="radio" className="form-check-input" type="radio" name="${`${props.title}inlineRadioOptions`}" value="Y${Y}" checked=${props.chosen == `Y${Y}`} onChange=${(e) => props.handlePlotChange(e)} />
+            <label key="lable" className="form-check-label">Iprb${Y}</label>
+          </div>
+          `
+          })}
+
         </div>
+      </div>
+      <div key="r2" className="row text-center fs-3 py-2">
+        ${props.latex || props.title == "Laplace"
+          ? html` <div key="c1" className="col-10">${MyComponent(mathMlString)}</div>
+              <div key="c2" className="col-2">
+                <div key="c3" className="d-grid gap-1">
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary py-0"
+                    onClick=${() => {
+                      const newLatex = MathML2LaTeX.convert(mathMlString);
+                      navigator.clipboard.writeText(newLatex);
+                      props.copiedToast.show();
+                    }}>
+                    Copy LaTeX
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary py-0"
+                    onClick=${() => {
+                      navigator.clipboard.writeText(mathMlString);
+                      props.copiedToastML.show();
+                    }}>
+                    Copy MathML
+                  </button>
+                </div>
+              </div>`
+          : html`<button
+              type="button"
+              className="btn btn-outline-primary py-0"
+              onClick=${() => {
+                props.handleRequestBilin();
+              }}>
+              Calculate bilinear transform
+            </button>`}
       </div>
     </div>
   `;
@@ -489,7 +591,6 @@ class Game extends React.Component {
     this.state = {
       history: [
         {
-          renameMap: {},
           elements: {},
           fmin: {
             value: 1,
@@ -504,6 +605,7 @@ class Game extends React.Component {
       ],
       latex: null,
       iinOrVin: "vin",
+      iprbList: [],
       bilinearMathML: null,
       elOnSchematic: [],
       schematicReadiness: {
@@ -512,6 +614,7 @@ class Game extends React.Component {
         gnd: false,
         solvable: false,
       },
+      chosenPlot:'vo'
     };
 
     this.TESTER = null;
@@ -579,6 +682,7 @@ class Game extends React.Component {
   //name it better
   handledropCb(a, addToSchematic) {
     //prevent user from having 2x vin or 2x vout elements
+
     if (a.id == "xvout" || a.id == "vin" || a.id == "iin") {
       if (a.id in this.state.elOnSchematic) {
         this.bsToast.show();
@@ -591,12 +695,24 @@ class Game extends React.Component {
         return;
       }
     }
+
+    //prevent multiple current probes
+    var allLetters = Array.from(a.id);
+    if (allLetters[0] == 'Y') {
+      for (const e in this.state.elOnSchematic) {
+        allLetters = Array.from(e);
+        if (allLetters[0] == 'Y') {
+          this.bsToast.show();
+          return;
+          }
+      }
+    }
     addToSchematic(a);
   }
 
   handleCanvasChange(canvasState) {
     if (canvasState.length == 0) {
-      console.log("schematic has been emptied");
+      console.log("schematic has been emptied", this.state);
       return;
     }
     // console.log("Inside handleCanvasChange");
@@ -607,7 +723,8 @@ class Game extends React.Component {
     var elements = current.elements;
     var schematicReadiness;
     var iinOrVin;
-    [schematicReadiness, mathMlResult, newElementMap, this.resString, bilinearMathML, iinOrVin] = calculateMNA(canvasState);
+    var iprbList;
+    [schematicReadiness, mathMlResult, newElementMap, this.resString, iinOrVin, iprbList] = calculateMNA(canvasState, this.state.chosenPlot);
     this.state.elOnSchematic = newElementMap;
 
     var schematicState = [];
@@ -615,7 +732,7 @@ class Game extends React.Component {
     //add new elements
     //handle the parameter input
     for (const key in newElementMap) {
-      if (key == "gnd" || key == "xvout" || key == "vin" || key[0] == "o") continue;
+      if (key == "gnd" || key == "xvout" || key == "vin" || key[0] == "o" || key[0] == "Y") continue;
       var allLetters = Array.from(key);
       var firstLetter = allLetters[0];
       if (!(key in elements)) {
@@ -669,10 +786,9 @@ class Game extends React.Component {
         });
         //handle this later
       } else {
-        var firstLetter = Array.from(item.id)[0];
         schematicState.push({
           type: "component",
-          firstLetter: firstLetter,
+          id: item.id,
           x: item.x,
           y: item.y,
         });
@@ -691,6 +807,7 @@ class Game extends React.Component {
       this.setState(
         {
           iinOrVin: iinOrVin,
+          iprbList: iprbList,
           latex: mathMlResult,
           bilinearMathML: bilinearMathML,
           schematicReadiness: schematicReadiness,
@@ -698,6 +815,8 @@ class Game extends React.Component {
         this.calculateTF
       );
     } else {
+      // console.log(iprbList, iprbList.length);
+      if(iprbList.length==0) this.setState({chosenPlot: 'vo'});
       this.setState(
         {
           history: this.state.history.concat([current]),
@@ -705,6 +824,7 @@ class Game extends React.Component {
           bilinearMathML: bilinearMathML,
           schematicReadiness: schematicReadiness,
           iinOrVin: iinOrVin,
+          iprbList: iprbList,
         },
         this.calculateTF
       );
@@ -737,8 +857,8 @@ class Game extends React.Component {
     this.copiedToastML = bootstrap.Toast.getOrCreateInstance(this.toastCopiedMathML.current);
 
     //enable tooltips
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
   }
 
   handleElChange(e, i) {
@@ -760,6 +880,20 @@ class Game extends React.Component {
     );
   }
 
+  handlePlotChange(e) {
+    var current = JSON.parse(JSON.stringify(this.state.history[this.state.history.length - 1]));
+
+    // console.log(e.target.value);
+    // return;
+    this.setState(
+      {
+        chosenPlot : e.target.value
+      }, ()=>this.redrawSchematic(current)
+    );
+    
+    
+  }
+
   handleUnitChange(e, i) {
     var current = JSON.parse(JSON.stringify(this.state.history[this.state.history.length - 1]));
 
@@ -779,6 +913,14 @@ class Game extends React.Component {
     );
   }
 
+  redrawSchematic(current) {
+    this.preventNewState = true;
+    this.state.elOnSchematic = {};
+    this.wdk_draw2d.reUpdateCanvas(current.schematic, (b) => this.handleCanvasChange(b));
+    this.preventNewState = false;
+    this.calculateTF;
+  }
+
   handleNameChange(e, i) {
     if (e.target.value.length < 1) return;
     var firstLetter = Array.from(e.target.value)[0];
@@ -792,13 +934,15 @@ class Game extends React.Component {
       {
         history: this.state.history.concat([current]),
       },
-      () => {
-        this.preventNewState = true;
-        this.state.elOnSchematic = {};
-        this.wdk_draw2d.reUpdateCanvas(current.schematic, (b) => this.handleCanvasChange(b));
-        this.preventNewState = false;
-        this.calculateTF;
-      }
+      // this.redrawSchematic(current)
+      () => this.redrawSchematic(current)
+      // {
+      //   this.preventNewState = true;
+      //   this.state.elOnSchematic = {};
+      //   this.wdk_draw2d.reUpdateCanvas(current.schematic, (b) => this.handleCanvasChange(b));
+      //   this.preventNewState = false;
+      //   this.calculateTF;
+      // }
     );
 
     // this.setState(
@@ -809,11 +953,13 @@ class Game extends React.Component {
     // );
   }
 
-  handleUndo() {
+  handleUndo(deleteOld) {
     if (this.state.history.length > 2) {
-      var a = this.state.history.pop();
+      if (deleteOld) {
+        var a = this.state.history.pop();
+        console.log("here", this.state.history, a);
+      }
 
-      console.log("here", this.state.history, a);
       this.preventNewState = true;
       this.state.elOnSchematic = {};
 
@@ -822,6 +968,19 @@ class Game extends React.Component {
       this.setState({
         history: this.state.history,
       });
+
+
+      // this.setState(
+      //   {
+      //     history: this.state.history.concat([current]),
+      //   },
+      //   // this.redrawSchematic(current)
+      //   () => this.redrawSchematic(current)
+      // this.preventNewState = true;
+      // this.state.elOnSchematic = {};
+      // this.wdk_draw2d.reUpdateCanvas(current.schematic, (b) => this.handleCanvasChange(b));
+      // this.preventNewState = false;
+      // this.calculateTF;
     }
   }
 
@@ -838,7 +997,7 @@ class Game extends React.Component {
 
     // Update the DOM
     return html`
-      <${navBar} title="ONLINE CIRCUIT SOLVER" key="navBar" onClickUndo=${(e) => this.handleUndo(e)} />
+      <${navBar} title="ONLINE CIRCUIT SOLVER" key="navBar" onClickUndo=${() => this.handleUndo(true)} />
       <${Toasts} key="toasts" toastMxVIsource=${this.toastMxVIsource} toastCopiedLatex=${this.toastCopiedLatex} toastCopiedMathML=${this.toastCopiedMathML} />
       <div className="w-100 p-2 bg-green" key="wrapper">
         <div className="container-xl" key="topContainer">
@@ -863,16 +1022,20 @@ class Game extends React.Component {
                 nameChange=${(e, i) => this.handleNameChange(e, i)} />
             </div>
           </div>
-          <${TransformResults}
-            name="World"
-            key="TransformResults"
-            title="Laplace"
-            latex=${this.state.latex}
-            iinOrVin=${this.state.iinOrVin}
-            copiedToast=${this.copiedToast}
-            copiedToastML=${this.copiedToastML} />
-          <div className="row shadow-sm rounded bg-lightgreen my-2 py-1" id="schematic">
-            <div className="col">
+          <div key="lapl" className="row my-2 py-1 shadow-sm rounded bg-lightgreen">
+            <${TransformResults}
+              name="World"
+              key="TransformResults"
+              title="Laplace"
+              latex=${this.state.latex}
+              iinOrVin=${this.state.iinOrVin}
+              iprbList=${this.state.iprbList}
+              copiedToast=${this.copiedToast}
+              copiedToastML=${this.copiedToastML}
+              handlePlotChange=${(e) => this.handlePlotChange(e)}
+              chosen=${this.state.chosenPlot} />
+
+            <div className="col-12 pt-2">
               <${FreqResponse} key="FreqResponse" />
               <${FreqResponseControllers}
                 key="FreqResponseControllers"
@@ -884,16 +1047,22 @@ class Game extends React.Component {
                 unitChange=${(e, i) => this.handleUnitChange(e, i)} />
             </div>
           </div>
+          <div key="bilin" className="row my-2 py-1 shadow-sm rounded bg-lightgreen">
+
           <${TransformResults}
             name="World"
             key="TransformResultsBilin"
             title="Bilinear"
             latex=${this.state.bilinearMathML}
             iinOrVin=${this.state.iinOrVin}
+            iprbList=${[]}
             copiedToast=${this.copiedToast}
             handleRequestBilin=${() => this.handleRequestBilin()}
-            copiedToastML=${this.copiedToastML} />
+            copiedToastML=${this.copiedToastML} 
+            handlePlotChange=${(e) => this.handlePlotChange(e)}
+            chosen=${this.state.chosenPlot} />
           <${Comments} key="comments" />
+        </div>
         </div>
       </div>
     `;

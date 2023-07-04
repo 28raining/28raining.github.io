@@ -30,3 +30,14 @@ DONE: -deal with blank line at end of input
 [x] - Toast after copying latex for example viewing page. Make MathML viewer and direct there
 [x] - tooltips
 [x] - fix issue when current is connected directly to vout thru 1 resistor
+
+[ ] - Provide roots of polynomial solutions
+[ ] - Add VCCS and VCVS
+[x] - Add current probe
+[x] - Fix undo wehen Iprb used
+[x] - plot iprob response
+[x] - Toast to have clickable link
+[x] - why after clicking iprob0 can we not delete anything. After undo it's fine. Need to look into draw2d source code again. Or stop the rediculous way of switching from I to V plot
+[x] - Adding two inductors and switching from i to v somehow crashes undo
+[x] - Hide iplot button if there's no iprobes
+[x] - Support N iprobes

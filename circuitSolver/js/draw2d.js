@@ -7052,7 +7052,7 @@ _packages2.default.Canvas = Class.extend(
     // Catch the keyUp and CTRL-key and route them to the Canvas hook.
     //
     this.keyupCallback = function (event) {
-      // don't initiate the delete command if the event comes from an INPUT field. In this case the user want delete
+			// don't initiate the delete command if the event comes from an INPUT field. In this case the user want delete
       // a character in the input field and not the related shape
       var target = $(event.target);
       if (!target.is("input") && !target.is("textarea")) {
@@ -7071,13 +7071,14 @@ _packages2.default.Canvas = Class.extend(
       // don't initiate the delete command if the event comes from an INPUT field. In this case the user want delete
       // a character in the input field and not the related shape
       var target = $(event.target);
-      if (!target.is("input") && !target.is("textarea")) {
+			//wkelsey wdk commented this as canvas doesn't get reselected after click FIXME
+      // if (!target.is("input") && !target.is("textarea")) {
         _this.editPolicy.each(function (i, policy) {
           if (policy instanceof _packages2.default.policy.canvas.KeyboardPolicy) {
             policy.onKeyDown(_this, event.keyCode, event.shiftKey, event.ctrlKey);
           }
         });
-      }
+      // }
     };
     $(document).bind("keydown", this.keydownCallback);
   },

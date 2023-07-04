@@ -1,5 +1,7 @@
 import simplify_algebra from "./simplify_algebra.js";
 
+var debug = false;
+
 function arrayContains(list1, item) {
   return list1.findIndex((elem) => elem.el == item.el && elem.port == item.port);
 }
@@ -38,7 +40,7 @@ function processCanvasState(canvasState) {
       //if its not a connection its an element
       letters = Array.from(item.id);
       //cnt is how many connections it's expected
-      if (letters[0] == "L" || letters[0] == "R" || letters[0] == "C") cnt = 2;
+      if (letters[0] == "L" || letters[0] == "R" || letters[0] == "C" || letters[0] == "Y") cnt = 2;
       else if (letters[0] == "o") cnt = 3;
       else cnt = 1;
       allElements[item.id] = { cnt: cnt };
@@ -66,7 +68,7 @@ function processCanvasState(canvasState) {
     }
   } while (optimized == true);
 
-  //loop thru nodemap and remove elements which don't have both ports connected
+  //loop thru nodemap and remove elements which don't have all ports connected
   for (i = 0; i < nodeMap.length; i++) {
     for (j = 0; j < nodeMap[i].length; j++) {
       allElements[nodeMap[i][j].el].cnt -= 1;
@@ -75,7 +77,6 @@ function processCanvasState(canvasState) {
   for (const key in allElements) {
     if (allElements[key].cnt > 0) {
       //element must be removed!
-      // console.log('removing', key)
       for (i = 0; i < nodeMap.length; i++) {
         for (j = 0; j < nodeMap[i].length; j++) {
           do {
@@ -87,9 +88,8 @@ function processCanvasState(canvasState) {
       // delete usedElements[key]
     } else usedElements[key] = {};
   }
-  // console.log(usedElements);
 
-  //Create an array of all nodes connected to Vout.
+  //Create an array of all nodes connected to Vout. So any circuits without a route to Vout can be removed
   var nodeVin, nodeVout, nodeGnd;
   var connectedNodes = [];
   var node;
@@ -143,47 +143,44 @@ function processCanvasState(canvasState) {
   // console.log('vout node', nodeMap)
   // console.log('schematicReadiness', schematicReadiness)
 
-  return [mnaNodeMap, usedElements, connectedNodes, schematicReadiness, allElements, iinOrVin];
+  return [mnaNodeMap, usedElements, schematicReadiness, allElements, iinOrVin];
 }
 
-export function calculateMNA(canvasState) {
+export function calculateMNA(canvasState, chosenPlot) {
   var nodeMap = [];
   var i, j;
   var vinNode, gndNode, voutNode, iinNode;
+  var iprbNode = null
   var elementMap = {};
   var allElements = {};
   var usedElements = {};
   var element;
-  var connectedNodes = [];
   var schematicReadiness;
   var opAmpsMap;
   var iinOrVin;
+  var iprbMap = {};
 
-  [nodeMap, usedElements, connectedNodes, schematicReadiness, allElements, iinOrVin] = processCanvasState(canvasState);
-  // console.log("bp1", nodeMap, usedElements)
-
-  // console.log(json);
-  // console.log('nodemap', nodeMap);
-  // console.log('elements on node', elementsOnNodes);
-  // console.log('all elements on this node', elementsOnThisNode);
+  [nodeMap, usedElements, schematicReadiness, allElements, iinOrVin] = processCanvasState(canvasState);
+  if (debug) console.log("nodemap", nodeMap)
+  if (debug) console.log("usedElements", usedElements)
+  if (debug) console.log("schematicReadiness", schematicReadiness)
+  if (debug) console.log("allElements", allElements)
+  if (debug) console.log("iinOrVin", iinOrVin)
 
   // Build MNA array
   if (schematicReadiness.vout && schematicReadiness.vin && schematicReadiness.gnd) {
     var numOpAmps = 0;
     for (const key in usedElements) if (Array.from(key)[0] == "o") numOpAmps += 1;
+    var numIprb = 0;
+    for (const key in usedElements) if (Array.from(key)[0] == "Y") numIprb += 1;  //FIXME - confirm this is used
     // Create 2D modified nodal analysis array
-    if (iinOrVin == "vin") var mnaMatrix = new Array(nodeMap.length + 1 + numOpAmps);
-    else var mnaMatrix = new Array(nodeMap.length + numOpAmps);
+    if (iinOrVin == "vin") var mnaMatrix = new Array(nodeMap.length + 1 + numOpAmps + numIprb);
+    else var mnaMatrix = new Array(nodeMap.length + numOpAmps + numIprb);
     for (i = 0; i < mnaMatrix.length; i++) mnaMatrix[i] = new Array(mnaMatrix.length).fill("0");
-    //create node map without gnd node. All nodes might need to shift
-    // for (i = 0; i < nodeMap.length; i++) {
-    //   if (includesElement(nodeMap[i], 'gnd') >= 0) gndNode = i;
-    // }
-    // var nodeMapNoGnd = nodeMap;
-    // nodeMapNoGnd.splice(gndNode, 1);  //removes the ground node so MNA is arranged properly
 
     // Step 1 - create map of every element and which node it connects too. Doing this here, after node map is complete and ground node is removed
     var opAmpsMap = {};
+
     var letters, ll;
     for (i = 0; i < nodeMap.length; i++) {
       for (j = 0; j < nodeMap[i].length; j++) {
@@ -194,23 +191,38 @@ export function calculateMNA(canvasState) {
         ll = letters[letters.length - 1];
         if (letters[0] == "o") {
           if (!(ll in opAmpsMap)) opAmpsMap[ll] = [null, null, null];
-          // console.log(opAmpsMap, letters, nodeMap[i][j]);
           opAmpsMap[ll][nodeMap[i][j].port] = i;
+        } else if (letters[0] == "Y") {
+          if (!(ll in iprbMap)) iprbMap[ll] = [null, null];
+          iprbMap[ll][nodeMap[i][j].port] = i;
         }
       }
     }
+
+    if (debug) console.log('elementMap', elementMap)
+    if (debug) console.log('iprbMap', iprbMap)
+
     voutNode = elementMap["xvout"][0];
+    if (numIprb  == 1) {
+      var allLetters;
+      for (const e in elementMap) {
+        allLetters = Array.from(e);
+        if (allLetters[0] == 'Y') {
+          iprbNode = elementMap[e][0];
+          break;
+        }
+      }
+    }
     if (iinOrVin == "vin") vinNode = elementMap["vin"][0];
     else iinNode = elementMap["iin"][0];
 
     // Step 2 - loop thru elementMap and start adding things to the MNA
-    var laplaceElement, firstLetter;
+    var laplaceElement;
     for (const key2 in elementMap) {
       letters = Array.from(key2);
-      if (letters[0] != "v" && letters[0] != "g" && letters[0] != "o" && letters[0] != "x" && letters[0] != "i") {
-        firstLetter = Array.from(key2)[0];
-        if (firstLetter == "R") laplaceElement = key2;
-        else if (firstLetter == "L") laplaceElement = "(s*" + key2 + ")";
+      if (letters[0] != "v" && letters[0] != "g" && letters[0] != "o" && letters[0] != "x" && letters[0] != "i" && letters[0] != 'Y') {
+        if (letters[0] == "R") laplaceElement = key2;
+        else if (letters[0] == "L") laplaceElement = "(s*" + key2 + ")";
         else laplaceElement = "1/(s*" + key2 + ")";
 
         //2.1 in the diagonal is the sum of all impedances connected to that node
@@ -226,10 +238,10 @@ export function calculateMNA(canvasState) {
     }
     if (iinOrVin == "vin") {
       //2.3 Add a 1 in the bottom row indicating which node is Vin connected too
-      mnaMatrix[mnaMatrix.length - 1 - numOpAmps][vinNode] = "1";
+      mnaMatrix[mnaMatrix.length - 1 - numOpAmps - numIprb][vinNode] = "1";
 
       //2.4 Add a 1 in the node connected to Vin to indicate that Iin flows into that node
-      mnaMatrix[vinNode][mnaMatrix.length - 1 - numOpAmps] = "1";
+      mnaMatrix[vinNode][mnaMatrix.length - 1 - numOpAmps - numIprb] = "1";
     }
 
     //2.5 For each op-amp add some 1's. It says that 2 nodes are equal to each other, and that 1 node has a new ideal current source
@@ -241,24 +253,25 @@ export function calculateMNA(canvasState) {
     var idx;
     for (const key in opAmpsMap) {
       idx = parseInt(key);
-      // console.log('setting ', idx, nodeMap.length + 1 + idx, mnaMatrix)
       if (opAmpsMap[key][0] != null) mnaMatrix[nodeMap.length + 1 + idx][opAmpsMap[idx][0]] = "1";
       if (opAmpsMap[key][1] != null) mnaMatrix[nodeMap.length + 1 + idx][opAmpsMap[idx][1]] = "-1";
       if (opAmpsMap[key][2] != null) mnaMatrix[opAmpsMap[idx][2]][nodeMap.length + 1 + idx] = "1";
-      // console.log('post-op', mnaMatrix, mnaMatrix[opAmpsMap[idx][2]][nodeMap.length + 1 + idx], opAmpsMap[idx][2], nodeMap.length + 1 + idx);
-
-      // if (Array.from(key)[0] == 'o') {
-      //   opAmp = opAmp + 1;
-      //   console.log("bp3", opAmp, key, elementMap[key])
-      //   mnaMatrix[nodeMap.length + 1 + opAmp][elementMap[key][0]] = '-1';
-      //   mnaMatrix[nodeMap.length + 1 + opAmp][elementMap[key][1]] = '1';
-      //   mnaMatrix[elementMap[key][2]][nodeMap.length + 1 + opAmp] = '1';
-      // }
     }
 
-    // console.log('elementMap', elementMap);
-    // // console.log('vin, vout and gnd node', vinNode, voutNode, gndNode);
-    // console.log('mna ', mnaMatrix);
+    //2.6 Current probes. The last rows are for current probes. 4x 1's are inserted to the Matrix, unless one node is ground
+    var iprbCounter=0;
+    for (const key in iprbMap) {
+      idx = parseInt(key);
+      if (iprbMap[key][0] != null) {
+        mnaMatrix[nodeMap.length + 1 + numOpAmps + iprbCounter][iprbMap[idx][0]] = "1";
+        mnaMatrix[iprbMap[idx][0]][ nodeMap.length + 1 + numOpAmps + iprbCounter] = "1";
+      }
+      if (iprbMap[key][1] != null) {
+        mnaMatrix[nodeMap.length + 1 + numOpAmps + iprbCounter][iprbMap[idx][1]] = "-1";
+        mnaMatrix[iprbMap[idx][1]][nodeMap.length + 1 + numOpAmps + iprbCounter] = "-1";
+      }
+      iprbCounter = iprbCounter+1;
+    }
 
     var nerdStrArr = [];
     var nerdStr = "";
@@ -266,8 +279,7 @@ export function calculateMNA(canvasState) {
       nerdStrArr.push("[" + mnaMatrix[i].join(",") + "]");
     }
     nerdStr = nerdStrArr.join(",");
-    // console.log(mnaMatrix);
-    // console.log('bp1');
+    if (debug) console.log('mnaMatrix', mnaMatrix);
 
     //Using algebrite not nerdamer
     // const start = Date.now();
@@ -282,9 +294,18 @@ export function calculateMNA(canvasState) {
         Algebrite.eval("inv_mna = inv(mna)");
         // Algebrite.eval("inv_mna")
         if (iinOrVin == "vin") {
-          Algebrite.eval("mna_vo_vi = (inv_mna[" + (voutNode + 1) + "][" + (mnaMatrix.length - numOpAmps) + "])");
+          if ((chosenPlot=="vo") || (iprbNode==null)) {
+            Algebrite.eval("mna_vo_vi = (inv_mna[" + (voutNode + 1) + "][" + (mnaMatrix.length - numOpAmps - numIprb) + "])");
+          } else {
+            //current thru the probe is this equation
+            Algebrite.eval("mna_vo_vi = (inv_mna[" + (mnaMatrix.length) + "][" + (mnaMatrix.length - numOpAmps - numIprb) + "])");
+          }
         } else {
-          Algebrite.eval("mna_vo_vi = (inv_mna[" + (voutNode + 1) + "][" + (iinNode + 1) + "])");
+          if ((chosenPlot=="vo") || (iprbNode==null)) {
+            Algebrite.eval("mna_vo_vi = (inv_mna[" + (voutNode + 1) + "][" + (iinNode + 1) + "])");
+          } else {
+            Algebrite.eval("mna_vo_vi = (inv_mna[" + (mnaMatrix.length) + "][" + (iinNode + 1) + "])");
+          }
         }
       }
       //Original: 38ms
@@ -292,7 +313,11 @@ export function calculateMNA(canvasState) {
       //Remove simplify: 15ms
       var strOut = Algebrite.eval("mna_vo_vi").toString(); //4ms
 
-      // console.log(strOut);
+      // if (iprbNode!=null) console.log('iprb result', Algebrite.eval("iprb").toString() );
+
+      
+
+
       [resString, resMathML] = simplify_algebra(strOut);
       schematicReadiness.solvable = true;
     } catch (err) {
@@ -302,17 +327,17 @@ export function calculateMNA(canvasState) {
       resString = "";
     }
 
-    var bilinearMathML = null;
+    // var bilinearMathML = null;
     // var bilinearMathML = calcBilinear(); // FIXME - call on button click
   } else {
     resMathML = "<mtext>Schematic currently invalid</mtext>";
-    bilinearMathML = "<mtext>Schematic currently invalid</mtext>";
+    // bilinearMathML = "<mtext>Schematic currently invalid</mtext>";
     schematicReadiness.solvable = false;
   }
 
   // console.log('bp2', resString)
 
-  return [schematicReadiness, resMathML, allElements, resString, bilinearMathML, iinOrVin];
+  return [schematicReadiness, resMathML, allElements, resString, iinOrVin, Object.keys(iprbMap)];
 }
 
 export function calcBilinear() {

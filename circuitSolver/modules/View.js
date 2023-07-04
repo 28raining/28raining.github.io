@@ -21,6 +21,7 @@ export class View extends draw2d.Canvas {
     this.rCounter = 0;
     this.cCounter = 0;
     this.lCounter = 0;
+    this.iprbCounter = 0;
     this.elements = [];
     this.dropCb = dropCB;
     this.getElements = getElements;
@@ -58,7 +59,7 @@ export class View extends draw2d.Canvas {
     } else return name;
   }
 
-  addShapeToSchem(type, x, y) {
+  addShapeToSchem(type, x, y, id) {
     // console.log(type, x, y)
     // console.log(this.getElements());
 
@@ -82,6 +83,17 @@ export class View extends draw2d.Canvas {
       },
     });
 
+    if (id) {
+      if ((type == "res") || (type == "cap") || (type == "ind") || (type == "iprobe") || (type == "op")) {
+        var newCount = parseInt(id.slice(1))
+        if (type == "res") this.rCounter = Math.max(this.rCounter, newCount);
+        if (type == "cap") this.cCounter = Math.max(this.cCounter, newCount);
+        if (type == "ind") this.lCounter = Math.max(this.lCounter, newCount);
+        if (type == "iprobe") this.iprbCounter = Math.max(this.iprbCounter, newCount);
+        if (type == "op") this.opCounter = Math.max(this.opCounter, newCount);
+      }
+    }
+
     // console.log(x, y)
     x = 16 * Math.round(x / 16);
     y = 16 * Math.round(y / 16);
@@ -92,7 +104,8 @@ export class View extends draw2d.Canvas {
       var outputLocator = new MyInputPortLocator(48, 16);
       e.createPort("hybrid", inputLocator);
       e.createPort("hybrid", outputLocator);
-      e.id = `R${this.rCounter}`;
+      if (id) e.id = id;
+      else e.id = `R${this.rCounter}`;
       e.add(new draw2d.shape.basic.Text({ text: this.getName(e.id, this.getElements()), stroke: 0 }), new draw2d.layout.locator.TopLocator());
       this.rCounter = this.rCounter + 1;
       e.installEditPolicy(new SelectionMenuPolicy());
@@ -102,7 +115,8 @@ export class View extends draw2d.Canvas {
       var outputLocator = new MyInputPortLocator(16, 48);
       e.createPort("hybrid", inputLocator);
       e.createPort("hybrid", outputLocator);
-      e.id = `C${this.cCounter}`;
+      if (id) e.id = id;
+      else e.id = `C${this.cCounter}`;
       e.add(new draw2d.shape.basic.Text({ text: this.getName(e.id, this.getElements()), stroke: 0 }), new draw2d.layout.locator.RightLocator());
       this.cCounter = this.cCounter + 1;
       e.installEditPolicy(new SelectionMenuPolicy());
@@ -112,7 +126,8 @@ export class View extends draw2d.Canvas {
       var outputLocator = new MyInputPortLocator(65, 16);
       e.createPort("hybrid", inputLocator);
       e.createPort("hybrid", outputLocator);
-      e.id = `L${this.lCounter}`;
+      if (id) e.id = id;
+      else e.id = `L${this.lCounter}`;
       e.add(new draw2d.shape.basic.Text({ text: this.getName(e.id, this.getElements()), stroke: 0 }), new draw2d.layout.locator.TopLocator());
       this.lCounter = this.lCounter + 1;
       e.installEditPolicy(new SelectionMenuPolicy());
@@ -139,6 +154,17 @@ export class View extends draw2d.Canvas {
       e.createPort("hybrid", inputLocator);
       // e.createPort("hybrid",outputLocator);
       e.id = `xvout`;
+    } else if (type == "iprobe") {
+      var e = new shapeIprobe({ x: x, y: y });
+      var inputLocator = new MyInputPortLocator(0, 32);
+      e.createPort("hybrid", inputLocator);
+      e.createPort("hybrid", new MyInputPortLocator(64, 32));
+      // e.createPort("hybrid",outputLocator);
+      if (id) e.id = id;
+      else e.id = `Y${this.iprbCounter}`;
+      e.add(new draw2d.shape.basic.Text({ text: this.getName(`iPrb${this.iprbCounter}`, this.getElements()), stroke: 0 }), new draw2d.layout.locator.TopLocator());
+      this.iprbCounter = this.iprbCounter + 1;
+
     } else if (type == "op") {
       var e = new shapeOpamp({ x: x, y: y });
       var inputALocator = new MyInputPortLocator(0, 32);
@@ -147,16 +173,17 @@ export class View extends draw2d.Canvas {
       e.createPort("hybrid", inputALocator);
       e.createPort("hybrid", inputBLocator);
       e.createPort("hybrid", outputLocator);
-      e.id = `op${this.opCounter}`;
+      if (id) e.id = id;
+      else e.id = `op${this.opCounter}`;
       this.opCounter = this.opCounter + 1;
     } else console.log("ERROR: You gave a bad type: ", type);
 
     this.x = x;
     this.y = y;
     e.resizeable = false;
+    // console.log('add', add);
     var add = this.dropCb(e, (a) => this.addToSchematic(a));
     // add = true;
-    // console.log('add', add);
 
     // if (add) {
     //   e.resizeable = false;
@@ -175,6 +202,7 @@ export class View extends draw2d.Canvas {
     this.cCounter = 0;
     this.lCounter = 0;
     this.opCounter = 0;
+    this.iprbCounter = 0;
     console.log("cleared, now adding this", startupSchematic);
 
     var connections = [];
@@ -188,8 +216,11 @@ export class View extends draw2d.Canvas {
         connections.push(newConn);
         id = id + 1;
       } else {
+        // console.log(item)
         var type;
-        var firstLetter = item.firstLetter;
+        var firstLetter = Array.from(item.id)[0];
+
+        // var firstLetter = item.firstLetter;
         if (firstLetter == "R") type = "res";
         else if (firstLetter == "C") type = "cap";
         else if (firstLetter == "L") type = "ind";
@@ -197,9 +228,10 @@ export class View extends draw2d.Canvas {
         else if (firstLetter == "v") type = "vin";
         else if (firstLetter == "i") type = "iin";
         else if (firstLetter == "x") type = "xvout";
+        else if (firstLetter == "Y") type = "iprobe";
         // console.log(item, type)
 
-        this.addShapeToSchem(type, item.x, item.y);
+        this.addShapeToSchem(type, item.x, item.y, item.id);
       }
     });
 
