@@ -55,7 +55,10 @@ function Toasts({ toastMxVIsource, toastCopiedLatex, toastCopiedMathML }) {
           <strong className="me-auto">Copied to clipboard</strong>
           <button type="button" className="btn-close" data-bs-dismiss="toast"></button>
         </div>
-        <div className="toast-body">Copied to your clipboard. Here's a free online latex editor: <a className="text-white" href="https://latexeditor.lagrida.com/" target="_blank">https://latexeditor.lagrida.com/</a></div>
+        <div className="toast-body">
+          Copied to your clipboard. Here's a free online latex editor:
+          <a className="text-white" href="https://latexeditor.lagrida.com/" target="_blank">https://latexeditor.lagrida.com/</a>
+        </div>
       </div>
 
       <div id="liveToast" className="toast bg-success text-white" role="alert" ref=${toastCopiedMathML}>
@@ -63,7 +66,10 @@ function Toasts({ toastMxVIsource, toastCopiedLatex, toastCopiedMathML }) {
           <strong className="me-auto">Copied to clipboard</strong>
           <button type="button" className="btn-close" data-bs-dismiss="toast"></button>
         </div>
-        <div className="toast-body">Copied to your clipboard. Here's a free online MathML editor: <a className="text-white" href="https://codepen.io/bqlou/pen/yOgbmb" target="_blank">https://codepen.io/bqlou/pen/yOgbmb</a></div>
+        <div className="toast-body">
+          Copied to your clipboard. Here's a free online MathML editor:
+          <a className="text-white" href="https://codepen.io/bqlou/pen/yOgbmb" target="_blank">https://codepen.io/bqlou/pen/yOgbmb</a>
+        </div>
       </div>
     </div>
   `;
@@ -318,9 +324,11 @@ function updateGraph(el, freq, mag) {
 
 function TransformResults(props) {
   // console.log(props)
-  const mathMlString = `<math>${props.chosen == 'vo' ? `<mfrac><mrow><mi>V</mi><mn>o</mn></mrow><mrow><mi>${props.iinOrVin == "vin" ? "V" : "I"}</mi><mn>i</mn></mrow></mfrac>` : `<msub><mi>I</mi><mn>prb0</mn></msub>` }<mo>=</mo>${
-    props.latex
-  }</math>`;
+  const mathMlString = `<math>${
+    props.chosen == "vo"
+      ? `<mfrac><mrow><mi>V</mi><mn>o</mn></mrow><mrow><mi>${props.iinOrVin == "vin" ? "V" : "I"}</mi><mn>i</mn></mrow></mfrac>`
+      : `<msub><mi>I</mi><mn>prb0</mn></msub>`
+  }<mo>=</mo>${props.latex}</math>`;
   var z = html`
     <div key="c1" className="col-12">
       <div key="r1" className="row">
@@ -329,18 +337,31 @@ function TransformResults(props) {
         </div>
         <div key="select" className="col-6 text-end">
           <div className="form-check form-check-inline">
-            <input key="radio" className="form-check-input" type="radio" name="${`${props.title}inlineRadioOptions`}" value="vo" checked=${props.chosen == 'vo'} onChange=${(e) => props.handlePlotChange(e)} />
+            <input
+              key="radio"
+              className="form-check-input"
+              type="radio"
+              name="${`${props.title}inlineRadioOptions`}"
+              value="vo"
+              checked=${props.chosen == "vo"}
+              onChange=${(e) => props.handlePlotChange(e)} />
             <label key="lable" className="form-check-label">${props.iinOrVin == "vin" ? "Vo/Vi" : "Vo/Ii"}</label>
           </div>
-          ${props.iprbList.map(Y => {
-          return html`
-                    <div className="form-check form-check-inline" key="iprb${Y}">
-            <input key="radio" className="form-check-input" type="radio" name="${`${props.title}inlineRadioOptions`}" value="Y${Y}" checked=${props.chosen == `Y${Y}`} onChange=${(e) => props.handlePlotChange(e)} />
-            <label key="lable" className="form-check-label">Iprb${Y}</label>
-          </div>
-          `
+          ${props.iprbList.map((Y) => {
+            return html`
+              <div className="form-check form-check-inline" key="iprb${Y}">
+                <input
+                  key="radio"
+                  className="form-check-input"
+                  type="radio"
+                  name="${`${props.title}inlineRadioOptions`}"
+                  value="Y${Y}"
+                  checked=${props.chosen == `Y${Y}`}
+                  onChange=${(e) => props.handlePlotChange(e)} />
+                <label key="lable" className="form-check-label">Iprb${Y}</label>
+              </div>
+            `;
           })}
-
         </div>
       </div>
       <div key="r2" className="row text-center fs-3 py-2">
@@ -614,7 +635,7 @@ class Game extends React.Component {
         gnd: false,
         solvable: false,
       },
-      chosenPlot:'vo'
+      chosenPlot: "vo",
     };
 
     this.TESTER = null;
@@ -637,7 +658,6 @@ class Game extends React.Component {
 
   calculateTF() {
     const current = this.state.history[this.state.history.length - 1];
-    // console.log(this.schematicReady())
     if (!this.schematicReady()) {
       // console.log('thhhhh')
       updateGraph(this.TESTER, [], []);
@@ -671,7 +691,7 @@ class Game extends React.Component {
 
     for (var f = fmin; f < fmax; f = f * fstep) {
       this.freq.push(f);
-      this.mag.push(20 * Math.log10(eval(res.replace(re, 2 * Math.PI * f))));
+      this.mag.push(20 * Math.log10(Math.abs(eval(res.replace(re, 2 * Math.PI * f)))));
     }
 
     // console.log("response: ", this.freq, this.mag )
@@ -698,13 +718,13 @@ class Game extends React.Component {
 
     //prevent multiple current probes
     var allLetters = Array.from(a.id);
-    if (allLetters[0] == 'Y') {
+    if (allLetters[0] == "Y") {
       for (const e in this.state.elOnSchematic) {
         allLetters = Array.from(e);
-        if (allLetters[0] == 'Y') {
+        if (allLetters[0] == "Y") {
           this.bsToast.show();
           return;
-          }
+        }
       }
     }
     addToSchematic(a);
@@ -816,7 +836,7 @@ class Game extends React.Component {
       );
     } else {
       // console.log(iprbList, iprbList.length);
-      if(iprbList.length==0) this.setState({chosenPlot: 'vo'});
+      if (iprbList.length == 0) this.setState({ chosenPlot: "vo" });
       this.setState(
         {
           history: this.state.history.concat([current]),
@@ -887,11 +907,10 @@ class Game extends React.Component {
     // return;
     this.setState(
       {
-        chosenPlot : e.target.value
-      }, ()=>this.redrawSchematic(current)
+        chosenPlot: e.target.value,
+      },
+      () => this.redrawSchematic(current)
     );
-    
-    
   }
 
   handleUnitChange(e, i) {
@@ -968,7 +987,6 @@ class Game extends React.Component {
       this.setState({
         history: this.state.history,
       });
-
 
       // this.setState(
       //   {
@@ -1048,21 +1066,22 @@ class Game extends React.Component {
             </div>
           </div>
           <div key="bilin" className="row my-2 py-1 shadow-sm rounded bg-lightgreen">
-
-          <${TransformResults}
-            name="World"
-            key="TransformResultsBilin"
-            title="Bilinear"
-            latex=${this.state.bilinearMathML}
-            iinOrVin=${this.state.iinOrVin}
-            iprbList=${[]}
-            copiedToast=${this.copiedToast}
-            handleRequestBilin=${() => this.handleRequestBilin()}
-            copiedToastML=${this.copiedToastML} 
-            handlePlotChange=${(e) => this.handlePlotChange(e)}
-            chosen=${this.state.chosenPlot} />
-          <${Comments} key="comments" />
-        </div>
+            <${TransformResults}
+              name="World"
+              key="TransformResultsBilin"
+              title="Bilinear"
+              latex=${this.state.bilinearMathML}
+              iinOrVin=${this.state.iinOrVin}
+              iprbList=${[]}
+              copiedToast=${this.copiedToast}
+              handleRequestBilin=${() => this.handleRequestBilin()}
+              copiedToastML=${this.copiedToastML}
+              handlePlotChange=${(e) => this.handlePlotChange(e)}
+              chosen=${this.state.chosenPlot} />
+          </div>
+          <div key="comments" className="row my-2 py-1 shadow-sm rounded bg-lightgreen">
+            <${Comments} key="comments" />
+          </div>
         </div>
       </div>
     `;
