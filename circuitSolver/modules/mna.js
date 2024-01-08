@@ -123,6 +123,7 @@ function processCanvasState(canvasState) {
     if (includesElement(nodeMap[node], "gnd") < 0) mnaNodeMap.push(nodeMap[node]);
     else schematicReadiness.gnd = true;
   }
+  schematicReadiness.gnd = true //FIXME - quick hack to allow op-amp in unity gain buffer mode
 
   var iinOrVin = "vin";
 
