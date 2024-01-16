@@ -313,13 +313,16 @@ export function calculateMNA(canvasState, chosenPlot) {
       //Remove eval: 35ms
       //Remove simplify: 15ms
       var strOut = Algebrite.eval("mna_vo_vi").toString(); //4ms
-
+      
       // if (iprbNode!=null) console.log('iprb result', Algebrite.eval("iprb").toString() );
 
       
 
 
-      [resString, resMathML] = simplify_algebra(strOut);
+      var xyz= simplify_algebra(strOut);
+      resString = xyz[0]
+      resMathML = xyz[1]
+      // [resString, resMathML] = simplify_algebra(strOut);
       schematicReadiness.solvable = true;
     } catch (err) {
       console.log("Solving failed with this error:", err);

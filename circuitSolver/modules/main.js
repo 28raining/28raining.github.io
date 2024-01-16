@@ -388,6 +388,17 @@ function TransformResults(props) {
                     }}>
                     Copy MathML
                   </button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary py-0"
+                    onClick=${() => {
+                      // const newLatex = MathML2LaTeX.convert(mathMlString);
+                      var encoded_latex = encodeURIComponent(props.resString);
+                      var newURL = `https://www.wolframalpha.com/input?i2d=true&i=${encoded_latex}`
+                      window.open(newURL, '_blank');
+                    }}>
+                    Wolfram Alpha
+                  </button>
                 </div>
               </div>`
           : html`<button
@@ -1050,6 +1061,7 @@ class Game extends React.Component {
               iprbList=${this.state.iprbList}
               copiedToast=${this.copiedToast}
               copiedToastML=${this.copiedToastML}
+              resString=${this.resString}
               handlePlotChange=${(e) => this.handlePlotChange(e)}
               chosen=${this.state.chosenPlot} />
 
