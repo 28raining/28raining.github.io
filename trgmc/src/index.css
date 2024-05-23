@@ -1,0 +1,30 @@
+@keyframes example2 {
+  0%   {background-color: rgba(95, 188, 222, 0.5)}
+  40%   {background-color: rgba(95, 188, 222, 0.5)}
+  100%  {background-color: rgba(95, 188, 222,0.0)}
+}
+@keyframes example3 {
+  0%   {background-color: rgba(95, 188, 222, 0.5)}
+  40%   {background-color: rgba(95, 188, 222, 0.5)}
+  100%  {background-color: rgba(95, 188, 222,0.0)}
+}
+
+.anim1 {
+  animation-name: "example2";
+  animation-duration: 1.5s;
+}
+.anim2 {
+  animation-name: "example3";
+  animation-duration: 1.5s;
+}
+
+.plotHeight {
+  height: calc(100vh - 100px)
+}
+
+/* .outputLabelWidth {
+  width: 250px;
+} */
+.mw-130 {
+  min-width: 130px;
+}
