@@ -17,21 +17,11 @@ Currently, two official plugins are available:
 # Todo
 
 ## Important
-- re-fix all the input boxes
--- form validation (no -ve numbers)
--- why "56-" shows NaN
---- make monthly payment small
-- all inputs should be string, so middle character can be deleted without cursor moving
-- property tax with monthly input
--- hoa and insurance 
-- test everything
--- no console issues
-- percents should have 2 decimal points
--- Make sure all numbers are treated as strings
 - Show breakdown of total repayments
-- Fix rounding issue which means final payment != monthly payment
 - get a domain, make the site live
-- Crashes when put a letter into loan length. Or 0
+- fix total repayment when overpayment & refinance added
+- show amount saved by doing overpayment
+
 
 ## Later
 - hover over explains how th eboxes were calculated
@@ -54,15 +44,32 @@ Currently, two official plugins are available:
 - build run a strict linter
 - put input in URL
 - little padlock showing that value won't change?
+- typing '.' at the end of homeVal adds a zero to the front?
+- setting downpay cash to 15%, make homeValue big, make homeValue small
 
 
 
 
 
 # Done
+- limit % to <100
+- Crashes when put a letter into loan length. Or 0
+- Fix rounding issue which means final payment != monthly payment
+- percents should have 2 decimal points
+-- Make sure all numbers are treated as strings
+-- no console issues
+- test everything
+- re-fix all the input boxes
+-- Property tax can't be bigger than monthly payment
+- all inputs should be string, so middle character can be deleted without cursor moving
+- when box contains just 0 and user types '5', display '5' not '05'
+-- form validation (no -ve numbers)
+-- why "56-" shows NaN
+-- All loan maths should happen on first render, and after user input. Not on every render. This means previous results can be saved if invalid input is given
 - when edit event then highlight the text temporarily
 -- Put all the user changes into a reducer function. This will allow easier flash handling, and less prop drilling
-
+- property tax with monthly input
+-- hoa and insurance 
 - separate tax, hoa and insurance. Use nice color separation
 - RE-FORMAT
 -- Finish mobile optimization

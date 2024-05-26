@@ -1,21 +1,25 @@
-function loanCalc(numMonths, interestRate, loanAmount, chosenInput, monthlyPaymentInput, downPayCash, monthlyExtraPercent, monthlyExtraFee) {
+function loanCalc(numMonths, interestRate, loanAmount, chosenInput, monthlyPaymentInput, downPay, userSetDownPercent, monthlyExtraPercent, monthlyExtraFee) {
   // console.log('loanCalc', numMonths, interestRate, loanAmount, chosenInput, monthlyPaymentInput, downPayCash, monthlyExtraPercent, monthlyExtraFee)
 
   var monthlyInterest = 1 + interestRate / (12 * 100);
   var interestScalar = monthlyInterest ** numMonths;
-  var T = (monthlyExtraPercent/100);
+  var T = monthlyExtraPercent / 100;
 
-
-  if (chosenInput == "monthly_payment") {
+  if (chosenInput == "monthlyPayment") {
     var actualMonthly = monthlyPaymentInput - monthlyExtraFee;
     var totalRepay = numMonths * actualMonthly;
     if (interestRate == 0) {
       var loanAmount_new = totalRepay;
+      var homeVal = userSetDownPercent ? loanAmount_new/(1 - downPay) : loanAmount_new + downPay ;
     } else {
-      var Z = ((interestScalar - 1) / (interestRate / (12 * 100))) / interestScalar;
-      // console.log('bp7', actualMonthly, T, Z, interestRate, interestScalar)
-      var homeVal = (actualMonthly / (T + 1/Z)) + downPayCash/(T*Z + 1);
-      var loanAmount_new = homeVal - downPayCash;
+      var Z = (interestScalar - 1) / (interestRate / (12 * 100)) / interestScalar;
+      if (userSetDownPercent) {
+        var homeVal = actualMonthly / (T + 1 / Z) / (1 - downPay / (T * Z + 1));
+        var loanAmount_new = homeVal / (1 + downPay);
+      } else {
+        var homeVal = actualMonthly / (T + 1 / Z) + downPay / (T * Z + 1);
+        var loanAmount_new = homeVal - downPay;
+      }
       var monthlyTax = homeVal * T;
 
       // var compoundTotalRepay = actualMonthly * ((interestScalar - 1) / (interestRate / (12 * 100)));
@@ -23,7 +27,13 @@ function loanCalc(numMonths, interestRate, loanAmount, chosenInput, monthlyPayme
     }
     // console.log('bp85', loanAmount, loanAmount_new, actualMonthly, monthlyTax, numMonths, interestScalar, monthlyExtraFee)
 
-    return { monthly: actualMonthly - monthlyTax, totalRepay: totalRepay, loanAmount: loanAmount_new, monthlyExta: monthlyTax+monthlyExtraFee };
+    return {
+      monthly: actualMonthly - monthlyTax,
+      totalRepay: totalRepay,
+      loanAmount: loanAmount_new,
+      monthlyExta: monthlyTax + monthlyExtraFee,
+      homeVal: homeVal,
+    };
   } else {
     var totalRepay = loanAmount * interestScalar;
     if (interestRate == 0) {
@@ -33,33 +43,55 @@ function loanCalc(numMonths, interestRate, loanAmount, chosenInput, monthlyPayme
       var monthly = totalRepay / ((interestScalar - 1) / (interestRate / (12 * 100)));
       var newTotalRepay = monthly * numMonths;
     }
-    var monthlyTax = (loanAmount+downPayCash) * T;
-    // console.log('bp85', loanAmount, monthlyTax, numMonths, interestScalar, monthlyExtraFee)
+    var homeVal = userSetDownPercent ? loanAmount / (1 - downPay) : (loanAmount + downPay);
+    var monthlyTax = T * homeVal;
+    // console.log('bp85', homeVal)
 
-    return { monthly: monthly, totalRepay: newTotalRepay, loanAmount: loanAmount, monthlyExta: monthlyTax + monthlyExtraFee };
+    return { monthly: monthly, totalRepay: newTotalRepay, loanAmount: loanAmount, monthlyExta: monthlyTax + monthlyExtraFee, homeVal: homeVal };
   }
 }
 
-export default function loanMaths(loanAmount, numYears, interestRate, loanEvent, chosenInput, monthlyPaymentInput, downPayCash, monthlyExtraPercent, monthlyExtraFee) {
+export default function loanMaths(
+  loanAmount,
+  numYears,
+  interestRate,
+  loanEvent,
+  chosenInput,
+  monthlyPaymentInput,
+  downPay,
+  userSetDownPercent,
+  monthlyExtraPercent,
+  monthlyExtraFee
+) {
   // console.log('loanMaths', loanAmount, numYears, interestRate, loanEvent, chosenInput, monthlyPaymentInput, downPayCash, monthlyExtraPercent, monthlyExtraFee)
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   var loanMonths = [];
   var monthIndex;
   var start = 4;
   var thisMonth;
-  var year = new Date().getFullYear();// % 100;
+  var year = new Date().getFullYear(); // % 100;
   var eventIndex = 0;
   var monthlyPaymentPerEvent = [];
 
   var numMonths = numYears * 12;
 
-  var loanData = loanCalc(numMonths, interestRate, loanAmount, chosenInput, monthlyPaymentInput, downPayCash, monthlyExtraPercent, monthlyExtraFee);
+  var loanData = loanCalc(
+    numMonths,
+    interestRate,
+    loanAmount,
+    chosenInput,
+    monthlyPaymentInput,
+    downPay,
+    userSetDownPercent,
+    monthlyExtraPercent,
+    monthlyExtraFee
+  );
 
   var monthlyPayment = new Array(numYears * 12);
   var monthlyInterest = new Array(numYears * 12);
   var monthlyPrincipal = new Array(numYears * 12);
   var remaining = new Array(numYears * 12 + 1);
-  var loanCopy = {...loanData};
+  var loanCopy = { ...loanData };
   remaining[0] = loanCopy["loanAmount"];
 
   var rate = interestRate / 100;
@@ -81,8 +113,7 @@ export default function loanMaths(loanAmount, numYears, interestRate, loanEvent,
           rate = Number(loanEvent[eventIndex].change) / 100;
           remaining[i] = remaining[i] + loanEvent[eventIndex].cost;
           if (loanEvent[eventIndex]["newLength"] != 0) numMonths = i + loanEvent[eventIndex]["newLength"] * 12;
-          loanData = loanCalc(numMonths - i, rate * 100, remaining[i], "house_value", null, 0, monthlyExtraPercent, monthlyExtraFee);
-          eventIndex = eventIndex + 1;
+          loanData = loanCalc(numMonths - i, rate * 100, remaining[i], "homeVal", null, 0, 0, monthlyExtraPercent, monthlyExtraFee);
         }
         eventIndex = eventIndex + 1;
       }
@@ -93,7 +124,7 @@ export default function loanMaths(loanAmount, numYears, interestRate, loanEvent,
         if (loanEvent[eventIndex]["event"] == "Recast") {
           // rate = loanEvent[eventIndex].change/100;
           remaining[i] = remaining[i] + loanEvent[eventIndex].cost;
-          loanData = loanCalc(numMonths - i, interestRate, remaining[i], "house_value", null, 0, monthlyExtraPercent, monthlyExtraFee);
+          loanData = loanCalc(numMonths - i, interestRate, remaining[i], "homeVal", null, 0, 0, monthlyExtraPercent, monthlyExtraFee);
           eventIndex = eventIndex + 1;
         }
       }
@@ -129,6 +160,7 @@ export default function loanMaths(loanAmount, numYears, interestRate, loanEvent,
     numMonths: numMonths,
     remaining: remaining,
     totalRepay: loanData["totalRepay"],
+    homeVal: loanData["homeVal"],
     monthlyPaymentPerEvent: monthlyPaymentPerEvent,
   };
 }

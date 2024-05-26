@@ -3,6 +3,8 @@ import { DashCircle, Pen } from "react-bootstrap-icons";
 // import Modal from "react-bootstrap/Modal";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
+import {cashFormat} from "./LoanForm"
+import {isNumber} from "./App"
 
 function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEvent }) {
   const [chosenEvent, setChosenEvent] = useState("Over-payment");
@@ -10,6 +12,8 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
   const [chosenDate, setChosenDate] = useState(loanMonths[1]);
   const [newLength, setNewLength] = useState(0);
   const [cost, setCost] = useState(100);
+
+  // console.log(monthlyPaymentPerEvent);  
 
   // const handleClose = () => setShow(false);
   // const handleShow = () => setShow(true);
@@ -54,20 +58,20 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
     return true;
   }
 
-  const validDate = loanMonths.indexOf(chosenDate) > 0;
+  const validDate = loanMonths.indexOf(chosenDate) >= 0;
   const validRecast = validRecastDate();
   const validOverpay = chosenEvent != "Over-payment" || newChange > 0;
   const canRefi = noOtherEvents();
   const canAdd = validDate & validRecast & validOverpay & canRefi;
   const canAddText = "Correct the form";
-  const canRefiText = "Cannot refinance on same day as other event";
   const overPayText = "Overpay must be > 0";
 
   function addEvent() {
     var newEvent = {};
     newEvent["event"] = chosenEvent;
     newEvent["date"] = chosenDate;
-    newEvent["cost"] = cost;
+    if (isNumber(cost)) newEvent["cost"] = parseFloat(cost);
+    else newEvent["cost"] = 0;
     if (chosenEvent == "Recast") newEvent["change"] = "-";
     else newEvent["change"] = newChange;
 
@@ -77,16 +81,19 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
     newEventObj.push(newEvent);
     newEventObj.sort(sortEvents);
     setLoanEvent(newEventObj);
+
+    var newDate = loanMonths.indexOf(chosenDate) + 1;
+    setChosenDate(loanMonths[newDate])
   }
 
   return (
-    <div className="row shadow-sm border rounded mb-2 py-2 mx-0">
-      <div className="col-12">
+    <div className="row shadow-sm border rounded mb-2 py-2 mx-0" key="row0">
+      <div className="col-12" key="col0">
         <div className="row">
           <div className="col-12" key="col1">
             <div className="input-group ">
               {eventList.map((x, i) => (
-                <OverlayTrigger overlay={<Tooltip>{description[x]}</Tooltip>}>
+                <OverlayTrigger overlay={<Tooltip key={`evDescTool_${i}`}>{description[x]}</Tooltip>} key={`evDesc_${i}`}>
                   <div className="form-check form-check-inline" key={x}>
                     <input
                       className="form-check-input"
@@ -95,7 +102,7 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
                       checked={chosenEvent == x}
                       value={x}
                       onChange={(e) => {
-                        if (e.target.value == "Refinance") setNewChange(5);
+                        if (e.target.value == "Refinance") setNewChange("5.00");
                         setChosenEvent(e.target.value);
                       }}
                     />
@@ -109,8 +116,15 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
         <div className="row">
           <div className={chosenEvent == "Recast" ? "col-6" : "col-xl-3 col-6"}>
             <label>Date:</label>
+            <select className="form-select mb-1" onChange={(e) => setChosenDate(e.target.value)} value={chosenDate}>
+              {loanMonths.map((x) => (
+                <option value={x} key={x}>
+                  {x}
+                </option>
+              ))}
+            </select>
 
-            <input
+            {/* <input
               className={validDate ? "form-control px-1" : "form-control px-1 is-invalid"}
               list="datalistOptions"
               placeholder="Chose the month..."
@@ -121,7 +135,7 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
               {loanMonths.map((x) => (
                 <option value={x} key={x} />
               ))}
-            </datalist>
+            </datalist> */}
             {!validDate ? (
               <div className="invalid-feedback" style={{ display: "initial" }}>
                 Date invalid
@@ -139,6 +153,8 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
           {chosenEvent == "Recast" ? null : (
             <div className="col-xl-3 col-6" key="col2">
               <label>{chosenEvent == "Over-payment" ? "Amount" : "New rate"}</label>
+              <div className="input-group ">
+
               <input
                 type="text"
                 className="form-control px-1"
@@ -147,14 +163,21 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
                     ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0, minimumFractionDigits: 0 }).format(
                         newChange
                       )
-                    : new Intl.NumberFormat("en-US", { style: "percent", maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(newChange / 100)
+                    : newChange
                 }
                 onChange={(e) => {
                   var stripped = e.target.value.replace(/[^0-9.-]+/g, "");
-                  console.log(stripped, e.target.value);
+                  // console.log(stripped, e.target.value);
                   setNewChange(stripped);
                 }}
+                
               />
+              {chosenEvent == "Over-payment" ? null :
+                              <span className="input-group-text" id="basic-addon1">
+                  %
+                </span>
+}
+                </div>
               {!validOverpay ? (
                 <div className="invalid-feedback" style={{ display: "initial" }}>
                   {overPayText}
@@ -186,7 +209,7 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
                 </button>
               </div>
             ) : (
-              <OverlayTrigger overlay={<Tooltip id="allowAdd">{canAddText}</Tooltip>}>
+              <OverlayTrigger key="AddHelper" overlay={<Tooltip id="allowAdd" key={`AddHelperTt`}>{canAddText}</Tooltip>}>
                 <div className="d-grid gap-2">
                   <button
                     type="button"
@@ -233,9 +256,9 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
                     <th scope="col"></th>
                   </tr>
                 </thead>
-                <tbody>
                   {loanEvent.map((x, i) => (
-                    <>
+                <tbody key={i}>
+
                       <tr key={i}>
                         <th scope="row">{i + 1}</th>
                         <td>{x["event"]}</td>
@@ -247,7 +270,7 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
                             maximumFractionDigits: 0,
                           }).format(x["cost"])}
                         </td>
-                        <td>{x["change"]}</td>
+                        <td>{`${x["change"]}${x["event"] == "Refinance" ? '%' : ''}`}</td>
                         <td key="pen">
                           <span
                             style={{ cursor: "pointer" }}
@@ -263,8 +286,8 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
                               setLoanEvent(newEventObj);
                             }}
                           >
-                            <OverlayTrigger overlay={<Tooltip>{"Edit"}</Tooltip>}>
-                              <Pen color="blue" size={16} />
+                            <OverlayTrigger key={`overlay_edit_${i}`} overlay={<Tooltip key={`overlay_edit_tt_${i}`}>{"Edit"}</Tooltip>}>
+                              <Pen color="blue" size={16}  key="iconPen"/>
                             </OverlayTrigger>
                           </span>
 
@@ -277,27 +300,26 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
                               setLoanEvent(newEventObj);
                             }}
                           >
-                            <OverlayTrigger overlay={<Tooltip>{"Remove"}</Tooltip>}>
-                              <DashCircle color="blue" size={16} />
+                            <OverlayTrigger key={`overlay_rm_${i}`} overlay={<Tooltip key={`overlay_rm_tt_${i}`}>{"Remove"}</Tooltip>}>
+                              <DashCircle color="blue" size={16} key="iconCircle"/>
                             </OverlayTrigger>
                           </span>
                         </td>
                       </tr>
                       {x["event"] == "Refinance" ? (
                         <>
-                          <tr>
+                          <tr key={'refi1'}>
                             <td></td>
-                            <td colSpan={5}>New loan length: {x["newLength"]}yr</td>
+                            <td colSpan={5}>New loan length: {x["newLength"] == "" ? <em>unchanged</em> : `${x["newLength"]}yr`}</td>
                           </tr>
-                          <tr>
+                          <tr key={'refi2'}>
                             <td></td>
-                            <td colSpan={5}>New monthly payment: {monthlyPaymentPerEvent[i + 1]}</td>
+                            <td colSpan={5}>New monthly payment: {cashFormat(monthlyPaymentPerEvent[i + 1])}</td>
                           </tr>
-                        </>
-                      ) : null}
                     </>
+                      ) : null}
+                        </tbody>
                   ))}
-                </tbody>
               </table>
             )}
           </div>
