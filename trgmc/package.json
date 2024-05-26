@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "eslint src && vite build",
+    "build": "prettier src --write && eslint src && vite build",
     "lint": "eslint src",
     "preview": "vite preview"
   },
@@ -16,7 +16,8 @@
     "react-bootstrap": "^2.10.1",
     "react-bootstrap-icons": "^1.11.3",
     "react-chartjs-2": "^5.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "serve": "^14.2.3"
   },
   "devDependencies": {
     "@eslint/compat": "^1.0.1",

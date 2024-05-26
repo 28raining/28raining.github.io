@@ -1,6 +1,6 @@
 import { Chart } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement } from "chart.js";
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, PointElement, LineElement); //Legend
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, BarController, LineController, Title, Tooltip, PointElement, LineElement } from "chart.js"; //Legend
+ChartJS.register(CategoryScale, LinearScale, BarElement, BarController, Title, Tooltip, PointElement, LineElement, LineController); //Legend
 import { useState } from "react";
 
 // ChartJS.register(
@@ -21,27 +21,34 @@ function LoanPlot({ maxMonthly, loanRes, loanMonths, propertyTax, hoa, insurance
 
   // console.log('rem',loanRes["remaining"])
 
-  var loanMonthsFiltered = loanMonths.filter(function (element, index, array) {
+  var loanMonthsFiltered = loanMonths.filter(function (element, index) {
     return index % indexPlot === 0;
   });
-  var monthlyPrincipalFiltered = loanRes["monthlyPrincipal"].filter(function (element, index, array) {
+  var monthlyPrincipalFiltered = loanRes["monthlyPrincipal"].filter(function (element, index) {
     return index % indexPlot === 0;
   });
-  var monthlyInterestFiltered = loanRes["monthlyInterest"].filter(function (element, index, array) {
+  var monthlyInterestFiltered = loanRes["monthlyInterest"].filter(function (element, index) {
     return index % indexPlot === 0;
   });
   // var monthlyTaxFiltered = loanRes["monthlyTax"].filter(function (element, index, array) {
   //   return index % indexPlot === 0;
   // });
-  var remainingFiltered = loanRes["remaining"].filter(function (element, index, array) {
+  var remainingFiltered = loanRes["remaining"].filter(function (element, index) {
     return index % indexPlot === 0;
   });
-  
-  const DEFAULT_PLOTLY_COLORS=['rgba(31, 119, 180, 0.6)', 'rgba(255, 127, 14, 0.6)',
-                       'rgba(44, 160, 44, 0.6)', 'rgba(214, 39, 40, 0.6)',
-                       'rgba(148, 103, 189, 0.6)', 'rgba(140, 86, 75, 0.6)',
-                       'rgba(227, 119, 194, 0.6)', 'rgba(127, 127, 127, 0.6)',
-                       'rgba(188, 189, 34, 0.6)', 'rgba(23, 190, 207, 0.6)']
+
+  const DEFAULT_PLOTLY_COLORS = [
+    "rgba(31, 119, 180, 0.6)",
+    "rgba(255, 127, 14, 0.6)",
+    "rgba(44, 160, 44, 0.6)",
+    "rgba(214, 39, 40, 0.6)",
+    "rgba(148, 103, 189, 0.6)",
+    "rgba(140, 86, 75, 0.6)",
+    "rgba(227, 119, 194, 0.6)",
+    "rgba(127, 127, 127, 0.6)",
+    "rgba(188, 189, 34, 0.6)",
+    "rgba(23, 190, 207, 0.6)",
+  ];
 
   var data = {
     labels: loanMonthsFiltered,
@@ -80,30 +87,26 @@ function LoanPlot({ maxMonthly, loanRes, loanMonths, propertyTax, hoa, insurance
     ],
   };
 
-  var title = ['Tax', 'HoA', 'Insurance'];
+  var title = ["Tax", "HoA", "Insurance"];
   [propertyTax, hoa, insurance].forEach((x, i) => {
-    if (x>0) {
+    if (x > 0) {
       // console.log('test', x)
       var plotable = [];
-      for (var z=0; z<loanMonthsFiltered.length; z++) plotable.push(x);
-      data.datasets.push(
-        {
-          type: "bar",
-          label: title[i],
-          data: plotable,
-          backgroundColor: DEFAULT_PLOTLY_COLORS[2+i],
-          hoverBackgroundColor: "rgba(0, 0, 0, 1.0)",
-          barPercentage: 1.0,
-          categoryPercentage: 1.0,
-          borderWidth: 0,
-          order: 4+i,
-          xAxisID: "x",
-        }
-      )
+      for (var z = 0; z < loanMonthsFiltered.length; z++) plotable.push(x);
+      data.datasets.push({
+        type: "bar",
+        label: title[i],
+        data: plotable,
+        backgroundColor: DEFAULT_PLOTLY_COLORS[2 + i],
+        hoverBackgroundColor: "rgba(0, 0, 0, 1.0)",
+        barPercentage: 1.0,
+        categoryPercentage: 1.0,
+        borderWidth: 0,
+        order: 4 + i,
+        xAxisID: "x",
+      });
     }
   });
-
-
 
   var options = {
     indexAxis: "y",
@@ -179,10 +182,10 @@ function LoanPlot({ maxMonthly, loanRes, loanMonths, propertyTax, hoa, insurance
           </div>
         </div>
 
-      <div className="row mx-0">
-        <div className="col-12 px-0">
-          <div className="input-group ">
-            <span className="pe-3">Show: </span>
+        <div className="row mx-0">
+          <div className="col-12 px-0">
+            <div className="input-group ">
+              <span className="pe-3">Show: </span>
               {[1, 2, 12].map((x) => (
                 <div className="form-check form-check-inline" key={x}>
                   <input
@@ -191,16 +194,16 @@ function LoanPlot({ maxMonthly, loanRes, loanMonths, propertyTax, hoa, insurance
                     name="numMonPlot"
                     checked={monthsPerYearToPlot == x}
                     value={x}
-                    onChange={(e) => setMonthsPerYearToPlot(x)}
+                    onChange={() => setMonthsPerYearToPlot(x)}
                   />
                   <label className="form-check-label">
                     {x} month{x > 1 ? "s" : null} per year
                   </label>
                 </div>
               ))}
+            </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );

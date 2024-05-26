@@ -169,7 +169,6 @@ function App() {
       newFlash["homeVal"] = !flash["homeVal"];
       if (userSetDownPercent) newFlash["downPayCash"] = !flash["downPayCash"];
       else newFlash["downPayPercent"] = !flash["downPayPercent"];
-      
     } else if (field == "monthlyPayment") {
       newChosenInput = "monthlyPayment";
       // newFlash["loanAmount"] = !flash["loanAmount"];
@@ -218,7 +217,7 @@ function App() {
       if (!isNumber(newUserInput[i])) {
         newValid[i] = "Must be a valid number";
       } else {
-        var inputNumber = parseInt(newUserInput[i])
+        var inputNumber = parseInt(newUserInput[i]);
         if (i == "homeVal" || i == "loanAmount" || i == "monthlyPayment") {
           if (inputNumber <= 0) {
             newValid[i] = "Must be a greater than 0";
@@ -232,23 +231,22 @@ function App() {
         }
         if (
           (i == "downPayPercent" && newUserSetDownPercent) ||
-          (i == "insurance" && (newUserInput.insuranceUnit>1)) ||
-          (i == "hoa" && (newUserInput.hoaUnit>1)) ||
-          (i == "propertyTax" && (newUserInput.propertyTaxUnit>1))
-         ) {
+          (i == "insurance" && newUserInput.insuranceUnit > 1) ||
+          (i == "hoa" && newUserInput.hoaUnit > 1) ||
+          (i == "propertyTax" && newUserInput.propertyTaxUnit > 1)
+        ) {
           // var newDownPay = field == "downPayCash" ? newUserInput.downPayCash : downPayCash;
           if (inputNumber > 100) {
             newValid[i] = "Must be <100%";
           }
         }
-        if (((i == "propertyTax") || (i == "hoa") || (i == "insurance"))  && (newChosenInput == "monthlyPayment")) {
+        if ((i == "propertyTax" || i == "hoa" || i == "insurance") && newChosenInput == "monthlyPayment") {
           // var newDownPay = field == "downPayCash" ? newUserInput.downPayCash : downPayCash;
           if (inputNumber > newUserInput.monthlyPayment) {
             newValid[i] = "Must be < than monthly payment";
           }
         }
       }
-
     }
     if (newChosenInput == "monthlyPayment") newValid["homeVal"] = null;
     else newValid["monthlyPayment"] = null;

@@ -62,8 +62,8 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
 
   function updateIfChanged(oldVal, newVal, name) {
     var parsedNewVal = newVal.replace(/[^0-9.]+/g, "");
-    if (oldVal != parsedNewVal) {
-      if (oldVal == "0" && isNumber(noLeading0)) {
+    if (oldVal !== parsedNewVal) {
+      if (oldVal === "0" && isNumber(parsedNewVal)) {
         var noLeading0 = parseFloat(parsedNewVal).toString();
       } else noLeading0 = parsedNewVal;
       updateUserInput(name, noLeading0);
@@ -84,13 +84,7 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
                 // className={flash["homeVal"] ? `form-control anim1 ${class_validHomeVal}` : `form-control anim2 ${class_validHomeVal}`}
                 className={inputClass["homeVal"]}
                 value={cashFormat(displayState["homeVal"])}
-                onChange={(e) =>
-                  updateIfChanged(
-                    displayState["homeVal"],
-                    e.target.value,
-                    "homeVal",
-                  )
-                }
+                onChange={(e) => updateIfChanged(displayState["homeVal"], e.target.value, "homeVal")}
               />
               <ValidFbComp x={valid["homeVal"]} />
             </div>
@@ -100,13 +94,7 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
               <input
                 type="text"
                 className={inputClass["monthlyPayment"]}
-                onChange={(e) =>
-                  updateIfChanged(
-                    displayState["monthlyPayment"],
-                    e.target.value,
-                    "monthlyPayment",
-                  )
-                }
+                onChange={(e) => updateIfChanged(displayState["monthlyPayment"], e.target.value, "monthlyPayment")}
                 value={cashFormat(displayState["monthlyPayment"])}
               />
               <ValidFbComp x={valid["monthlyPayment"]} />
@@ -133,11 +121,7 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
                   style={{ width: "70px" }}
                   value={cashFormat(displayState["downPayCash"])}
                   onChange={(e) => {
-                    updateIfChanged(
-                      displayState["downPayCash"],
-                      e.target.value,
-                      "downPayCash",
-                    );
+                    updateIfChanged(displayState["downPayCash"], e.target.value, "downPayCash");
 
                     // updateUserInput("downPayCash", e.target.value.replace(/[^0-9.]+/g, ""))
                     // updateDownPayCash(e.target.value.replace(/[^0-9.]+/g, ""));
@@ -152,11 +136,7 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
                   // className={userSetDownPercent ? "form-control" : flash["downPay"] ? "form-control anim1" : "form-control anim2"}
                   value={displayState["downPayPercent"]}
                   onChange={(e) => {
-                    updateIfChanged(
-                      displayState["downPayPercent"],
-                      e.target.value,
-                      "downPayPercent",
-                    );
+                    updateIfChanged(displayState["downPayPercent"], e.target.value, "downPayPercent");
                     // updateUserInput("downPayPercent", e.target.value)
 
                     // updateDownPayPercent(e.target.value);
@@ -178,11 +158,7 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
                 onChange={
                   (e) =>
                     // console.log("triggered loanAmount Change");
-                    updateIfChanged(
-                      displayState["loanAmount"],
-                      e.target.value,
-                      "loanAmount",
-                    )
+                    updateIfChanged(displayState["loanAmount"], e.target.value, "loanAmount")
                   // updateUserInput("loanAmount", e.target.value.replace(/[^0-9.]+/g, ""))
 
                   // setLoanAmount(e.target.value.replace(/[^0-9.]+/g, ""));
@@ -199,13 +175,7 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
                   // className="form-control"
                   className={inputClass["interestRate"]}
                   value={displayState["interestRate"]}
-                  onChange={(e) =>
-                    updateIfChanged(
-                      displayState["interestRate"],
-                      e.target.value,
-                      "interestRate",
-                    )
-                  }
+                  onChange={(e) => updateIfChanged(displayState["interestRate"], e.target.value, "interestRate")}
                 />
                 <span className="input-group-text" id="basic-addon1">
                   %
@@ -220,11 +190,7 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
                   className={inputClass["loanLength"]}
                   value={displayState["loanLength"]}
                   onChange={(e) => {
-                    updateIfChanged(
-                      displayState["loanLength"],
-                      e.target.value,
-                      "loanLength",
-                    );
+                    updateIfChanged(displayState["loanLength"], e.target.value, "loanLength");
                     // updateUserInput("loanLength", e.target.value.replace(/[^0-9.]+/g, ""));
                   }}
                 />
@@ -247,18 +213,13 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
                   type="text"
                   className={inputClass["propertyTax"]}
                   value={
-                    displayState["propertyTaxUnit"] == 0 ||
-                    displayState["propertyTaxUnit"] == 1
+                    displayState["propertyTaxUnit"] == 0 || displayState["propertyTaxUnit"] == 1
                       ? cashFormat(displayState["propertyTax"])
                       : displayState["propertyTax"]
                   }
                   onChange={(e) => {
                     // var x = Number(e.target.value.replace(/[^0-9.]+/g, ""));
-                    updateIfChanged(
-                      displayState["propertyTax"],
-                      e.target.value,
-                      "propertyTax",
-                    );
+                    updateIfChanged(displayState["propertyTax"], e.target.value, "propertyTax");
                     // updateUserInput("propertyTax", x);
 
                     // setPropertyTax(x);
@@ -292,11 +253,7 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
                 <input
                   type="text"
                   className={inputClass["hoa"]}
-                  value={
-                    displayState["hoaUnit"] == 0 || displayState["hoaUnit"] == 1
-                      ? cashFormat(displayState["hoa"])
-                      : displayState["hoa"]
-                  }
+                  value={displayState["hoaUnit"] == 0 || displayState["hoaUnit"] == 1 ? cashFormat(displayState["hoa"]) : displayState["hoa"]}
                   onChange={(e) => {
                     // var x = Number(e.target.value.replace(/[^0-9.]+/g, ""));
                     // updateUserInput("hoa", x);
@@ -337,18 +294,9 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
                   type="text"
                   className={inputClass["insurance"]}
                   value={
-                    displayState["insuranceUnit"] == 0 ||
-                    displayState["insuranceUnit"] == 1
-                      ? cashFormat(displayState["insurance"])
-                      : displayState["insurance"]
+                    displayState["insuranceUnit"] == 0 || displayState["insuranceUnit"] == 1 ? cashFormat(displayState["insurance"]) : displayState["insurance"]
                   }
-                  onChange={(e) =>
-                    updateIfChanged(
-                      displayState["insurance"],
-                      e.target.value,
-                      "insurance",
-                    )
-                  }
+                  onChange={(e) => updateIfChanged(displayState["insurance"], e.target.value, "insurance")}
                 />
 
                 <select

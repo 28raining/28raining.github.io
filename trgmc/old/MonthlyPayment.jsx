@@ -7,30 +7,36 @@ function MonthlyPayment({ loanRes, setMonthlyPaymentInput, displayState }) {
   // 'monthlyPayment': monthlyPayment,
   // 'monthlyPrincipal': monthlyPrincipal,
   const widthPrincipleInterest = (100 * (loanRes["monthlyPrincipal"][0] + loanRes["monthlyInterest"][0])) / loanRes["monthlyPayment"][0];
-  const widthPrincipleInterestFormat = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0, minimumFractionDigits: 0 }).format(
-    loanRes["monthlyPrincipal"][0] + loanRes["monthlyInterest"][0]
-  )
+  const widthPrincipleInterestFormat = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+  }).format(loanRes["monthlyPrincipal"][0] + loanRes["monthlyInterest"][0]);
   const widthOther = (100 * loanRes["monthlyOther"][0]) / loanRes["monthlyPayment"][0];
   const widthOtherFormat = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0, minimumFractionDigits: 0 }).format(
     loanRes["monthlyOther"][0]
-  )
+  );
 
   console.log();
   return (
     <div className="row shadow border rounded p-2 mb-3">
       <div className="col-6 px-0">
         <label>Monthly Payment</label>
-        <input 
-        type="text" 
-        className="form-control"
-        onChange={(e) => {
-          setMonthlyPaymentInput(e.target.value.replace(/[^0-9.-]+/g, ""));
-        }}
-        value=          {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0, minimumFractionDigits: 0, minimumIntegerDigits: displayState['monthlyPayment'].length }).format(
-          displayState['monthlyPayment']
-        )}
+        <input
+          type="text"
+          className="form-control"
+          onChange={(e) => {
+            setMonthlyPaymentInput(e.target.value.replace(/[^0-9.-]+/g, ""));
+          }}
+          value={new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+            maximumFractionDigits: 0,
+            minimumFractionDigits: 0,
+            minimumIntegerDigits: displayState["monthlyPayment"].length,
+          }).format(displayState["monthlyPayment"])}
         />
-
       </div>
       {/* <div className="col-6 px-0">
         <label> </label>

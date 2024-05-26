@@ -4,23 +4,24 @@ function loanCalc(numMonths, interestRate, loanAmount, chosenInput, monthlyPayme
   var monthlyInterest = 1 + interestRate / (12 * 100);
   var interestScalar = monthlyInterest ** numMonths;
   var T = monthlyExtraPercent / 100;
+  var homeVal, loanAmount_new, totalRepay, monthlyTax;
 
   if (chosenInput == "monthlyPayment") {
     var actualMonthly = monthlyPaymentInput - monthlyExtraFee;
-    var totalRepay = numMonths * actualMonthly;
+    totalRepay = numMonths * actualMonthly;
     if (interestRate == 0) {
-      var loanAmount_new = totalRepay;
-      var homeVal = userSetDownPercent ? loanAmount_new/(1 - downPay) : loanAmount_new + downPay ;
+      loanAmount_new = totalRepay;
+      homeVal = userSetDownPercent ? loanAmount_new / (1 - downPay) : loanAmount_new + downPay;
     } else {
       var Z = (interestScalar - 1) / (interestRate / (12 * 100)) / interestScalar;
       if (userSetDownPercent) {
-        var homeVal = actualMonthly / (T + 1 / Z) / (1 - downPay / (T * Z + 1));
-        var loanAmount_new = homeVal / (1 + downPay);
+        homeVal = actualMonthly / (T + 1 / Z) / (1 - downPay / (T * Z + 1));
+        loanAmount_new = homeVal / (1 + downPay);
       } else {
-        var homeVal = actualMonthly / (T + 1 / Z) + downPay / (T * Z + 1);
-        var loanAmount_new = homeVal - downPay;
+        homeVal = actualMonthly / (T + 1 / Z) + downPay / (T * Z + 1);
+        loanAmount_new = homeVal - downPay;
       }
-      var monthlyTax = homeVal * T;
+      monthlyTax = homeVal * T;
 
       // var compoundTotalRepay = actualMonthly * ((interestScalar - 1) / (interestRate / (12 * 100)));
       // var loanAmount_new = compoundTotalRepay / interestScalar;
@@ -35,16 +36,17 @@ function loanCalc(numMonths, interestRate, loanAmount, chosenInput, monthlyPayme
       homeVal: homeVal,
     };
   } else {
-    var totalRepay = loanAmount * interestScalar;
+    var monthly, newTotalRepay;
+    totalRepay = loanAmount * interestScalar;
     if (interestRate == 0) {
-      var monthly = totalRepay / numMonths;
-      var newTotalRepay = loanAmount;
+      monthly = totalRepay / numMonths;
+      newTotalRepay = loanAmount;
     } else {
-      var monthly = totalRepay / ((interestScalar - 1) / (interestRate / (12 * 100)));
-      var newTotalRepay = monthly * numMonths;
+      monthly = totalRepay / ((interestScalar - 1) / (interestRate / (12 * 100)));
+      newTotalRepay = monthly * numMonths;
     }
-    var homeVal = userSetDownPercent ? loanAmount / (1 - downPay) : (loanAmount + downPay);
-    var monthlyTax = T * homeVal;
+    homeVal = userSetDownPercent ? loanAmount / (1 - downPay) : loanAmount + downPay;
+    monthlyTax = T * homeVal;
     // console.log('bp85', homeVal)
 
     return { monthly: monthly, totalRepay: newTotalRepay, loanAmount: loanAmount, monthlyExta: monthlyTax + monthlyExtraFee, homeVal: homeVal };
