@@ -14,6 +14,7 @@ Currently, two official plugins are available:
 - multi-language?
 
 
+
 # Todo
 
 ## Important
@@ -21,6 +22,12 @@ Currently, two official plugins are available:
 - get a domain, make the site live
 - fix total repayment when overpayment & refinance added
 - show amount saved by doing overpayment
+- CLIO FEEDBACK
+-- show standard loan types and autofill length
+-- overpayment shows remaining balance reduction
+-- show “yearly”, “monthly”
+-- add comments section
+-- move export fn to common file to enable fast refresh
 
 
 ## Later
@@ -49,9 +56,15 @@ Currently, two official plugins are available:
 
 
 
-
-
 # Done
+-- screen vertical too small
+-- note that monthly includes all
+-- refinance on same date crashes site
+-- multiple overpayments on the same date
+--- Put events into URL
+- state to URL
+-- add start date
+-- property tax default %/year
 - limit % to <100
 - Crashes when put a letter into loan length. Or 0
 - Fix rounding issue which means final payment != monthly payment

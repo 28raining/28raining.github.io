@@ -1,7 +1,11 @@
-import { isNumber } from "./App";
+import { isNumber } from "./loanMaths.js";
+import { Calendar } from "react-calendar";
+import { Modal } from "react-bootstrap";
+import { useState } from "react";
 
 export function cashFormat(val) {
   if (val == "") return "";
+  if (!isNumber(val)) return "";
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -23,6 +27,7 @@ function ValidFbComp({ x }) {
 }
 
 function LoanForm({ displayState, flash, updateUserInput, valid }) {
+  const [show, setShow] = useState(false);
   const feeOptions = ["$ / year", "$ / month", "% / year", "% / month"];
   // const loanAmount = displayState["loanAmount"];
 
@@ -32,6 +37,7 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
   // const class_validMontly = valid.monthlyPayment === null ? null : "is-invalid";
 
   //builds class for each input based on flash (whether it changed and should flash) and valid (if user input is valid)
+  const startDateOptions = { month: "short", year: "numeric" };
   var inputClass = {};
   for (const i of [
     "homeVal",
@@ -70,11 +76,19 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
     }
   }
 
+  function calToMonth(v) {
+    var newDate = new Date(v);
+    // console.log(newDate.getMonth())}
+
+    setShow(false);
+    updateUserInput("startDate", newDate.getTime());
+  }
+
   //  console.log("displayState", displayState)
   return (
     <div>
       <div className="row shadow-sm border rounded my-2 py-2 mx-0">
-        <div className="col-12 pb-2">
+        <div className="col-12">
           <div className="row">
             <div className="col-5 pe-0">
               <label>Home Value</label>
@@ -87,6 +101,9 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
                 onChange={(e) => updateIfChanged(displayState["homeVal"], e.target.value, "homeVal")}
               />
               <ValidFbComp x={valid["homeVal"]} />
+              <label>
+                <small></small>
+              </label>
             </div>
             <div className="col-2 text-center align-self-center">or</div>
             <div className="col-5 ps-0">
@@ -98,6 +115,10 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
                 value={cashFormat(displayState["monthlyPayment"])}
               />
               <ValidFbComp x={valid["monthlyPayment"]} />
+              <label>
+                <small>{cashFormat(displayState["monthlyPaymentToLoan"])} towards loan</small>
+              </label>
+
               {/* {valid.monthlyPayment === null ? null : (
                 <div className="invalid-feedback" style={{ display: "initial" }}>
                   {valid.monthlyPayment}
@@ -110,7 +131,7 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
       <div className="row shadow-sm border rounded my-2 py-2 mx-0">
         <div className="col-12">
           <div className="row">
-            <div className="col-xl-6 col-12">
+            <div className="col-12">
               <label>Down Payment</label>
 
               <div className="input-group mb-1">
@@ -147,6 +168,8 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
                 </span>
               </div>
             </div>
+          </div>
+          <div className="row">
             <div className="col-xl-6 col-12">
               <label>Loan Amount</label>
 
@@ -165,8 +188,6 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
                 }
               />
             </div>
-          </div>
-          <div className="row">
             <div className="col-xl-6 col-12">
               <label>Interest rate</label>
               <div className="input-group mb-1">
@@ -181,6 +202,23 @@ function LoanForm({ displayState, flash, updateUserInput, valid }) {
                   %
                 </span>
               </div>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-6">
+              <label>Start Date</label>
+              <output type="text" className="form-control" value="may" onClick={() => setShow(true)}>
+                {new Intl.DateTimeFormat("en-US", startDateOptions).format(displayState["startDate"])}
+              </output>
+
+              <Modal show={show} onHide={() => setShow(false)}>
+                <Modal.Header closeButton>
+                  <Modal.Title>Chose the starting month</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <Calendar maxDetail="year" onClickMonth={(v) => calToMonth(v)} />
+                </Modal.Body>
+              </Modal>
             </div>
             <div className="col-xl-6 col-12">
               <label>Loan length</label>

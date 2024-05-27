@@ -4,7 +4,7 @@ import { DashCircle, Pen } from "react-bootstrap-icons";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import { cashFormat } from "./LoanForm";
-import { isNumber } from "./App";
+import { isNumber } from "./loanMaths.js";
 
 function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEvent }) {
   const [chosenEvent, setChosenEvent] = useState("Over-payment");
@@ -12,6 +12,10 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
   const [chosenDate, setChosenDate] = useState(loanMonths[1]);
   const [newLength, setNewLength] = useState(0);
   const [cost, setCost] = useState(100);
+
+  //prevent hanging when url params set up illegal state
+  if (loanMonths.length < 2) return null;
+  if (monthlyPaymentPerEvent < 0) return null;
 
   // console.log(monthlyPaymentPerEvent);
 
@@ -58,6 +62,7 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
     return true;
   }
 
+  if (loanMonths.indexOf(chosenDate) < 0) setChosenDate(loanMonths[1]);
   const validDate = loanMonths.indexOf(chosenDate) >= 0;
   const validRecast = validRecastDate();
   const validOverpay = chosenEvent != "Over-payment" || newChange > 0;
@@ -114,7 +119,7 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
           </div>
         </div>
         <div className="row">
-          <div className={chosenEvent == "Recast" ? "col-6" : "col-xl-3 col-6"}>
+          <div className={chosenEvent == "Recast" ? "col-7" : "col-xl-4 col-6"}>
             <label>Date:</label>
             <select className="form-select mb-1" onChange={(e) => setChosenDate(e.target.value)} value={chosenDate}>
               {loanMonths.map((x) => (
@@ -198,7 +203,7 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
             </div>
           </div>
 
-          <div className="col-xl-3 col-6">
+          <div className="col-xl-2 col-6">
             <label></label>
             {canAdd ? (
               <div className="d-grid gap-2">

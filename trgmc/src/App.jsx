@@ -1,11 +1,13 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import "./App.css";
 // import { PlusCircle } from "react-bootstrap-icons";
 import LoanForm from "./LoanForm.jsx";
-import loanMaths from "./loanMaths.js";
+import { loanMaths, isNumber } from "./loanMaths.js";
+// import  from "./loanMaths.js";
 import LoanPlot from "./LoanPlot.jsx";
 import LoanStats from "./LoanStats.jsx";
 import EventsForm from "./EventsForm.jsx";
+import { Comments } from "@hyvor/hyvor-talk-react";
 // import MonthlyPayment from "./MonthlyPayment.jsx";
 
 function runCalculations(userInput, loanEvent, chosenInput, userSetDownPercent) {
@@ -38,7 +40,8 @@ function runCalculations(userInput, loanEvent, chosenInput, userSetDownPercent) 
     parseFloat(downPay),
     userSetDownPercent,
     parseFloat(monthlyExtraPercent),
-    parseFloat(monthlyExtraFee)
+    parseFloat(monthlyExtraFee),
+    userInput["startDate"]
   );
 
   const homeVal = parseFloat(loanRes["homeVal"]);
@@ -48,6 +51,7 @@ function runCalculations(userInput, loanEvent, chosenInput, userSetDownPercent) 
   } else {
     displayState["monthlyPayment"] = parseFloat(loanRes["monthlyPayment"][0]);
   }
+  displayState["monthlyPaymentToLoan"] = parseFloat(loanRes["monthlyInterest"][0]) + parseFloat(loanRes["monthlyPrincipal"][0]);
   if (userSetDownPercent) {
     displayState["downPayPercent"] = userInput["downPayPercent"];
     displayState["downPayCash"] = homeVal * parseFloat(userInput["downPayPercent"]) * 0.01;
@@ -71,34 +75,66 @@ function runCalculations(userInput, loanEvent, chosenInput, userSetDownPercent) 
   displayState["propertyTaxUnit"] = userInput["propertyTaxUnit"];
   displayState["hoaUnit"] = userInput["hoaUnit"];
   displayState["insuranceUnit"] = userInput["insuranceUnit"];
+  displayState["startDate"] = userInput["startDate"];
 
   return [displayState, loanRes];
 }
 
-//determines if a string is a number
-export function isNumber(num) {
-  if (num === "") return false;
-  return !isNaN(num);
+function loanEventEncoder(loanEvent) {
+  // console.log(loanEvent)
+  var str = `${loanEvent["event"]}_${loanEvent["date"].replace(" ", "")}_${loanEvent["cost"]}_${loanEvent["change"]}`;
+  if ("newLength" in loanEvent) str += `_${loanEvent["newLength"]}`;
+  return str;
 }
 
+function loanEventDecoder(e) {
+  var newEvent = {};
+  var items = e.split("_");
+  newEvent["event"] = items[0];
+  newEvent["date"] = `${items[1].substring(0, 3)} ${items[1].substring(3, 7)}`;
+  newEvent["cost"] = parseInt(items[2]);
+  newEvent["change"] = parseInt(items[3]);
+  if (items.length > 4) newEvent["newLength"] = parseInt(items[4]);
+  // console.log(newEvent, items);
+  return newEvent;
+}
+
+var accurateDate = new Date();
+const dateLu = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+var dStr = `${accurateDate.getFullYear()}-${dateLu[accurateDate.getMonth()]}-01`;
+var coarseDate = Date.parse(dStr); //only care about month - don't want minor date changes going in URL
+console.log("coarseDate", dStr, coarseDate);
+const initialState = {
+  homeVal: "500000",
+  monthlyPayment: "0",
+  downPayCash: "100000",
+  downPayPercent: "0",
+  interestRate: "5.00",
+  loanLength: "30",
+  propertyTax: "0.00",
+  hoa: "0",
+  insurance: "0",
+  propertyTaxUnit: 2,
+  hoaUnit: 1,
+  insuranceUnit: 0,
+  startDate: coarseDate,
+};
+const searchParams = new URLSearchParams(window.location.search);
+const initialOverride = {};
+var initialEvents = [];
+for (const [key, value] of searchParams.entries()) {
+  if (key == "events") initialEvents.push(loanEventDecoder(value));
+  else initialOverride[key] = value;
+}
+
+// console.log(initialEvents)
+
 function App() {
-  const [loanEvent, setLoanEvent] = useState([]);
+  const [loanEvent, setLoanEvent] = useState(initialEvents);
   const [chosenInput, setChosenInput] = useState("homeVal");
   const [userSetDownPercent, setUserSetDownPercent] = useState(false);
-  const [userInput, setUserInput] = useState({
-    homeVal: "500000",
-    monthlyPayment: "0",
-    downPayCash: "100000",
-    downPayPercent: "0",
-    interestRate: "5.00",
-    loanLength: "30",
-    propertyTax: "0",
-    hoa: "0",
-    insurance: "0",
-    propertyTaxUnit: 0,
-    hoaUnit: 1,
-    insuranceUnit: 0,
-  });
+
+  const [userInput, setUserInput] = useState({ ...initialState, ...initialOverride });
   const [flash, setFlash] = useState({
     loanAmount: false,
     monthlyPayment: false,
@@ -123,29 +159,46 @@ function App() {
     hoa: null,
     insurance: null,
   });
-  const [displayState, setDisplayState] = useState({});
-  const [loanRes, setLoanRes] = useState({});
+  var newDisplayState, newLoanRes;
+  [newDisplayState, newLoanRes] = runCalculations(userInput, loanEvent, chosenInput, userSetDownPercent);
+  const [displayState, setDisplayState] = useState(newDisplayState);
+  const [loanRes, setLoanRes] = useState(newLoanRes);
 
-  function useFirstRender() {
-    const ref = useRef(true);
-    const firstRender = ref.current;
-    ref.current = false;
-    return firstRender;
-  }
-  if (useFirstRender()) {
-    var newDisplayState, newLoanRes;
-    [newDisplayState, newLoanRes] = runCalculations(userInput, loanEvent, chosenInput, userSetDownPercent);
-    setDisplayState(newDisplayState);
-    setLoanRes(newLoanRes);
-  }
+  // console.log("loanEvent", loanEvent);
+  var newUserInput = { ...userInput };
+
+  // function useFirstRender() {
+  //   const ref = useRef(true);
+  //   const firstRender = ref.current;
+  //   ref.current = false;
+  //   return firstRender;
+  // }
+  // if (useFirstRender()) {
+  //   // var newDisplayState, newLoanRes;
+  //   // // var newUserInput = { ...userInput };
+
+  //   // //read saved state from the URL
+  //   var isDiff = false;
+  //   const searchParams = new URLSearchParams(window.location.search);
+  //   for (const [key, value] of searchParams.entries()) {
+  //     if (newUserInput[key] != value) isDiff = true;
+  //     newUserInput[key] = value;
+  //   }
+
+  //   // [newDisplayState, newLoanRes] = runCalculations(newUserInput, loanEvent, chosenInput, userSetDownPercent);
+  //   // setDisplayState(newDisplayState);
+  //   // setLoanRes(newLoanRes);
+  //   console.log('bp1', newDisplayState, isDiff, newUserInput)
+  //   if (isDiff) updateUserInput(null, null)
+  // }
 
   function updateUserInput(field, value) {
-    var newUserInput = { ...userInput };
     var newFlash = { ...flash };
     var newChosenInput = chosenInput;
     var newValid = { ...valid };
     var newUserSetDownPercent = userSetDownPercent;
     var newDisplayState = { ...displayState };
+    console.log("bp2");
 
     // if (userSetDownPercent) {
     //   var downPayCash = (loanRes["loanAmount"] * userInput["downPayPercent"]) / 100;
@@ -201,6 +254,8 @@ function App() {
       newUserInput.propertyTax = value;
     } else if (field == "propertyTaxUnit") {
       newUserInput.propertyTaxUnit = value;
+    } else if (field == "startDate") {
+      newUserInput.startDate = value;
     }
 
     if (newChosenInput == "homeVal") {
@@ -274,6 +329,31 @@ function App() {
     return u == 0 ? 1 / 12 : u == 1 ? 1 : u == 2 ? (displayState["homeVal"] * 0.01) / 12 : u == 3 ? displayState["homeVal"] * 0.01 : 0;
   }
 
+  // //Save any user inputs to the URL
+  const urlParams = new URLSearchParams(window.location.search);
+
+  for (const i in newUserInput) {
+    if (newUserInput[i] != initialState[i]) {
+      urlParams.set(i, newUserInput[i]);
+    } else urlParams.delete(i);
+  }
+  urlParams.delete("events");
+  if (loanEvent.length > 0) {
+    for (const o in loanEvent) {
+      // var str = `${loanEvent[o]['event']}_${loanEvent[o]['date'].replace(" ", "")}_${loanEvent[o]['cost']}_${loanEvent[o]['change']}`;
+      // if ('newLength' in Object.keys(loanEvent[o])) str+=`_${loanEvent[o]['newLength']}`
+      urlParams.append("events", loanEventEncoder(loanEvent[o]));
+    }
+  }
+  window.history.replaceState(null, null, "?" + urlParams.toString());
+
+  //   const url = new URL();
+  // url.search = new URLSearchParams(obj);
+  //   console.log("userDiff",new URLSearchParams(userDiff).toString())
+  //   console.log("url", url)
+  // console.log(
+  // loanRes["loanMonths"],
+  // loanEvent,loanRes["monthlyPaymentPerEvent"]);
   return (
     <>
       <nav className="navbar bg-body-tertiary mb-2">
@@ -312,6 +392,12 @@ function App() {
               insurance={userInput["insurance"] * unitScaler(userInput["insuranceUnit"])}
             />
           </div>
+        </div>
+        <div className="row">
+         <p>Leave some feedback!</p>
+        </div>
+        <div className="row">
+          <Comments website-id={11189} page-id="" />
         </div>
       </div>
     </>

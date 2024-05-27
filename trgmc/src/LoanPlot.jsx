@@ -154,6 +154,12 @@ function LoanPlot({ maxMonthly, loanRes, loanMonths, propertyTax, hoa, insurance
       //   position: "bottom",
       // },
       tooltip: {
+        titleFont: {
+          size: 16,
+        },
+        bodyFont: {
+          size: 16,
+        },
         callbacks: {
           label: function (context) {
             let label = context.dataset.label || "";

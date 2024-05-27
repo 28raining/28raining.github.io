@@ -1,3 +1,9 @@
+//determines if a string is a number
+export function isNumber(num) {
+  if (num === "") return false;
+  return !isNaN(num);
+}
+
 function loanCalc(numMonths, interestRate, loanAmount, chosenInput, monthlyPaymentInput, downPay, userSetDownPercent, monthlyExtraPercent, monthlyExtraFee) {
   // console.log('loanCalc', numMonths, interestRate, loanAmount, chosenInput, monthlyPaymentInput, downPayCash, monthlyExtraPercent, monthlyExtraFee)
 
@@ -53,7 +59,7 @@ function loanCalc(numMonths, interestRate, loanAmount, chosenInput, monthlyPayme
   }
 }
 
-export default function loanMaths(
+export function loanMaths(
   loanAmount,
   numYears,
   interestRate,
@@ -63,15 +69,18 @@ export default function loanMaths(
   downPay,
   userSetDownPercent,
   monthlyExtraPercent,
-  monthlyExtraFee
+  monthlyExtraFee,
+  startDate
 ) {
   // console.log('loanMaths', loanAmount, numYears, interestRate, loanEvent, chosenInput, monthlyPaymentInput, downPayCash, monthlyExtraPercent, monthlyExtraFee)
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var stDate = new Date(Number(startDate));
   var loanMonths = [];
   var monthIndex;
-  var start = 4;
+  var start = stDate.getMonth();
+  // console.log(start, startDate, stDate)
   var thisMonth;
-  var year = new Date().getFullYear(); // % 100;
+  var year = stDate.getFullYear(); // % 100;
   var eventIndex = 0;
   var monthlyPaymentPerEvent = [];
 
@@ -105,32 +114,49 @@ export default function loanMaths(
     thisMonth = `${months[monthIndex]} ${year}`;
     loanMonths.push(thisMonth);
 
-    //Check if any events happened that month
-    if (loanEvent.length > eventIndex) {
-      if (thisMonth == loanEvent[eventIndex]["date"]) {
-        // console.log('Event!', loanEvent[eventIndex])
-        if (loanEvent[eventIndex]["event"] == "Over-payment") {
-          remaining[i] = remaining[i] + loanEvent[eventIndex]["cost"] - loanEvent[eventIndex]["change"];
-        } else if (loanEvent[eventIndex]["event"] == "Refinance") {
-          rate = Number(loanEvent[eventIndex].change) / 100;
-          remaining[i] = remaining[i] + loanEvent[eventIndex].cost;
-          if (loanEvent[eventIndex]["newLength"] != 0) numMonths = i + loanEvent[eventIndex]["newLength"] * 12;
-          loanData = loanCalc(numMonths - i, rate * 100, remaining[i], "homeVal", null, 0, 0, monthlyExtraPercent, monthlyExtraFee);
-        }
-        eventIndex = eventIndex + 1;
+    //Check if any events happening this month
+    while (loanEvent.length > eventIndex && thisMonth == loanEvent[eventIndex]["date"]) {
+      if (loanEvent[eventIndex]["event"] == "Over-payment") {
+        remaining[i] = remaining[i] + loanEvent[eventIndex]["cost"] - loanEvent[eventIndex]["change"];
+      } else if (loanEvent[eventIndex]["event"] == "Refinance") {
+        interestRate = Number(loanEvent[eventIndex].change);
+        rate = interestRate / 100;
+        remaining[i] = remaining[i] + loanEvent[eventIndex].cost;
+        if (loanEvent[eventIndex]["newLength"] != 0) numMonths = i + loanEvent[eventIndex]["newLength"] * 12;
+        loanData = loanCalc(numMonths - i, interestRate, remaining[i], "homeVal", null, 0, 0, monthlyExtraPercent, monthlyExtraFee);
+      } else if (loanEvent[eventIndex]["event"] == "Recast") {
+        // rate = loanEvent[eventIndex].change/100;
+        remaining[i] = remaining[i] + loanEvent[eventIndex].cost;
+        loanData = loanCalc(numMonths - i, interestRate, remaining[i], "homeVal", null, 0, 0, monthlyExtraPercent, monthlyExtraFee);
       }
+      eventIndex = eventIndex + 1;
     }
-    //code is like this to handle recast on same date as overpayment
-    if (loanEvent.length > eventIndex) {
-      if (thisMonth == loanEvent[eventIndex]["date"]) {
-        if (loanEvent[eventIndex]["event"] == "Recast") {
-          // rate = loanEvent[eventIndex].change/100;
-          remaining[i] = remaining[i] + loanEvent[eventIndex].cost;
-          loanData = loanCalc(numMonths - i, interestRate, remaining[i], "homeVal", null, 0, 0, monthlyExtraPercent, monthlyExtraFee);
-          eventIndex = eventIndex + 1;
-        }
-      }
-    }
+
+    // if (loanEvent.length > eventIndex) {
+    //   if (thisMonth == loanEvent[eventIndex]["date"]) {
+    //     // console.log('Event!', loanEvent[eventIndex])
+    //     if (loanEvent[eventIndex]["event"] == "Over-payment") {
+    //       remaining[i] = remaining[i] + loanEvent[eventIndex]["cost"] - loanEvent[eventIndex]["change"];
+    //     } else if (loanEvent[eventIndex]["event"] == "Refinance") {
+    //       rate = Number(loanEvent[eventIndex].change) / 100;
+    //       remaining[i] = remaining[i] + loanEvent[eventIndex].cost;
+    //       if (loanEvent[eventIndex]["newLength"] != 0) numMonths = i + loanEvent[eventIndex]["newLength"] * 12;
+    //       loanData = loanCalc(numMonths - i, rate * 100, remaining[i], "homeVal", null, 0, 0, monthlyExtraPercent, monthlyExtraFee);
+    //     }
+    //     eventIndex = eventIndex + 1;
+    //   }
+    // }
+    // //code is like this to handle recast on same date as overpayment
+    // if (loanEvent.length > eventIndex) {
+    //   if (thisMonth == loanEvent[eventIndex]["date"]) {
+    //     if (loanEvent[eventIndex]["event"] == "Recast") {
+    //       // rate = loanEvent[eventIndex].change/100;
+    //       remaining[i] = remaining[i] + loanEvent[eventIndex].cost;
+    //       loanData = loanCalc(numMonths - i, interestRate, remaining[i], "homeVal", null, 0, 0, monthlyExtraPercent, monthlyExtraFee);
+    //       eventIndex = eventIndex + 1;
+    //     }
+    //   }
+    // }
 
     //Calculate 'the numbers' for the month
     monthlyPayment[i] = loanData.monthly + loanData.monthlyExta;

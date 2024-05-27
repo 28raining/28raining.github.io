@@ -10,11 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hyvor/hyvor-talk-react": "^0.0.3",
     "bootstrap": "^5.3.2",
     "chart.js": "^4.4.1",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.1",
     "react-bootstrap-icons": "^1.11.3",
+    "react-calendar": "^5.0.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "serve": "^14.2.3"
