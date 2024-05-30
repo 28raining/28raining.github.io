@@ -15,27 +15,59 @@ import { useState } from "react";
 //   BarController
 // );
 
-function LoanPlot({ maxMonthly, loanRes, loanMonths, propertyTax, hoa, insurance }) {
-  const [monthsPerYearToPlot, setMonthsPerYearToPlot] = useState(1);
-  const indexPlot = 12 / monthsPerYearToPlot;
+function LoanPlot({ maxMonthly, loanRes, loanMonths, propertyTax, hoa, insurance, startDate }) {
+  const [monthsPerYearToPlot, setMonthsPerYearToPlot] = useState("yearly payments");
+  const indexPlot = monthsPerYearToPlot == "monthly payments" ? 1 : 12;
+  const yTitle = monthsPerYearToPlot == "monthly payments" ? "Monthly Payments" : "Yearly Payments";
+  const startMonth = startDate.getMonth();
+  // console.log(startDate, startMonth)
 
   // console.log('rem',loanRes["remaining"])
+  var monthlyPrincipalFiltered;
+  var monthlyInterestFiltered;
+  var loanMonthsFiltered;
+  var remainingFiltered;
 
-  var loanMonthsFiltered = loanMonths.filter(function (element, index) {
-    return index % indexPlot === 0;
-  });
-  var monthlyPrincipalFiltered = loanRes["monthlyPrincipal"].filter(function (element, index) {
-    return index % indexPlot === 0;
-  });
-  var monthlyInterestFiltered = loanRes["monthlyInterest"].filter(function (element, index) {
-    return index % indexPlot === 0;
-  });
-  // var monthlyTaxFiltered = loanRes["monthlyTax"].filter(function (element, index, array) {
-  //   return index % indexPlot === 0;
-  // });
-  var remainingFiltered = loanRes["remaining"].filter(function (element, index) {
-    return index % indexPlot === 0;
-  });
+  if (monthsPerYearToPlot == "monthly payments") {
+    loanMonthsFiltered = loanMonths;
+    monthlyPrincipalFiltered = loanRes["monthlyPrincipal"];
+    monthlyInterestFiltered = loanRes["monthlyInterest"];
+    remainingFiltered = loanRes["remaining"];
+  } else {
+    // var loanMonthsFiltered = [0]
+    monthlyPrincipalFiltered = [0];
+    monthlyInterestFiltered = [0];
+    // var remainingFiltered = [0]
+
+    var loanMonthsFiltered_full = loanMonths.filter(function (element, index) {
+      return index % 12 === 0;
+    });
+    loanMonthsFiltered = loanMonthsFiltered_full.map((d) => d.substring(4, 8));
+    remainingFiltered = loanRes["remaining"].filter(function (element, index) {
+      return index % indexPlot === 0;
+    });
+
+    for (var i = 0; i < loanMonths.length; i++) {
+      var yearIndex = Math.floor((startMonth + i) / 12);
+      // console.log(yearIndex)
+      // if ((yearIndex==0) || (i==0)) {
+      //   monthlyPrincipalFiltered.push(0);// = 0
+      //   monthlyInterestFiltered[yearIndex] = 0
+      // }
+      if (yearIndex >= monthlyPrincipalFiltered.length) monthlyPrincipalFiltered.push(0);
+      if (yearIndex >= monthlyInterestFiltered.length) monthlyInterestFiltered.push(0);
+      monthlyPrincipalFiltered[yearIndex] = monthlyPrincipalFiltered[yearIndex] + loanRes["monthlyPrincipal"][i];
+      monthlyInterestFiltered[yearIndex] = monthlyInterestFiltered[yearIndex] + loanRes["monthlyInterest"][i];
+    }
+    // console.log(yearIndex, loanRes["monthlyPrincipal"], loanRes["monthlyInterest"])
+
+    // var monthlyPrincipalFiltered = loanRes["monthlyPrincipal"].filter(function (element, index) {
+    //   return index % indexPlot === 0;
+    // });
+    // var monthlyInterestFiltered = loanRes["monthlyInterest"].filter(function (element, index) {
+    //   return index % indexPlot === 0;
+    // });
+  }
 
   const DEFAULT_PLOTLY_COLORS = [
     "rgba(31, 119, 180, 0.6)",
@@ -126,7 +158,7 @@ function LoanPlot({ maxMonthly, loanRes, loanMonths, propertyTax, hoa, insurance
             // return '$' + value;
           },
         },
-        title: { text: "Monthly Payments", display: true },
+        title: { text: yTitle, display: true },
       },
       x1: {
         ticks: {
@@ -192,7 +224,7 @@ function LoanPlot({ maxMonthly, loanRes, loanMonths, propertyTax, hoa, insurance
           <div className="col-12 px-0">
             <div className="input-group ">
               <span className="pe-3">Show: </span>
-              {[1, 2, 12].map((x) => (
+              {["monthly payments", "yearly payments"].map((x) => (
                 <div className="form-check form-check-inline" key={x}>
                   <input
                     className="form-check-input"
@@ -202,9 +234,7 @@ function LoanPlot({ maxMonthly, loanRes, loanMonths, propertyTax, hoa, insurance
                     value={x}
                     onChange={() => setMonthsPerYearToPlot(x)}
                   />
-                  <label className="form-check-label">
-                    {x} month{x > 1 ? "s" : null} per year
-                  </label>
+                  <label className="form-check-label">{x}</label>
                 </div>
               ))}
             </div>

@@ -29,7 +29,6 @@ function ValidFbComp({ x }) {
 function LoanForm({ displayState, flash, updateUserInput, valid }) {
   const [show, setShow] = useState(false);
   const feeOptions = ["$ / year", "$ / month", "% / year", "% / month"];
-  // const loanAmount = displayState["loanAmount"];
 
   // var validClass = {};
   // for (const i in valid) validClass[i] = valid[i] === null ? null : "is-invalid";

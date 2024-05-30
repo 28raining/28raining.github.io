@@ -11,7 +11,7 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
   const [newChange, setNewChange] = useState(1000);
   const [chosenDate, setChosenDate] = useState(loanMonths[1]);
   const [newLength, setNewLength] = useState(0);
-  const [cost, setCost] = useState(100);
+  const [cost, setCost] = useState(0);
 
   //prevent hanging when url params set up illegal state
   if (loanMonths.length < 2) return null;
@@ -279,7 +279,7 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
                           maximumFractionDigits: 0,
                         }).format(x["cost"])}
                       </td>
-                      <td>{`${x["change"]}${x["event"] == "Refinance" ? "%" : ""}`}</td>
+                      <td>{x["event"] == "Refinance" ? `${x["change"]}%` : x["event"] == "Over-payment" ? cashFormat(x["change"]) : x["change"]}</td>
                       <td key="pen">
                         <span
                           style={{ cursor: "pointer" }}
@@ -316,16 +316,16 @@ function EventsForm({ loanMonths, loanEvent, setLoanEvent, monthlyPaymentPerEven
                       </td>
                     </tr>
                     {x["event"] == "Refinance" ? (
-                      <>
-                        <tr key={"refi1"}>
-                          <td></td>
-                          <td colSpan={5}>New loan length: {x["newLength"] == "" ? <em>unchanged</em> : `${x["newLength"]}yr`}</td>
-                        </tr>
-                        <tr key={"refi2"}>
-                          <td></td>
-                          <td colSpan={5}>New monthly payment: {cashFormat(monthlyPaymentPerEvent[i + 1])}</td>
-                        </tr>
-                      </>
+                      <tr key={"refi1"}>
+                        <td></td>
+                        <td colSpan={5}>New loan length: {x["newLength"] == "" ? <em>unchanged</em> : `${x["newLength"]}yr`}</td>
+                      </tr>
+                    ) : null}
+                    {x["event"] == "Refinance" || x["event"] == "Recast" ? (
+                      <tr key={"refi2"}>
+                        <td></td>
+                        <td colSpan={5}>New monthly payment: {cashFormat(monthlyPaymentPerEvent[i + 1])}</td>
+                      </tr>
                     ) : null}
                   </tbody>
                 ))}

@@ -30,6 +30,8 @@ function runCalculations(userInput, loanEvent, chosenInput, userSetDownPercent) 
     : parseFloat(userInput["homeVal"]) - parseFloat(userInput["downPayCash"]);
   const downPay = userSetDownPercent ? parseFloat(userInput.downPayPercent) * 0.01 : parseFloat(userInput.downPayCash);
 
+  // console.log("loanAmount_1", loanAmount)
+
   var loanRes = loanMaths(
     parseFloat(loanAmount),
     parseFloat(userInput["loanLength"]),
@@ -52,6 +54,7 @@ function runCalculations(userInput, loanEvent, chosenInput, userSetDownPercent) 
     displayState["monthlyPayment"] = parseFloat(loanRes["monthlyPayment"][0]);
   }
   displayState["monthlyPaymentToLoan"] = parseFloat(loanRes["monthlyInterest"][0]) + parseFloat(loanRes["monthlyPrincipal"][0]);
+  // console.log("homeVal",homeVal)
   if (userSetDownPercent) {
     displayState["downPayPercent"] = userInput["downPayPercent"];
     displayState["downPayCash"] = homeVal * parseFloat(userInput["downPayPercent"]) * 0.01;
@@ -68,6 +71,7 @@ function runCalculations(userInput, loanEvent, chosenInput, userSetDownPercent) 
   displayState["interestRate"] = userInput["interestRate"];
   displayState["loanLength"] = userInput["loanLength"];
   displayState["loanAmount"] = loanRes["loanAmount"];
+  // console.log("loanAmount_2", loanRes["loanAmount"])
 
   displayState["propertyTax"] = userInput["propertyTax"];
   displayState["hoa"] = userInput["hoa"];
@@ -100,10 +104,11 @@ function loanEventDecoder(e) {
 }
 
 var accurateDate = new Date();
-const dateLu = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
-var dStr = `${accurateDate.getFullYear()}-${dateLu[accurateDate.getMonth()]}-01`;
+// const dateLu = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+// var dStr = `${accurateDate.getFullYear()}-${dateLu[accurateDate.getMonth()]}-05`;
+var dStr = `${accurateDate.getFullYear()}-01-05`; //Always defaultstarting at month 01 so graph looks symetrical
 var coarseDate = Date.parse(dStr); //only care about month - don't want minor date changes going in URL
-console.log("coarseDate", dStr, coarseDate);
+// console.log("coarseDate", dStr, coarseDate);
 const initialState = {
   homeVal: "500000",
   monthlyPayment: "0",
@@ -198,7 +203,6 @@ function App() {
     var newValid = { ...valid };
     var newUserSetDownPercent = userSetDownPercent;
     var newDisplayState = { ...displayState };
-    console.log("bp2");
 
     // if (userSetDownPercent) {
     //   var downPayCash = (loanRes["loanAmount"] * userInput["downPayPercent"]) / 100;
@@ -244,16 +248,22 @@ function App() {
       // newFlash["loanAmount"] = !flash["loanAmount"];
     } else if (field == "insurance") {
       newUserInput.insurance = value;
+      if (newChosenInput == "homeVal") newFlash["loanAmount"] = !newFlash["loanAmount"];
     } else if (field == "insuranceUnit") {
       newUserInput.insuranceUnit = value;
+      if (newChosenInput == "homeVal") newFlash["loanAmount"] = !newFlash["loanAmount"];
     } else if (field == "hoa") {
       newUserInput.hoa = value;
+      if (newChosenInput == "homeVal") newFlash["loanAmount"] = !newFlash["loanAmount"];
     } else if (field == "hoaUnit") {
       newUserInput.hoaUnit = value;
+      if (newChosenInput == "homeVal") newFlash["loanAmount"] = !newFlash["loanAmount"];
     } else if (field == "propertyTax") {
       newUserInput.propertyTax = value;
+      if (newChosenInput == "homeVal") newFlash["loanAmount"] = !newFlash["loanAmount"];
     } else if (field == "propertyTaxUnit") {
       newUserInput.propertyTaxUnit = value;
+      if (newChosenInput == "homeVal") newFlash["loanAmount"] = !newFlash["loanAmount"];
     } else if (field == "startDate") {
       newUserInput.startDate = value;
     }
@@ -359,7 +369,7 @@ function App() {
       <nav className="navbar bg-body-tertiary mb-2">
         <div className="container-xxl">
           <a className="navbar-brand" href="#">
-            <b>t</b>he <b>R</b>eally <b>G</b>ood <b>M</b>ortgage <b>C</b>alculator
+            the <b>R</b>eally <b>G</b>ood <b>M</b>ortgage <b>C</b>alculator <small>.net</small>
           </a>
         </div>
       </nav>
@@ -380,7 +390,7 @@ function App() {
               monthlyPaymentPerEvent={loanRes["monthlyPaymentPerEvent"]}
             />
 
-            <LoanStats loanRes={loanRes} loanEvent={loanEvent} />
+            <LoanStats loanRes={loanRes} loanEvent={loanEvent} userInput={userInput} />
           </div>
           <div className="col-md-7 col-12">
             <LoanPlot
@@ -390,11 +400,12 @@ function App() {
               propertyTax={userInput["propertyTax"] * unitScaler(userInput["propertyTaxUnit"])}
               hoa={userInput["hoa"] * unitScaler(userInput["hoaUnit"])}
               insurance={userInput["insurance"] * unitScaler(userInput["insuranceUnit"])}
+              startDate={new Date(Number(userInput["startDate"]))}
             />
           </div>
         </div>
         <div className="row">
-         <p>Leave some feedback!</p>
+          <p>It would be great to hear your feedback!</p>
         </div>
         <div className="row">
           <Comments website-id={11189} page-id="" />

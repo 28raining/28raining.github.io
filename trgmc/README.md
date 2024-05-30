@@ -18,19 +18,19 @@ Currently, two official plugins are available:
 # Todo
 
 ## Important
-- Show breakdown of total repayments
+-- Add a reset button
+-- Add a share button
+-- save it to cookie
+-- Add footer with ym name and link to git
+- tax should reduce if loan length decreases
+- show new finish date after events
+- double check maths against other sites
 - get a domain, make the site live
-- fix total repayment when overpayment & refinance added
-- show amount saved by doing overpayment
-- CLIO FEEDBACK
--- show standard loan types and autofill length
--- overpayment shows remaining balance reduction
--- show “yearly”, “monthly”
--- add comments section
--- move export fn to common file to enable fast refresh
+-- google analytics
 
 
 ## Later
+-- show standard loan types and autofill length
 - hover over explains how th eboxes were calculated
 - refinance has option to change loan length
 - Show loan length and new monthly payment
@@ -57,6 +57,15 @@ Currently, two official plugins are available:
 
 
 # Done
+- Show breakdown of total repayments
+-- fix total repayment when overpayment & refinance added
+-- show amount saved by doing overpayment
+-- overpayment shows remaining balance reduction
+
+-- new monthly payment when re-cast is chosen
+-- show “yearly”, “monthly”
+-- move export fn to common file to enable fast refresh
+-- add comments section
 -- screen vertical too small
 -- note that monthly includes all
 -- refinance on same date crashes site
