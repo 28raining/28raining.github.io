@@ -77,7 +77,7 @@ function Toasts({ toastMxVIsource, toastCopiedLatex, toastCopiedMathML }) {
 
 function Comments() {
   return html`
-    <giscus-widget
+    <!-- <giscus-widget
       repo="28raining/28raining.github.io"
       repo-id="MDEwOlJlcG9zaXRvcnkxMjcyMzY4NjM="
       category-id="DIC_kwDOB5V6_84CUAVa"
@@ -91,7 +91,8 @@ function Comments() {
       theme="light"
       lang="en"
       loading="lazy">
-    </giscus-widget>
+    </giscus-widget> -->
+  <div className="giscus"></div>
   `;
 }
 
