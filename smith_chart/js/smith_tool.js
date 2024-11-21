@@ -2,7 +2,7 @@
 var resolution = 100;// 100; //number of points per arc
 var span_resolution = 20;
 var precision = 3;
-
+var spanChanged = false;
 
 //code to save the state to jsonBin - cool! (and free)
 var toastElList = [].slice.call(document.querySelectorAll('.toast'))
@@ -228,6 +228,7 @@ function updateFromOldState() {
 
 function updateFromDom() {
   schematic[0].freq = Number(domFreq.value);
+  spanChanged = !(schematic[0].span == Number(domSpan.value))
   schematic[0].span = Number(domSpan.value)
   zo = Number(domZo.value);
   schematic[0].zo = Number(domZo.value);
@@ -478,12 +479,12 @@ function update_smith_chart() {
   freq = schematic[0].freq * schematic[0].freq_unit.multiplier;
   span_freq = schematic[0].span * schematic[0].span_unit.multiplier;
   //console.log(schematic[0].freq * schematic[0].freq_unit.multiplier,schematic[0].span * schematic[0].span_unit.multiplier)
-  if (freq < span_freq) {
+  if ((freq < span_freq) && spanChanged) {
     swal({
       type: 'error',
       title: 'Oops...',
-      text: 'Span is larger than frequency, this will result in -ve frequencies and is not allowed..."',
-      footer: '<a href>Reduce your span frequency</a>'
+      text: 'Span is larger than frequency, this will result in -ve frequencies and likely you did not mean this',
+      footer: 'Reduce your span frequency'
     })
   }
 
