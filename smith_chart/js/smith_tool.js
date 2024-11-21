@@ -1306,7 +1306,7 @@ function draw_schematic(i) {
       sch_svg = 2000;
       break;
     case ("tl"):
-      rows_to_create = [['blank-impedance'], ['abs', 'unit_0'], ['line_zo']];
+      rows_to_create = [['blank-impedance'], ['abs', 'unit_0'], ['line_zo'], ['tol']];
       sch_label = "Transmission Line";
       sch_imag = false;
       sch_real = false;
