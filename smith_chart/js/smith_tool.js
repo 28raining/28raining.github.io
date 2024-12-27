@@ -1388,7 +1388,8 @@ function draw_schematic(i) {
             if (schematic[i].imaginary * zo >= 0) innerText += ' + '
             else innerText += ' - '
           }
-          if (sch_imag) innerText += Number((Math.abs(schematic[i].imaginary * zo)).toPrecision(precision)) + 'j'
+          if (sch_real && sch_imag) innerText += Number((Math.abs(schematic[i].imaginary * zo)).toPrecision(precision)) + 'j'
+          else if (sch_imag) innerText += Number((schematic[i].imaginary * zo).toPrecision(precision)) + 'j'
           innerText += '</div>'
         } else if (boxType == 'custom') {
           innerText += '<button type="button" class="btn btn-secondary m-auto" data-bs-toggle="modal" data-bs-target="#customZModal" onclick="createCustomZModal(' + i + ')">Impedance Table</button>';
