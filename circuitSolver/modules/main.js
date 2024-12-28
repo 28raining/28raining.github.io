@@ -92,7 +92,11 @@ function Comments() {
       lang="en"
       loading="lazy">
     </giscus-widget> -->
-  <div className="giscus"></div>
+  <!-- <div className="giscus"></div> -->
+<hyvor-talk-comments
+	website-id="12350"
+	page-id="7"
+></hyvor-talk-comments>
   `;
 }
 
