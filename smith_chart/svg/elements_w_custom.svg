@@ -27,7 +27,12 @@
   <path stroke-linecap="round"  fill="none" stroke="#000" stroke-width="10" d="M6680 140h140v120h-140z" />
   <text x="6750" y="195" font-family="Helvetica" font-size="35" text-anchor="middle">custom</text>
   <text x="6750" y="234" font-family="Helvetica" font-size="35" text-anchor="middle">Z vs F</text>
-  <path stroke-linecap="round"  fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M6500 90h30q10 0 10 10v90q0 10 10 10h130m140 0h130q10 0 10-10v-90q0-10 10-10h30" />
+  <!-- <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M6500 90h30q10 0 10 10v90q0 10 10 10h130m140 0h130q10 0 10-10v-90q0-10 10-10h30" /> -->
+  <!-- RLC parallel -->
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M6500 90h30q10 0 10 10v90q0 10 10 10h130M6820 200h130q10 0 10-10v-90q0-10 10-10h30M7430 90h70M7070 180h159" />
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10"  d="M7234 100v140M7264 100v140" />
+  <path stroke-linecap="round" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="10" d="M7269 180h161M7070 300h120M7310 300h120M7190 300q20-50 40 0M7230 300q20-50 40 0M7270 300q20-50 40 0M7070 400h120M7310 400h120M7200 370l-10 30M7200 370l20 60M7240 370l20 60M7280 370l20 60M7240 370l-20 60M7280 370l-20 60M7310 400l-10 30M7070 400V180M7430 180v220M7430 180V90M7070 90v90M7000 90h70" />
+
 		</g>
 	</defs>
 </svg>

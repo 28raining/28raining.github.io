@@ -314,6 +314,8 @@ function clicked_cell(type) {
     schematic.push({ type: 'rl', real: 0, imaginary: 0, abs: [50, 1], unit: ['Ω', 'nH'], tol: 0 });
   } else if (type == "rlc") {
     schematic.push({ type: 'rlc', real: 0, imaginary: 0, abs: [50, 1, 1], unit: ['Ω', 'nH', 'pF'], tol: 0 });
+  } else if (type == "rlc_par") {
+    schematic.push({ type: 'rlc_par', real: 0, imaginary: 0, abs: [50, 1, 1], unit: ['Ω', 'nH', 'pF'], tol: 0 });
   } else if (type == "customZ") {
     schematic.push({ type: 'customZ', real: 0, imaginary: 0, abs: [50, 1, 1], unit: ['Ω', 'nH', 'pF'], lut: [[2440e6, 50, 50]], interp: "linear", raw: "2440e6,50,50", tol: 0 });
   }
@@ -338,6 +340,7 @@ function update_schem_abs(target_num, obj, absCounter) {
     case ("rc"):
     case ("rl"):
     case ("rlc"):
+    case ("rlc_par"):
     case ("bb"):
     case ("sr"):
     case ("pr"):
@@ -395,6 +398,10 @@ function update_schem_component(freq_here, save_impedance, sch_index) {
     case ("si"):
       im_here = (schematic[sch_index].abs[0] * scaler[0] * 2 * Math.PI * freq_here / zo);
       break;
+    case ("rlc_par"):
+      re_here = schematic[sch_index].abs[0] * scaler[0] / zo;
+      im_here = (1/zo) / ((1/(schematic[sch_index].abs[1] * scaler[1] * 2 * Math.PI * freq_here)) - (schematic[sch_index].abs[2] * scaler[2] * 2 * Math.PI * freq_here));
+      break;
     case ("rlc"):
       re_here = schematic[sch_index].abs[0] * scaler[0] / zo;
       im_here = ((schematic[sch_index].abs[1] * scaler[1] * 2 * Math.PI * freq_here) - (1 / (schematic[sch_index].abs[2] * scaler[2] * 2 * Math.PI * freq_here))) / zo;
@@ -438,15 +445,17 @@ function update_schem_component(freq_here, save_impedance, sch_index) {
   }
 
   if (save_impedance) {
-    if ((Math.abs(re_here) < 0.1) && (re_here != 0)) schematic[sch_index].real = expo(re_here, 2);
-    else schematic[sch_index].real = Number(re_here).toPrecision(precision);
+    //This is removing precision before the calculation is done! oops.
+    // if ((Math.abs(re_here) < 0.1) && (re_here != 0)) schematic[sch_index].real = expo(re_here, 2);
+    // else schematic[sch_index].real = Number(re_here);
 
-    if ((Math.abs(im_here) < 0.1) && (im_here != 0)) schematic[sch_index].imaginary = expo(im_here, 2);
-    else schematic[sch_index].imaginary = Number(im_here).toPrecision(precision);
+    // if ((Math.abs(im_here) < 0.1) && (im_here != 0)) schematic[sch_index].imaginary = expo(im_here, 2);
+    // else schematic[sch_index].imaginary = Number(im_here);
 
+    schematic[sch_index].real = Number(re_here);
+    schematic[sch_index].imaginary = Number(im_here);
     schematic[sch_index].line_length = ln_here;
   }
-
   return [re_here, im_here, ln_here]
   //}
   //}
@@ -622,7 +631,7 @@ function update_smith_chart() {
           var schem_inv = one_over_complex(start[0] + schem_inv[0], start[1] + schem_inv[1]);
           span_impedance_re[sp] = schem_inv[0];
           span_impedance_im[sp] = schem_inv[1];
-        } else if ((schematic[i].type[0] == 's') || (schematic[i].type[0] == 'b') || (schematic[i].type == 'customZ')) {
+        } else if ((schematic[i].type[0] == 's') || (schematic[i].type[0] == 'b') || (schematic[i].type == 'customZ') || (schematic[i].type == 'rlc_par')) {
           //For series elements plotted on normal curves....
           start_impedance[0] = span_impedance_re[sp];
           start_impedance[1] = span_impedance_im[sp];
@@ -1108,6 +1117,8 @@ function update_smith_chart() {
     yaxis: 'y2',
     type: 'scatter'
   };
+  var traceS21 = {...traceS11};
+  var traceS21Ph = {...traceS11Ph};
 
   var sParamLayout = {
     yaxis: {
@@ -1125,9 +1136,11 @@ function update_smith_chart() {
       zeroline: false,
       // showgrid: true,
       gridcolor: "rgb(37, 50, 64)",
+      griddash:"dash",
       fixedrange: true,
       title: 'Phase (deg)',
       automargin: true,
+      overlaying:"y"
     },
     xaxis: {
       automargin: true,
@@ -1143,8 +1156,11 @@ function update_smith_chart() {
       b: 20,
       t: 20
     },
-    hovermode: false,
+    hovermode:"x unified",
     showlegend: false,
+    hoverlabel: {
+      bgcolor:"lightblue"
+    },
     // legend: {
     //   x: 1,
     //   xanchor: 'right',
@@ -1178,17 +1194,29 @@ function update_smith_chart() {
     // [reflectio_coeff_real, reflectio_coeff_imag, reflection_mag, reflection_phase] = impedanceToReflectionCoefficient (real_old, imag_old, zo) 
     traceS11.x = [];
     traceS11Ph.x = [];
+    traceS21.x = [];
+    traceS21Ph.x = [];
+    traceS11.y = [];
+    traceS11Ph.y = [];
+    traceS21.y = [];
+    traceS21Ph.y = [];
     for (i = 0; i < span_impedance_re.length; i++) {
       [reflectio_coeff_real, reflectio_coeff_imag, reflection_mag, reflection_phase] = impedanceToReflectionCoefficient(span_impedance_re[i], span_impedance_im[i], zo)
       if (reflection_mag == 0) {
         traceS11.y.push(0);
         traceS11Ph.y.push(0);
+        traceS21.y.push(0);
+        traceS21Ph.y.push(0);
       } else {
         traceS11.y.push(20 * Math.log10(reflection_mag));
         traceS11Ph.y.push(reflection_phase);
+        traceS21.y.push(20 * Math.log10(1-reflection_mag));
+        traceS21Ph.y.push(-reflection_phase);
       }
       traceS11.x.push((freq + span_freq * (i - span_res) / span_res) / schematic[0].freq_unit.multiplier);
       traceS11Ph.x.push((freq + span_freq * (i - span_res) / span_res) / schematic[0].freq_unit.multiplier);
+      traceS21.x.push((freq + span_freq * (i - span_res) / span_res) / schematic[0].freq_unit.multiplier);
+      traceS21Ph.x.push((freq + span_freq * (i - span_res) / span_res) / schematic[0].freq_unit.multiplier);
     }
     newSpanFreq = span_freq / schematic[0].freq_unit.multiplier;
   }
@@ -1197,11 +1225,10 @@ function update_smith_chart() {
 
   // var data = [traceS11, traceS22];
   var data = [traceS11, traceS11Ph];
-  // var smith_lambda = document.getElementById("SParamPlot").offsetWidth;
-  // sParamLayout.width = smith_lambda;
-  // sParamLayout.height = smith_lambda;
+  var data21 = [traceS21, traceS21Ph];
 
   Plotly.react('SParamPlot', data, sParamLayout, config);
+  Plotly.react('SParamPlot_s21', data21, sParamLayout, config);
 
 
   //update the HTML tables
@@ -1232,7 +1259,6 @@ function draw_schematic(i) {
       sch_imag = true;
       sch_real = true;
       sch_abs = true;
-      sch_icon = "black_box";
       sch_svg = 0;
       rows_to_create = [['Impedance'], ['abs', 'abs'], ['tol']];
       break;
@@ -1241,7 +1267,6 @@ function draw_schematic(i) {
       sch_imag = true;
       sch_real = true;
       sch_abs = true;
-      sch_icon = "CustomZ";
       sch_svg = 6500;
       rows_to_create = [['blank-impedance'], ['custom']];
       break;
@@ -1252,7 +1277,6 @@ function draw_schematic(i) {
       sch_real = true;
       sch_abs = true;
       unit = [['mΩ', 'Ω', 'KΩ', 'MΩ']];
-      sch_icon = "resistor_parallel";
       sch_svg = 2500;
       break;
     case ("sr"):
@@ -1262,7 +1286,6 @@ function draw_schematic(i) {
       sch_real = true;
       sch_abs = true;
       unit = [['mΩ', 'Ω', 'KΩ', 'MΩ']];
-      sch_icon = "resistor_series";
       sch_svg = 3000;
       break;
     case ("pc"):
@@ -1272,7 +1295,6 @@ function draw_schematic(i) {
       sch_real = false;
       sch_abs = true;
       unit = [['mF', 'uF', 'nF', 'pF', 'fF']];
-      sch_icon = "capacitor_parallel";
       sch_svg = 500;
       break;
     case ("sc"):
@@ -1282,7 +1304,6 @@ function draw_schematic(i) {
       sch_real = false;
       sch_abs = true;
       unit = [['mF', 'uF', 'nF', 'pF', 'fF']];
-      sch_icon = "capacitor_series";
       sch_svg = 1000;
       break;
     case ("pi"):
@@ -1292,7 +1313,6 @@ function draw_schematic(i) {
       sch_real = false;
       sch_abs = true;
       unit = [['H', 'mH', 'uH', 'nH', 'pH']];
-      sch_icon = "inductor_parallel";
       sch_svg = 1500;
       break;
     case ("si"):
@@ -1302,7 +1322,6 @@ function draw_schematic(i) {
       sch_real = false;
       sch_abs = true;
       unit = [['H', 'mH', 'uH', 'nH', 'pH']];
-      sch_icon = "inductor_series";
       sch_svg = 2000;
       break;
     case ("tl"):
@@ -1312,7 +1331,6 @@ function draw_schematic(i) {
       sch_real = false;
       sch_abs = true; //is actually length
       unit = [[' m', 'mm', 'um', 'λ']];
-      sch_icon = "transmission_line";
       sch_svg = 3500;
       break;
     case ("ss"):
@@ -1322,7 +1340,6 @@ function draw_schematic(i) {
       sch_real = false;
       sch_abs = true; //is actually length
       unit = [[' m', 'mm', 'um', 'λ']];
-      sch_icon = "stub_short";
       sch_svg = 4500;
       break;
     case ("so"):
@@ -1332,7 +1349,6 @@ function draw_schematic(i) {
       sch_real = false;
       sch_abs = true; //is actually length
       unit = [[' m', 'mm', 'um', 'λ']];
-      sch_icon = "stub_open";
       sch_svg = 4000;
       break
     case ("rc"):
@@ -1342,7 +1358,6 @@ function draw_schematic(i) {
       sch_real = true;
       sch_abs = true;
       unit = [['mΩ', 'Ω', 'KΩ', 'MΩ'], ['mF', 'uF', 'nF', 'pF', 'fF']];
-      sch_icon = "black_box";
       sch_svg = 5000;
       break;
     case ("rl"):
@@ -1352,18 +1367,25 @@ function draw_schematic(i) {
       sch_real = true;
       sch_abs = true;
       unit = [['mΩ', 'Ω', 'KΩ', 'MΩ'], ['H', 'mH', 'uH', 'nH', 'pH']];
-      sch_icon = "black_box";
       sch_svg = 5500;
       break;
     case ("rlc"):
       rows_to_create = [['Impedance'], ['abs', 'unit_0'], ['abs', 'unit_1'], ['abs', 'unit_2'], ['tol']];
-      sch_label = "Inductor w/ ESR";
+      sch_label = "Grounded RLC";
       sch_imag = true;
       sch_real = true;
       sch_abs = true;
       unit = [['mΩ', 'Ω', 'KΩ', 'MΩ'], ['H', 'mH', 'uH', 'nH', 'pH'], ['mF', 'uF', 'nF', 'pF', 'fF']];
-      sch_icon = "black_box";
       sch_svg = 6000;
+      break;
+    case ("rlc_par"):
+      rows_to_create = [['Impedance'], ['abs', 'unit_0'], ['abs', 'unit_1'], ['abs', 'unit_2'], ['tol']];
+      sch_label = "Parallel RLC";
+      sch_imag = true;
+      sch_real = true;
+      sch_abs = true;
+      unit = [['mΩ', 'Ω', 'KΩ', 'MΩ'], ['H', 'mH', 'uH', 'nH', 'pH'], ['mF', 'uF', 'nF', 'pF', 'fF']];
+      sch_svg = 7000;
       break;
   }
   innerText += '<div class="row"><div class="col"><svg viewBox="' + sch_svg + ' 0 500 500"><use xlink:href="svg/elements_w_custom.svg#rainbow3" alt="' + sch_label + '" /></svg></div></div>';
