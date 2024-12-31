@@ -450,12 +450,14 @@ function update_schem_component(freq_here, save_impedance, sch_index) {
       im_here = (schematic[sch_index].abs[0] * scaler[0] * 2 * Math.PI * freq_here) / zo;
       break;
     case "rlc_par":
-      re_here = (schematic[sch_index].abs[0] * scaler[0]) / zo;
-      im_here =
+      var re_temp = schematic[sch_index].abs[0] * scaler[0];
+      var im_temp =
         1 /
-        zo /
         (1 / (schematic[sch_index].abs[1] * scaler[1] * 2 * Math.PI * freq_here) -
           schematic[sch_index].abs[2] * scaler[2] * 2 * Math.PI * freq_here);
+      re_here = (im_temp * im_temp * re_temp) / (re_temp * re_temp + im_temp * im_temp) / zo;
+      im_here = (re_temp * re_temp * im_temp) / (re_temp * re_temp + im_temp * im_temp) / zo;
+      // console.log('bp1', re_temp, im_temp, re_here, im_here, scaler)
       break;
     case "rlc":
       re_here = (schematic[sch_index].abs[0] * scaler[0]) / zo;
@@ -840,10 +842,10 @@ function update_smith_chart() {
 
   //Update the impedance box
   var txt = '<div class="text_box">';
-  txt += (real_old * zo).toPrecision(3);
+  txt += (real_old * zo).toFixed(1);
   if (imag_old < 0) txt += " - ";
   else txt += " + ";
-  txt += Math.abs(imag_old * zo).toPrecision(3) + "j</div>";
+  txt += Math.abs(imag_old * zo).toFixed(1) + "j</div>";
   document.getElementById("current_impedance").innerHTML = txt;
 
   //Calculate the admittance
@@ -1397,7 +1399,6 @@ function update_smith_chart() {
 
   Plotly.react("SParamPlot", data, sParamLayout, config);
   Plotly.react("SParamPlot_s21", data21, sParamLayout, config);
-  console.log("data21", data21);
 
   //update the HTML tables
   drawMakerTable();
