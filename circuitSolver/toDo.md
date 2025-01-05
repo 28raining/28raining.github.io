@@ -1,11 +1,3 @@
-1 - Draw a static RC filter
-2 - Show laplace equation
--- Draw the laplace in Latex
--- Add 3 nodes (currently only support 2 nodes)
--- Add op-amps with R feedback
--- Add user drawing capability
--- Verify laplace is working by testing with big LC filter
--- Fix the MathML renderere
 
 
 -- Below is done later, after laplace derivation is more thoroughly verified... --

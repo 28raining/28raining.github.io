@@ -10,7 +10,6 @@ export class init_draw2d {
     // this.view.setScrollArea("#canvas");
 
     // var reader = new draw2d.io.json.Reader();
-    // reader.unmarshal(this.view, startupSchematic);
     this.view.loadSchematic(schematic);
     //The first load needs to trigger the calculateTF function
     this.writer.marshal(this.view, function (json) {
@@ -38,7 +37,6 @@ export class init_draw2d {
   }
 
   reUpdateCanvas(canvasState, handleCanvasChange) {
-    // startupSchematic = canvasState;
     this.view.loadSchematic(canvasState);
     this.writer.marshal(this.view, function (json) {
       handleCanvasChange(json);

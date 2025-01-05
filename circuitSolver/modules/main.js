@@ -7,6 +7,39 @@ import htm from "../js/htm.js";
 import { init_draw2d } from "./wdk_draw2d.js";
 import { calculateMNA, calcBilinear } from "./mna.js";
 
+//Decode the URL before starting and REACT stuff
+// Extract the query parameter
+
+var initialState = {
+  elements: {},
+  fmin: {
+    value: 1,
+    unit: "K",
+  },
+  fmax: {
+    value: 100,
+    unit: "G",
+  },
+  schematic: startupSchematic,
+};
+var startState = {...initialState};
+
+const urlParams = new URLSearchParams(window.location.search);
+const encodedCompressed = urlParams.get("state");
+if (encodedCompressed) {
+  // Decode the Base64 string back into a Uint8Array
+  const compressedBinary = Uint8Array.from(atob(decodeURIComponent(encodedCompressed)), (char) =>
+    char.charCodeAt(0)
+  );
+  const decompressed = pako.inflate(compressedBinary, { to: "string" }); // Decompress the data using pako
+  const decodedObject = JSON.parse(decompressed);  // Parse the decompressed JSON string into an object
+
+  if ('schematic' in decodedObject) startState.schematic = decodedObject.schematic;
+  if ('elements' in decodedObject) startState.elements = decodedObject.elements;
+  if ('fmin' in decodedObject) startState.fmin = decodedObject.fmin;
+  if ('fmax' in decodedObject) startState.fmax = decodedObject.fmax;
+
+} 
 const html = htm.bind(React.createElement);
 
 function navBar(props) {
@@ -14,15 +47,22 @@ function navBar(props) {
     <div className="container-xl" key="cont">
       <div className="row" key="r1">
         <div className="col" key="title">
-          <h4 className="mb-0" key="head"><strong>${props.title}</strong></h4>
+          <h4 className="mb-0" key="head"><strong><a href="/" style=${{'color':'#fff','text-decoration':'none'}}>${props.title}</a></strong></h4>
         </div>
-        <div className="col-1" key="undo">
+        <div className="col-2" key="undo">
           <button type="button" className="btn btn-secondary py-0" title="undo" onClick=${(e) => props.onClickUndo(e)} key="undoB">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" className="bi">
               <path d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"></path>
               <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"></path>
             </svg>
           </button>
+          <a href="/" style=${{'color':'#fff','text-decoration':'none'}}>
+          <button type="button" className="btn btn-secondary py-0 ms-2" title="restart" key="undoC">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">
+              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+              <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+            </svg>
+          </button></a>
         </div>
         <div className="col d-grid d-md-flex justify-content-md-end" key="navButtons">
           <a className="btn btn-light py-0" title="home" href="../" key="home">
@@ -627,18 +667,7 @@ class Game extends React.Component {
     super(props);
     this.state = {
       history: [
-        {
-          elements: {},
-          fmin: {
-            value: 1,
-            unit: "K",
-          },
-          fmax: {
-            value: 100,
-            unit: "G",
-          },
-          schematic: startupSchematic,
-        },
+        {...startState},
       ],
       latex: null,
       iinOrVin: "vin",
@@ -969,15 +998,7 @@ class Game extends React.Component {
       {
         history: this.state.history.concat([current]),
       },
-      // this.redrawSchematic(current)
       () => this.redrawSchematic(current)
-      // {
-      //   this.preventNewState = true;
-      //   this.state.elOnSchematic = {};
-      //   this.wdk_draw2d.reUpdateCanvas(current.schematic, (b) => this.handleCanvasChange(b));
-      //   this.preventNewState = false;
-      //   this.calculateTF;
-      // }
     );
 
     // this.setState(
@@ -1003,18 +1024,6 @@ class Game extends React.Component {
       this.setState({
         history: this.state.history,
       });
-
-      // this.setState(
-      //   {
-      //     history: this.state.history.concat([current]),
-      //   },
-      //   // this.redrawSchematic(current)
-      //   () => this.redrawSchematic(current)
-      // this.preventNewState = true;
-      // this.state.elOnSchematic = {};
-      // this.wdk_draw2d.reUpdateCanvas(current.schematic, (b) => this.handleCanvasChange(b));
-      // this.preventNewState = false;
-      // this.calculateTF;
     }
   }
 
@@ -1024,14 +1033,25 @@ class Game extends React.Component {
 
   render() {
     const current = this.state.history[this.state.history.length - 1];
-    // console.log(this.state)
+    // console.log("state", this.state)
+
+    //put the state into the URL
+    // Convert the object to a JSON string and encode it
+    const jsonString = JSON.stringify(current);
+    const compressed = pako.deflate(jsonString, { to: "string" });
+    // Encode the compressed data to make it URL-safe
+    const encodedCompressed = encodeURIComponent(btoa(String.fromCharCode(...compressed)));
+    const url = new URL(window.location.href);
+    // Use URLSearchParams to set the compressed data
+    url.searchParams.set("state", encodedCompressed);
+    window.history.pushState({}, "", url.toString()); // Update the browser URL without reloading
 
     // // Use state (variable containing all user inputs) to do MNA (modified nodal analysis)
     //
 
     // Update the DOM
     return html`
-      <${navBar} title="ONLINE CIRCUIT SOLVER" key="navBar" onClickUndo=${() => this.handleUndo(true)} />
+      <${navBar} title="ONLINE CIRCUIT SOLVER" key="navBar" onClickUndo=${() => this.handleUndo(true)}/>
       <${Toasts} key="toasts" toastMxVIsource=${this.toastMxVIsource} toastCopiedLatex=${this.toastCopiedLatex} toastCopiedMathML=${this.toastCopiedMathML} />
       <div className="w-100 p-2 bg-green" key="wrapper">
         <div className="container-xl" key="topContainer">
