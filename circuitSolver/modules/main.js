@@ -7,6 +7,12 @@ import htm from "../js/htm.js";
 import { init_draw2d } from "./wdk_draw2d.js";
 import { calculateMNA, calcBilinear } from "./mna.js";
 
+//RESET IT ERROR OCCURS!
+window.onerror = function (message, file, line, col, error) {
+  alert("The web page has crashed! Damn. If you can please describe what happened in a comment...\n\n" + error.message);
+  window.location.href = location.protocol + '//' + location.host + location.pathname;
+};
+
 //Decode the URL before starting and REACT stuff
 // Extract the query parameter
 

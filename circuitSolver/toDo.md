@@ -1,4 +1,4 @@
-
+- if add op amp with zero on input and LC on output, and change input to current source, it crashes
 
 
 
@@ -14,7 +14,7 @@
 3 - iin should not show cap size!
 4 - rotation state saved to the URL
 5 - Add url shareable button and toast
-
+6- - if state is corrupted then reset!
 # Draw2D
 - [x] Add a resistor shape to toolbar
 - [x] Add capacitor shape to toolbar
