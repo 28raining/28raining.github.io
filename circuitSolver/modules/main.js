@@ -9,8 +9,8 @@ import { calculateMNA, calcBilinear } from "./mna.js";
 
 //RESET IT ERROR OCCURS!
 window.onerror = function (message, file, line, col, error) {
-  alert("The web page has crashed! Damn. If you can please describe what happened in a comment...\n\n" + error.message);
-  window.location.href = location.protocol + '//' + location.host + location.pathname;
+alert("The web page has crashed! Damn. If you can please describe what happened in a comment...\n\n" + error.message);
+window.location.href = location.protocol + '//' + location.host + location.pathname;
 };
 
 //Decode the URL before starting and REACT stuff
@@ -742,19 +742,23 @@ class Game extends React.Component {
     this.freq = [];
     this.mag = [];
     var scaler;
-    var test = this.resString;
+    // var complex_freq = this.resString;
+    Algebrite.eval(`complex_response = subst(s*i,s,mna_vo_vi)`);
+    // console.log('0', Algebrite.eval("complex_response").toString());
+    var complex_freq = Algebrite.eval("abs(complex_response)").toString();
+    // console.log('a', complex_freq)
     var rep;
     for (const key in current.elements) {
       scaler = unitStrToVal(current.elements[key].unit);
       rep = RegExp(key, "g");
-      test = test.replace(rep, current.elements[key].value * scaler);
+      complex_freq = complex_freq.replace(rep, current.elements[key].value * scaler); 
     }
     // console.log(test, rep)
 
     //Now only remaining variable is S, substitute that and solve. Also swap power ^ for **
     const re = /s/gi;
     const re2 = /\^/gi;
-    var res = test.replace(re2, "**");
+    var res = complex_freq.replace(re2, "**");
 
     var fmin = current.fmin.value * unitStrToVal(current.fmin.unit);
     var fmax = current.fmax.value * unitStrToVal(current.fmax.unit);
@@ -1156,6 +1160,11 @@ class Game extends React.Component {
           <div key="comments" className="row my-2 py-1 shadow-sm rounded bg-lightgreen">
             <${Comments} key="comments" />
           </div>
+        </div>
+      </div>
+      <div className="w-100 p-3 bg-navy text-white" key="cont_w100">
+        <div className="container-xl" key="cont">
+            git: https://github.com/28raining/28raining.github.io/tree/master/circuitSolver
         </div>
       </div>
     `;
