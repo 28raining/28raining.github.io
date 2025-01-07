@@ -1,10 +1,19 @@
 
 
+
+
+
 -- Below is done later, after laplace derivation is more thoroughly verified... --
 3 - Show bilinear transform equation
 4 - Show state space representation
 5 - Draw amplitude response of those 3 transforms
 
+# Done on Jan 6 2024
+1 - mouse over tie to x
+2 - let user control number of steps
+3 - iin should not show cap size!
+4 - rotation state saved to the URL
+5 - Add url shareable button and toast
 
 # Draw2D
 - [x] Add a resistor shape to toolbar

@@ -56,6 +56,26 @@ export class init_draw2d {
   }
 }
 
+export function wdkRotate (figure)
+  {
+    // use a Command and CommandStack for undo/redo support
+    //
+    // var command = new draw2d.command.CommandDelete(figure);
+    // canvas.getCommandStack().execute(command);
+    var w = figure.getWidth();
+    var h = figure.getHeight();
+    var a = (figure.getRotationAngle() + 270) % 540;
+    var id = figure.getId();
+    // var letters = Array.from(id);
+    var rot = (a == 0) ^ (id[0] == "C") ? new draw2d.layout.locator.TopLocator() : new draw2d.layout.locator.RightLocator();
+    // console.log(figure.getChildren())
+    figure.resetChildren();
+
+    figure.add(new draw2d.shape.basic.Text({ text: id, stroke: 0 }), rot);
+    // console.log(a,h,w)
+    figure.attr({ angle: a, width: h, height: w });
+  }
+
 export var SelectionMenuPolicy = draw2d.policy.figure.SelectionPolicy.extend({
   NAME: "SelectionMenuPolicy",
 
@@ -86,24 +106,25 @@ export var SelectionMenuPolicy = draw2d.policy.figure.SelectionPolicy.extend({
         </svg>`
       );
       $("#canvasHolder").append(this.overlay);
-      this.overlay.on("click", function () {
-        // use a Command and CommandStack for undo/redo support
-        //
-        // var command = new draw2d.command.CommandDelete(figure);
-        // canvas.getCommandStack().execute(command);
-        var w = figure.getWidth();
-        var h = figure.getHeight();
-        var a = (figure.getRotationAngle() + 270) % 540;
-        var id = figure.getId();
-        // var letters = Array.from(id);
-        var rot = (a == 0) ^ (id[0] == "C") ? new draw2d.layout.locator.TopLocator() : new draw2d.layout.locator.RightLocator();
-        // console.log(figure.getChildren())
-        figure.resetChildren();
+      this.overlay.on("click", ()=>wdkRotate(figure))
+      // this.overlay.on("click", function () {
+      //   // use a Command and CommandStack for undo/redo support
+      //   //
+      //   // var command = new draw2d.command.CommandDelete(figure);
+      //   // canvas.getCommandStack().execute(command);
+      //   var w = figure.getWidth();
+      //   var h = figure.getHeight();
+      //   var a = (figure.getRotationAngle() + 270) % 540;
+      //   var id = figure.getId();
+      //   // var letters = Array.from(id);
+      //   var rot = (a == 0) ^ (id[0] == "C") ? new draw2d.layout.locator.TopLocator() : new draw2d.layout.locator.RightLocator();
+      //   // console.log(figure.getChildren())
+      //   figure.resetChildren();
 
-        figure.add(new draw2d.shape.basic.Text({ text: id, stroke: 0 }), rot);
-        // console.log(a,h,w)
-        figure.attr({ angle: a, width: h, height: w });
-      });
+      //   figure.add(new draw2d.shape.basic.Text({ text: id, stroke: 0 }), rot);
+      //   // console.log(a,h,w)
+      //   figure.attr({ angle: a, width: h, height: w });
+      // });
     }
     this.posOverlay(figure);
   },

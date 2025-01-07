@@ -1,4 +1,4 @@
-import { SelectionMenuPolicy } from "./wdk_draw2d.js";
+import { SelectionMenuPolicy, wdkRotate } from "./wdk_draw2d.js";
 
 const connectionDefault = {
   type: "draw2d.Connection",
@@ -59,7 +59,7 @@ export class View extends draw2d.Canvas {
     } else return name;
   }
 
-  addShapeToSchem(type, x, y, id) {
+  addShapeToSchem(type, x, y, id, angle) {
     // console.log(type, x, y)
     // console.log(this.getElements());
 
@@ -72,7 +72,7 @@ export class View extends draw2d.Canvas {
       relocate: function (index, figure) {
         var parent = figure.getParent();
         var rotAngle = parent.getRotationAngle();
-
+        
         if (rotAngle > 0) {
           // var newX =
           figure.setPosition(this.y, this.x);
@@ -181,6 +181,9 @@ export class View extends draw2d.Canvas {
     this.x = x;
     this.y = y;
     e.resizeable = false;
+    if (angle) {
+      if (angle > 0) wdkRotate(e);
+    }
     // console.log('add', add);
     var add = this.dropCb(e, (a) => this.addToSchematic(a));
     // add = true;
@@ -231,7 +234,7 @@ export class View extends draw2d.Canvas {
         else if (firstLetter == "Y") type = "iprobe";
         // console.log(item, type)
 
-        this.addShapeToSchem(type, item.x, item.y, item.id);
+        this.addShapeToSchem(type, item.x, item.y, item.id, item.angle);
       }
     });
 

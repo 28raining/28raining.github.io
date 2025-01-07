@@ -20,6 +20,7 @@ var initialState = {
     value: 100,
     unit: "G",
   },
+  numSteps: 100,
   schematic: startupSchematic,
 };
 var startState = {...initialState};
@@ -38,6 +39,7 @@ if (encodedCompressed) {
   if ('elements' in decodedObject) startState.elements = decodedObject.elements;
   if ('fmin' in decodedObject) startState.fmin = decodedObject.fmin;
   if ('fmax' in decodedObject) startState.fmax = decodedObject.fmax;
+  if ('numSteps' in decodedObject) startState.numSteps = decodedObject.numSteps;
 
 } 
 const html = htm.bind(React.createElement);
@@ -56,13 +58,18 @@ function navBar(props) {
               <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"></path>
             </svg>
           </button>
-          <a href="/" style=${{'color':'#fff','text-decoration':'none'}}>
+          <a href=${location.protocol + '//' + location.host + location.pathname} style=${{'color':'#fff','text-decoration':'none'}}>
           <button type="button" className="btn btn-secondary py-0 ms-2" title="restart" key="undoC">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">
               <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
               <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
             </svg>
           </button></a>
+          <button type="button" className="btn btn-secondary py-0 ms-2" title="share" onClick=${() => {navigator.clipboard.writeText(window.location.href); props.copiedToastURL.show()}} key="share">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
+              <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5m-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3"/>
+            </svg>
+          </button>
         </div>
         <div className="col d-grid d-md-flex justify-content-md-end" key="navButtons">
           <a className="btn btn-light py-0" title="home" href="../" key="home">
@@ -79,7 +86,7 @@ function navBar(props) {
   </div>`;
 }
 
-function Toasts({ toastMxVIsource, toastCopiedLatex, toastCopiedMathML }) {
+function Toasts({ toastMxVIsource, toastCopiedLatex, toastCopiedMathML, toastCopiedURL }) {
   return html`
     <div className="toast-container position-fixed top-0 end-0 p-3">
       <div id="liveToast" className="toast bg-warning" role="alert" ref=${toastMxVIsource}>
@@ -109,6 +116,16 @@ function Toasts({ toastMxVIsource, toastCopiedLatex, toastCopiedMathML }) {
         <div className="toast-body">
           Copied to your clipboard. Here's a free online MathML editor:
           <a className="text-white" href="https://codepen.io/bqlou/pen/yOgbmb" target="_blank">https://codepen.io/bqlou/pen/yOgbmb</a>
+        </div>
+      </div>
+
+      <div id="liveToast" className="toast bg-success text-white" role="alert" ref=${toastCopiedURL}>
+        <div className="toast-header">
+          <strong className="me-auto">Copied to clipboard</strong>
+          <button type="button" className="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div className="toast-body">
+          Shareable URL copied to your clipboard (same as in URL bar)
         </div>
       </div>
     </div>
@@ -327,7 +344,7 @@ var plotlyLayout = {
     showspikes: true,
     title: "amplitude (dB)",
   },
-  hovermode: "y unified",
+  hovermode: "x unified",
   autosize: true,
   margin: { t: 0 },
 };
@@ -608,6 +625,12 @@ function FreqResponseControllers(props) {
           </select>
         </div>
       </div>
+      <div className="col" key="numstep">
+        <div className="input-group mt-1">
+          <span className="input-group-text">Calculation Points</span>
+          <input type="text" className="form-control" value="${props.numStepsValue}" onChange=${(e) => props.onChange(e, "numSteps")} />
+        </div>
+      </div>
     </div>
   `;
 }
@@ -691,6 +714,7 @@ class Game extends React.Component {
     this.toastMxVIsource = React.createRef();
     this.toastCopiedLatex = React.createRef();
     this.toastCopiedMathML = React.createRef();
+    this.toastCopiedURL = React.createRef();
   }
 
   schematicReady() {
@@ -728,7 +752,7 @@ class Game extends React.Component {
 
     var fmin = current.fmin.value * unitStrToVal(current.fmin.unit);
     var fmax = current.fmax.value * unitStrToVal(current.fmax.unit);
-    var fstepdB_20 = Math.log10(fmax / fmin) / 100;
+    var fstepdB_20 = Math.log10(fmax / fmin) / current.numSteps;
     var fstep = 10 ** fstepdB_20;
     // console.log(fmin, fmax, fstep)
     // console.log(fmin, fmax, fstep, fstepdB_20, this.freq)
@@ -797,7 +821,7 @@ class Game extends React.Component {
     //add new elements
     //handle the parameter input
     for (const key in newElementMap) {
-      if (key == "gnd" || key == "xvout" || key == "vin" || key[0] == "o" || key[0] == "Y") continue;
+      if (key == "gnd" || key == "xvout" || key == "vin"  || key == "iin" || key[0] == "o" || key[0] == "Y") continue;
       var allLetters = Array.from(key);
       var firstLetter = allLetters[0];
       if (!(key in elements)) {
@@ -841,6 +865,7 @@ class Game extends React.Component {
 
     //build up a simplified schematic state
     canvasState.forEach((item) => {
+      // if (item.id == "R2") console.log('ii',{...item})
       if (item.type == "draw2d.Connection") {
         // newConn.source = item.source,
         // target: {node: 'vout', port: 'hybrid0'},
@@ -854,6 +879,7 @@ class Game extends React.Component {
         schematicState.push({
           type: "component",
           id: item.id,
+          angle: item.angle,
           x: item.x,
           y: item.y,
         });
@@ -920,6 +946,7 @@ class Game extends React.Component {
     this.bsToast = bootstrap.Toast.getOrCreateInstance(this.toastMxVIsource.current);
     this.copiedToast = bootstrap.Toast.getOrCreateInstance(this.toastCopiedLatex.current);
     this.copiedToastML = bootstrap.Toast.getOrCreateInstance(this.toastCopiedMathML.current);
+    this.copiedToastURL = bootstrap.Toast.getOrCreateInstance(this.toastCopiedURL.current);
 
     //enable tooltips
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
@@ -933,6 +960,8 @@ class Game extends React.Component {
       current.fmin.value = e.target.value;
     } else if (i == "fmax") {
       current.fmax.value = e.target.value;
+    } else if (i == "numSteps") {
+      current.numSteps = Math.round(e.target.value);
     } else {
       current.elements[i].value = e.target.value;
     }
@@ -1051,8 +1080,8 @@ class Game extends React.Component {
 
     // Update the DOM
     return html`
-      <${navBar} title="ONLINE CIRCUIT SOLVER" key="navBar" onClickUndo=${() => this.handleUndo(true)}/>
-      <${Toasts} key="toasts" toastMxVIsource=${this.toastMxVIsource} toastCopiedLatex=${this.toastCopiedLatex} toastCopiedMathML=${this.toastCopiedMathML} />
+      <${navBar} title="ONLINE CIRCUIT SOLVER" key="navBar" onClickUndo=${() => this.handleUndo(true)} copiedToastURL=${this.copiedToastURL} />
+      <${Toasts} key="toasts" toastMxVIsource=${this.toastMxVIsource} toastCopiedLatex=${this.toastCopiedLatex} toastCopiedMathML=${this.toastCopiedMathML} toastCopiedURL=${this.toastCopiedURL} />
       <div className="w-100 p-2 bg-green" key="wrapper">
         <div className="container-xl" key="topContainer">
           <div className="row">
@@ -1094,6 +1123,7 @@ class Game extends React.Component {
               <${FreqResponse} key="FreqResponse" />
               <${FreqResponseControllers}
                 key="FreqResponseControllers"
+                numStepsValue=${current.numSteps}
                 fminValue=${current.fmin.value}
                 fminUnit=${current.fmin.unit}
                 fmaxValue=${current.fmax.value}
