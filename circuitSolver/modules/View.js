@@ -176,7 +176,10 @@ export class View extends draw2d.Canvas {
       if (id) e.id = id;
       else e.id = `op${this.opCounter}`;
       this.opCounter = this.opCounter + 1;
-    } else console.log("ERROR: You gave a bad type: ", type);
+    } else {
+      console.log("ERROR: You gave a bad type: ", type);
+      return;
+    }
 
     this.x = x;
     this.y = y;
@@ -232,6 +235,7 @@ export class View extends draw2d.Canvas {
         else if (firstLetter == "i") type = "iin";
         else if (firstLetter == "x") type = "xvout";
         else if (firstLetter == "Y") type = "iprobe";
+        else if (firstLetter == "o") type = "op";
         // console.log(item, type)
 
         this.addShapeToSchem(type, item.x, item.y, item.id, item.angle);
