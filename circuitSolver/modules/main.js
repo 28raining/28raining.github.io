@@ -58,23 +58,39 @@ function navBar(props) {
           <h4 className="mb-0" key="head"><strong><a href="/" style=${{'color':'#fff','textDecoration':'none'}}>${props.title}</a></strong></h4>
         </div>
         <div className="col-2" key="undo">
-          <button type="button" className="btn btn-secondary py-0" title="undo" onClick=${(e) => props.onClickUndo(e)} key="undoB">
+          <button type="button" className="btn btn-secondary py-0" title="undo" onClick=${(e) => props.onClickUndo(e)} key="undoB" data-bs-toggle="tooltip"
+            data-bs-placement="bottom"
+            data-bs-title="Undo">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" className="bi">
               <path d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"></path>
               <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"></path>
             </svg>
           </button>
           <a href=${location.protocol + '//' + location.host + location.pathname} style=${{'color':'#fff','textDecoration':'none'}}>
-          <button type="button" className="btn btn-secondary py-0 ms-2" title="restart" key="undoC">
+          <button type="button" className="btn btn-secondary py-0 ms-2" title="restart" key="undoC" data-bs-toggle="tooltip"
+            data-bs-placement="bottom"
+            data-bs-title="Reset to original schematic">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-x-circle" viewBox="0 0 16 16">
               <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
               <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
             </svg>
           </button></a>
-          <button type="button" className="btn btn-secondary py-0 ms-2" title="share" onClick=${() => {navigator.clipboard.writeText(window.location.href); props.copiedToastURL.show()}} key="share">
+          <button type="button" className="btn btn-secondary py-0 ms-2" title="share" onClick=${() => {navigator.clipboard.writeText(window.location.href); props.copiedToastURL.show()}} key="share" data-bs-toggle="tooltip"
+            data-bs-placement="bottom"
+            data-bs-title="Share this circuit">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-share" viewBox="0 0 16 16">
               <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5m-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3"/>
             </svg>
+          </button>
+          <a href=${location.protocol + '//' + location.host + location.pathname + "/images/tutorial.gif"} style=${{'color':'#fff','textDecoration':'none'}} target="_blank">
+          <button type="button" className="btn btn-secondary py-0 ms-2" title="share" key="share" data-bs-toggle="tooltip"
+            data-bs-placement="bottom"
+            data-bs-title="Show me how to use this tool">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+              <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+            </svg>
+            </a>
           </button>
         </div>
         <div className="col d-grid d-md-flex justify-content-md-end" key="navButtons">
