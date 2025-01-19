@@ -780,13 +780,16 @@ class Game extends React.Component {
     var fmax = current.fmax.value * unitStrToVal(current.fmax.unit);
     var fstepdB_20 = Math.log10(fmax / fmin) / current.numSteps;
     var fstep = 10 ** fstepdB_20;
+    var absNew, evalNew;
     // console.log(fmin, fmax, fstep)
     // console.log(fmin, fmax, fstep, fstepdB_20, this.freq)
     // console.log('bp9', this.resString, res)
 
     for (var f = fmin; f < fmax; f = f * fstep) {
       this.freq.push(f);
-      this.mag.push(20 * Math.log10(Math.abs(eval(res.replace(re, 2 * Math.PI * f)))));
+      evalNew = eval(res.replace(re, 2 * Math.PI * f))
+      absNew = Math.abs(evalNew);
+      this.mag.push(20 * Math.log10(absNew));
     }
 
     // console.log("response: ", this.freq, this.mag )

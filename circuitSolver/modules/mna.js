@@ -168,15 +168,18 @@ export function calculateMNA(canvasState, chosenPlot) {
   if (debug) console.log("allElements", allElements)
   if (debug) console.log("iinOrVin", iinOrVin)
 
+  schematicReadiness.solvable = false;
+
   // Build MNA array
   if (schematicReadiness.vout && schematicReadiness.vin && schematicReadiness.gnd) {
+    var extraRow = 0;
+    if (iinOrVin == "vin") extraRow = 1;
     var numOpAmps = 0;
     for (const key in usedElements) if (Array.from(key)[0] == "o") numOpAmps += 1;
     var numIprb = 0;
     for (const key in usedElements) if (Array.from(key)[0] == "Y") numIprb += 1;  //FIXME - confirm this is used
     // Create 2D modified nodal analysis array
-    if (iinOrVin == "vin") var mnaMatrix = new Array(nodeMap.length + 1 + numOpAmps + numIprb);
-    else var mnaMatrix = new Array(nodeMap.length + numOpAmps + numIprb);
+    var mnaMatrix = new Array(nodeMap.length + extraRow + numOpAmps + numIprb);
     for (i = 0; i < mnaMatrix.length; i++) mnaMatrix[i] = new Array(mnaMatrix.length).fill("0");
 
     // Step 1 - create map of every element and which node it connects too. Doing this here, after node map is complete and ground node is removed
@@ -245,50 +248,50 @@ export function calculateMNA(canvasState, chosenPlot) {
       mnaMatrix[vinNode][mnaMatrix.length - 1 - numOpAmps - numIprb] = "1";
     }
 
-    //2.5 For each op-amp add some 1's. It says that 2 nodes are equal to each other, and that 1 node has a new ideal current source
-    // var opAmp = 0;
-    //port 0 -> +
-    //port 1 -> -
-    //port 2 -> out
-    // console.log('pre-op', mnaMatrix);
-    var idx;
-    for (const key in opAmpsMap) {
-      idx = parseInt(key);
-      if (opAmpsMap[key][0] != null) mnaMatrix[nodeMap.length + 1 + idx][opAmpsMap[idx][0]] = "1";
-      if (opAmpsMap[key][1] != null) mnaMatrix[nodeMap.length + 1 + idx][opAmpsMap[idx][1]] = "-1";
-      if (opAmpsMap[key][2] != null) mnaMatrix[opAmpsMap[idx][2]][nodeMap.length + 1 + idx] = "1";
-    }
-
-    //2.6 Current probes. The last rows are for current probes. 4x 1's are inserted to the Matrix, unless one node is ground
-    var iprbCounter=0;
-    for (const key in iprbMap) {
-      idx = parseInt(key);
-      if (iprbMap[key][0] != null) {
-        mnaMatrix[nodeMap.length + 1 + numOpAmps + iprbCounter][iprbMap[idx][0]] = "1";
-        mnaMatrix[iprbMap[idx][0]][ nodeMap.length + 1 + numOpAmps + iprbCounter] = "1";
-      }
-      if (iprbMap[key][1] != null) {
-        mnaMatrix[nodeMap.length + 1 + numOpAmps + iprbCounter][iprbMap[idx][1]] = "-1";
-        mnaMatrix[iprbMap[idx][1]][nodeMap.length + 1 + numOpAmps + iprbCounter] = "-1";
-      }
-      iprbCounter = iprbCounter+1;
-    }
-
-    var nerdStrArr = [];
-    var nerdStr = "";
-    for (i = 0; i < mnaMatrix.length; i++) {
-      nerdStrArr.push("[" + mnaMatrix[i].join(",") + "]");
-    }
-    nerdStr = nerdStrArr.join(",");
-    if (debug) console.log('mnaMatrix', mnaMatrix);
-
-    //Using algebrite not nerdamer
-    // const start = Date.now();
-    Algebrite.eval("clearall");
-    Algebrite.eval("mna = [" + nerdStr + "]");
-    var resString, resMathML;
-
     try {
+      var idx;
+      //2.5 For each op-amp add some 1's. It says that 2 nodes are equal to each other, and that 1 node has a new ideal current source
+      // var opAmp = 0;
+      //port 0 -> +
+      //port 1 -> -
+      //port 2 -> out
+      // console.log('pre-op', mnaMatrix, nodeMap.length, opAmpsMap);
+      for (const key in opAmpsMap) {
+        idx = parseInt(key);
+        if (opAmpsMap[key][0] != null) mnaMatrix[nodeMap.length + extraRow + idx][opAmpsMap[idx][0]] = "1";
+        if (opAmpsMap[key][1] != null) mnaMatrix[nodeMap.length + extraRow + idx][opAmpsMap[idx][1]] = "-1";
+        if (opAmpsMap[key][2] != null) mnaMatrix[opAmpsMap[idx][2]][nodeMap.length + extraRow + idx] = "1";
+      }
+
+      //2.6 Current probes. The last rows are for current probes. 4x 1's are inserted to the Matrix, unless one node is ground
+      var iprbCounter=0;
+      for (const key in iprbMap) {
+        idx = parseInt(key);
+        if (iprbMap[key][0] != null) {
+          mnaMatrix[nodeMap.length + 1 + numOpAmps + iprbCounter][iprbMap[idx][0]] = "1";
+          mnaMatrix[iprbMap[idx][0]][ nodeMap.length + 1 + numOpAmps + iprbCounter] = "1";
+        }
+        if (iprbMap[key][1] != null) {
+          mnaMatrix[nodeMap.length + 1 + numOpAmps + iprbCounter][iprbMap[idx][1]] = "-1";
+          mnaMatrix[iprbMap[idx][1]][nodeMap.length + 1 + numOpAmps + iprbCounter] = "-1";
+        }
+        iprbCounter = iprbCounter+1;
+      }
+
+      var nerdStrArr = [];
+      var nerdStr = "";
+      for (i = 0; i < mnaMatrix.length; i++) {
+        nerdStrArr.push("[" + mnaMatrix[i].join(",") + "]");
+      }
+      nerdStr = nerdStrArr.join(",");
+      if (debug) console.log('mnaMatrix', mnaMatrix);
+
+      //Using algebrite not nerdamer
+      // const start = Date.now();
+      Algebrite.eval("clearall");
+      Algebrite.eval("mna = [" + nerdStr + "]");
+      var resString, resMathML;
+
       if (mnaMatrix.length == 1) {
         Algebrite.eval(`mna_vo_vi = 1/(${mnaMatrix[0]})`);
       } else {
@@ -326,7 +329,6 @@ export function calculateMNA(canvasState, chosenPlot) {
       schematicReadiness.solvable = true;
     } catch (err) {
       console.log("Solving failed with this error:", err);
-      schematicReadiness.solvable = false;
       resMathML = "<mtext>Schematic currently invalid</mtext>";
       resString = "";
     }
@@ -336,7 +338,6 @@ export function calculateMNA(canvasState, chosenPlot) {
   } else {
     resMathML = "<mtext>Schematic currently invalid</mtext>";
     // bilinearMathML = "<mtext>Schematic currently invalid</mtext>";
-    schematicReadiness.solvable = false;
   }
 
   // console.log('bp2', resString)
