@@ -160,6 +160,7 @@ export function calculateMNA(canvasState, chosenPlot) {
   var opAmpsMap;
   var iinOrVin;
   var iprbMap = {};
+  var itemsForMatrixSolve = {};
 
   [nodeMap, usedElements, schematicReadiness, allElements, iinOrVin] = processCanvasState(canvasState);
   if (debug) console.log("nodemap", nodeMap)
@@ -290,67 +291,78 @@ export function calculateMNA(canvasState, chosenPlot) {
       // const start = Date.now();
       Algebrite.eval("clearall");
       Algebrite.eval("mna = [" + nerdStr + "]");
-      var resString, resMathML;
 
-      if (mnaMatrix.length == 1) {
-        Algebrite.eval(`mna_vo_vi = 1/(${mnaMatrix[0]})`);
-      } else {
-        Algebrite.eval("inv_mna = inv(mna)");
-        // Algebrite.eval("inv_mna")
-        if (iinOrVin == "vin") {
-          if ((chosenPlot=="vo") || (iprbNode==null)) {
-            Algebrite.eval("mna_vo_vi = (inv_mna[" + (voutNode + 1) + "][" + (mnaMatrix.length - numOpAmps - numIprb) + "])");
-          } else {
-            //current thru the probe is this equation
-            Algebrite.eval("mna_vo_vi = (inv_mna[" + (mnaMatrix.length) + "][" + (mnaMatrix.length - numOpAmps - numIprb) + "])");
-          }
-        } else {
-          if ((chosenPlot=="vo") || (iprbNode==null)) {
-            Algebrite.eval("mna_vo_vi = (inv_mna[" + (voutNode + 1) + "][" + (iinNode + 1) + "])");
-          } else {
-            Algebrite.eval("mna_vo_vi = (inv_mna[" + (mnaMatrix.length) + "][" + (iinNode + 1) + "])");
-          }
-        }
-      }
-      //Original: 38ms
-      //Remove eval: 35ms
-      //Remove simplify: 15ms
-      var strOut = Algebrite.eval("mna_vo_vi").toString(); //4ms
-      
-      // if (iprbNode!=null) console.log('iprb result', Algebrite.eval("iprb").toString() );
+      itemsForMatrixSolve['mnaMatrix'] = mnaMatrix; 
+      itemsForMatrixSolve['iinOrVin'] = iinOrVin; 
+      itemsForMatrixSolve['chosenPlot'] = chosenPlot; 
+      itemsForMatrixSolve['iprbNode'] = iprbNode; 
+      itemsForMatrixSolve['voutNode'] = voutNode; 
+      itemsForMatrixSolve['numOpAmps'] = numOpAmps; 
+      itemsForMatrixSolve['numIprb'] = numIprb; 
+      itemsForMatrixSolve['iinNode'] = iinNode; 
+      itemsForMatrixSolve['allElements'] = allElements; 
 
-      
-
-
-      var xyz= simplify_algebra(strOut);
-      resString = xyz[0]
-      resMathML = xyz[1]
-      // [resString, resMathML] = simplify_algebra(strOut);
-      schematicReadiness.solvable = true;
     } catch (err) {
-      console.log("Solving failed with this error:", err);
-      resMathML = "<mtext>Schematic currently invalid</mtext>";
-      resString = "";
+      console.log("Building MNA matrix failed with this error:", err);
     }
 
-    // var bilinearMathML = null;
-    // var bilinearMathML = calcBilinear(); // FIXME - call on button click
-  } else {
-    resMathML = "<mtext>Schematic currently invalid</mtext>";
-    // bilinearMathML = "<mtext>Schematic currently invalid</mtext>";
+    //   var resString, resMathML;
+
+    //   if (mnaMatrix.length == 1) {
+    //     Algebrite.eval(`mna_vo_vi = 1/(${mnaMatrix[0]})`);
+    //   } else {
+    //     Algebrite.eval("inv_mna = inv(mna)");
+    //     // Algebrite.eval("inv_mna")
+    //     if (iinOrVin == "vin") {
+    //       if ((chosenPlot=="vo") || (iprbNode==null)) {
+    //         Algebrite.eval("mna_vo_vi = (inv_mna[" + (voutNode + 1) + "][" + (mnaMatrix.length - numOpAmps - numIprb) + "])");
+    //       } else {
+    //         //current thru the probe is this equation
+    //         Algebrite.eval("mna_vo_vi = (inv_mna[" + (mnaMatrix.length) + "][" + (mnaMatrix.length - numOpAmps - numIprb) + "])");
+    //       }
+    //     } else {
+    //       if ((chosenPlot=="vo") || (iprbNode==null)) {
+    //         Algebrite.eval("mna_vo_vi = (inv_mna[" + (voutNode + 1) + "][" + (iinNode + 1) + "])");
+    //       } else {
+    //         Algebrite.eval("mna_vo_vi = (inv_mna[" + (mnaMatrix.length) + "][" + (iinNode + 1) + "])");
+    //       }
+    //     }
+    //   }
+    //   //Original: 38ms
+    //   //Remove eval: 35ms
+    //   //Remove simplify: 15ms
+    //   var strOut = Algebrite.eval("mna_vo_vi").toString(); //4ms
+      
+    //   // if (iprbNode!=null) console.log('iprb result', Algebrite.eval("iprb").toString() );
+
+      
+
+
+    //   var xyz= simplify_algebra(strOut);
+    //   resString = xyz[0]
+    //   resMathML = xyz[1]
+    //   // [resString, resMathML] = simplify_algebra(strOut);
+    //   schematicReadiness.solvable = true;
+    // } catch (err) {
+    //   console.log("Solving failed with this error:", err);
+    //   resMathML = "<mtext>Schematic currently invalid</mtext>";
+    //   resString = "";
+    // }
+
   }
 
-  // console.log('bp2', resString)
-
-  return [schematicReadiness, resMathML, allElements, resString, iinOrVin, Object.keys(iprbMap)];
+  return [schematicReadiness, allElements, iinOrVin, Object.keys(iprbMap), itemsForMatrixSolve];
 }
 
 export function calcBilinear() {
-  var discard, bilinearMathML;
+  var discard, bilinearMathML, x;
   Algebrite.eval("bilinear = subst((2/T)*(Z-1)/(Z+1),s,mna_vo_vi)");
   try {
-    [discard, bilinearMathML] = simplify_algebra(Algebrite.eval("bilinear").toString());
-  } catch {
+    x = simplify_algebra(Algebrite.eval("bilinear").toString());
+    discard = x[0]
+    bilinearMathML = x[1]
+  } catch (err) {
+    console.log(err)
     bilinearMathML = "<mtext>Having trouble calculating bilinear transform</mtext>";
   }
 

@@ -6,6 +6,8 @@ import ReactDOM from "https://unpkg.com/es-react@16.13.1/react-dom.js";
 import htm from "../js/htm.js";
 import { init_draw2d } from "./wdk_draw2d.js";
 import { calculateMNA, calcBilinear } from "./mna.js";
+import simplify_algebra from "./simplify_algebra.js";
+
 
 //RESET IT ERROR OCCURS!
 window.onerror = function (message, file, line, col, error) {
@@ -13,14 +15,36 @@ alert("The web page has crashed! Damn. If you can please describe what happened 
 window.location.href = location.protocol + '//' + location.host + location.pathname;
 };
 
+const isTouchDevice =  
+     (('ontouchstart' in window) ||
+     (navigator.maxTouchPoints > 0) ||
+     (navigator.msMaxTouchPoints > 0));
+
+
 //Decode the URL before starting and REACT stuff
 // Extract the query parameter
 
 var initialState = {
-  elements: {},
+  elements: {
+    "L0": {
+        "value": 1,
+        "unit": "u",
+        "displayName": "L0"
+    },
+    "R0": {
+        "value": 10,
+        "unit": "K",
+        "displayName": "R0"
+    },
+    "C0": {
+        "value": 10,
+        "unit": "f",
+        "displayName": "C0"
+    }
+},
   fmin: {
     value: 1,
-    unit: "K",
+    unit: "M",
   },
   fmax: {
     value: 100,
@@ -86,7 +110,7 @@ function navBar(props) {
           <button type="button" className="btn btn-secondary py-0 ms-2" title="share" key="share" data-bs-toggle="tooltip"
             data-bs-placement="bottom"
             data-bs-title="Show me how to use this tool">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-info-circle" viewBox="0 0 16 16">
               <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
               <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
             </svg>
@@ -108,10 +132,10 @@ function navBar(props) {
   </div>`;
 }
 
-function Toasts({ toastMxVIsource, toastCopiedLatex, toastCopiedMathML, toastCopiedURL }) {
+function Toasts({ toastMxVIsource, toastCopiedLatex, toastCopiedMathML, toastCopiedURL, toastError }) {
   return html`
     <div className="toast-container position-fixed top-0 end-0 p-3">
-      <div id="liveToast" className="toast bg-warning" role="alert" ref=${toastMxVIsource}>
+      <div id="liveToast1" className="toast bg-warning" role="alert" ref=${toastMxVIsource}>
         <div className="toast-header">
           <strong className="me-auto">Warning</strong>
           <button type="button" className="btn-close" data-bs-dismiss="toast"></button>
@@ -119,7 +143,7 @@ function Toasts({ toastMxVIsource, toastCopiedLatex, toastCopiedMathML, toastCop
         <div className="toast-body">You can only have one Voltage Source or Current Source. Also only one voltage probe, and one current probe</div>
       </div>
 
-      <div id="liveToast" className="toast bg-success text-white" role="alert" ref=${toastCopiedLatex}>
+      <div id="liveToast2" className="toast bg-success text-white" role="alert" ref=${toastCopiedLatex}>
         <div className="toast-header">
           <strong className="me-auto">Copied to clipboard</strong>
           <button type="button" className="btn-close" data-bs-dismiss="toast"></button>
@@ -130,7 +154,7 @@ function Toasts({ toastMxVIsource, toastCopiedLatex, toastCopiedMathML, toastCop
         </div>
       </div>
 
-      <div id="liveToast" className="toast bg-success text-white" role="alert" ref=${toastCopiedMathML}>
+      <div id="liveToast3" className="toast bg-success text-white" role="alert" ref=${toastCopiedMathML}>
         <div className="toast-header">
           <strong className="me-auto">Copied to clipboard</strong>
           <button type="button" className="btn-close" data-bs-dismiss="toast"></button>
@@ -141,13 +165,23 @@ function Toasts({ toastMxVIsource, toastCopiedLatex, toastCopiedMathML, toastCop
         </div>
       </div>
 
-      <div id="liveToast" className="toast bg-success text-white" role="alert" ref=${toastCopiedURL}>
+      <div id="liveToast4" className="toast bg-success text-white" role="alert" ref=${toastCopiedURL}>
         <div className="toast-header">
           <strong className="me-auto">Copied to clipboard</strong>
           <button type="button" className="btn-close" data-bs-dismiss="toast"></button>
         </div>
         <div className="toast-body">
           Shareable URL copied to your clipboard (same as in URL bar)
+        </div>
+      </div>
+
+      <div id="liveToast5" className="toast bg-danger text-white" role="alert" ref=${toastError}>
+        <div className="toast-header">
+          <strong className="me-auto">Error occurred</strong>
+          <button type="button" className="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div className="toast-body">
+          An unknown error has occurred. Please share reproduction steps in the comments
         </div>
       </div>
     </div>
@@ -343,11 +377,11 @@ function SchematicVal(props) {
   `;
 }
 
-function FreqResponse() {
+function FreqResponse(props) {
   return html`
     <div className="row">
-      <div className="col" style=${{ height: "400" + "px" }}>
-        <div id="tester" style=${{ height: "100" + "%", width: "100" + "%" }}></div>
+      <div className="col" style=${{ height: "400" + "px", visibility: props.calculationDone ? 'visible' : 'hidden' }}>
+        <div ref=${props.plotlyDiv} style=${{ height: "100" + "%", width: "100" + "%" }}></div>
       </div>
     </div>
   `;
@@ -371,13 +405,13 @@ var plotlyLayout = {
   margin: { t: 0 },
 };
 
-function createGraph(el) {
+function createGraph(el,freq,mag) {
   Plotly.newPlot(
-    el,
+    el.current,
     [
       {
-        x: [0],
-        y: [0],
+        x: freq,
+        y: mag,
         // x: freq,
         // y: mag
       },
@@ -387,6 +421,8 @@ function createGraph(el) {
 }
 
 function updateGraph(el, freq, mag) {
+  createGraph(el, freq, mag);
+  return;
   // console.log('thinking about it')
   if (el) {
     // console.log('doing it', freq, mag)
@@ -407,6 +443,7 @@ function updateGraph(el, freq, mag) {
 }
 
 function TransformResults(props) {
+  if(!props.calculationDone) return null;
   // console.log(props)
   const mathMlString = `<math>${
     props.chosen == "vo"
@@ -450,7 +487,7 @@ function TransformResults(props) {
       </div>
       <div key="r2" className="row text-center fs-3 py-2">
         ${props.latex || props.title == "Laplace"
-          ? html` <div key="c1" className="col-10">${MyComponent(mathMlString)}</div>
+          ? html` <div key="c1" className="col-10" style=${{'overflow':'auto'}}>${MyComponent(mathMlString)}</div>
               <div key="c2" className="col-2">
                 <div key="c3" className="d-grid gap-1">
                   <button
@@ -485,14 +522,14 @@ function TransformResults(props) {
                   </button>
                 </div>
               </div>`
-          : html`<button
+          : html`<div className="col"><button
               type="button"
               className="btn btn-outline-primary py-0"
               onClick=${() => {
                 props.handleRequestBilin();
               }}>
               Calculate bilinear transform
-            </button>`}
+            </button></div>`}
       </div>
     </div>
   `;
@@ -707,6 +744,82 @@ function centerSchematic(schem) {
   return schem;
 }
 
+function solveMatrixAlgebrite(itemsForMatrixSolve, calcT, elements, setSt) {
+  var  mnaMatrix = itemsForMatrixSolve['mnaMatrix']; 
+  var  iinOrVin = itemsForMatrixSolve['iinOrVin']; 
+  var  chosenPlot = itemsForMatrixSolve['chosenPlot']; 
+  var  iprbNode = itemsForMatrixSolve['iprbNode']; 
+  var  voutNode = itemsForMatrixSolve['voutNode']; 
+  var  numOpAmps = itemsForMatrixSolve['numOpAmps']; 
+  var  numIprb = itemsForMatrixSolve['numIprb']; 
+  var  iinNode = itemsForMatrixSolve['iinNode']; 
+  var  allElements = itemsForMatrixSolve['allElements']; 
+  try {
+      var resString, resMathML;
+      if (mnaMatrix.length == 1) {
+        Algebrite.eval(`mna_vo_vi = 1/(${mnaMatrix[0]})`);
+      } else {
+        Algebrite.eval("inv_mna = inv(mna)");
+        // Algebrite.eval("inv_mna")
+        if (iinOrVin == "vin") {
+          if ((chosenPlot=="vo") || (iprbNode==null)) {
+            Algebrite.eval("mna_vo_vi = (inv_mna[" + (voutNode + 1) + "][" + (mnaMatrix.length - numOpAmps - numIprb) + "])");
+          } else {
+            //current thru the probe is this equation
+            Algebrite.eval("mna_vo_vi = (inv_mna[" + (mnaMatrix.length) + "][" + (mnaMatrix.length - numOpAmps - numIprb) + "])");
+          }
+        } else {
+          if ((chosenPlot=="vo") || (iprbNode==null)) {
+            Algebrite.eval("mna_vo_vi = (inv_mna[" + (voutNode + 1) + "][" + (iinNode + 1) + "])");
+          } else {
+            Algebrite.eval("mna_vo_vi = (inv_mna[" + (mnaMatrix.length) + "][" + (iinNode + 1) + "])");
+          }
+        }
+      }
+
+      var strOut = Algebrite.eval("mna_vo_vi").toString(); //4ms
+
+      var xyz = simplify_algebra(strOut);
+      resString = xyz[0]
+      resMathML = xyz[1]
+      // schematicReadiness.solvable = true;
+
+      Algebrite.eval("complex_response = subst(s*i,s,mna_vo_vi)");
+      // console.log(Algebrite.eval("complex_response").toString());
+      Algebrite.eval("abs_complex_response = abs(complex_response)");
+      // console.log(Algebrite.eval("abs_complex_response").toString());
+      
+      // Algebrite.eval("re_complex_response = real(complex_response)");
+      // console.log(Algebrite.eval("re_complex_response").toString());
+      // Algebrite.eval("re_complex_response = real(complex_response)");
+      // console.log(Algebrite.eval("re_complex_response").toString());
+  
+
+
+      for (const key in allElements) {
+
+      if ((key in elements)) {
+        //handle renaming
+        if (elements[key].displayName != key) {
+          var dispLetters = Array.from(elements[key].displayName);
+          resMathML = resMathML.replaceAll(
+            `<mi>${firstLetter}</mi><mn>${allLetters.slice(1, allLetters.length).join("")}</mn>`,
+            `<mi>${firstLetter}</mi><mn>${dispLetters.slice(1, dispLetters.length).join("")}</mn>`
+          );
+        }
+      }
+      }
+
+      setSt({latex: resMathML, resString: resString})
+
+
+      calcT();
+    } catch (err) {
+      this.copiedToastError.show()
+      console.log("Solving failed with this error:", err);
+    }
+}
+
 class Game extends React.Component {
   constructor(props) {
     super(props);
@@ -718,6 +831,7 @@ class Game extends React.Component {
       iinOrVin: "vin",
       iprbList: [],
       bilinearMathML: null,
+      calculationDone:false,
       elOnSchematic: [],
       schematicReadiness: {
         vout: false,
@@ -726,17 +840,21 @@ class Game extends React.Component {
         solvable: false,
       },
       chosenPlot: "vo",
+      resString: null,
     };
 
     this.TESTER = null;
     this.freq = [];
     this.mag = [];
-    this.resString = null;
+    this.itemsForMatrixSolve = {};
+    // this.resString = null;
     this.preventNewState = false;
     this.toastMxVIsource = React.createRef();
     this.toastCopiedLatex = React.createRef();
     this.toastCopiedMathML = React.createRef();
     this.toastCopiedURL = React.createRef();
+    this.toastError = React.createRef();
+    this.plotlyDiv = React.createRef();
   }
 
   schematicReady() {
@@ -749,32 +867,27 @@ class Game extends React.Component {
 
   calculateTF() {
     const current = this.state.history[this.state.history.length - 1];
-    if (!this.schematicReady()) {
-      // console.log('thhhhh')
-      updateGraph(this.TESTER, [], []);
-      return;
-    }
     //Convert algebra result into a numerical result
     this.freq = [];
     this.mag = [];
     var scaler;
-    // var complex_freq = this.resString;
-    Algebrite.eval(`complex_response = subst(s*i,s,mna_vo_vi)`);
+    // Algebrite.eval(`complex_response = subst(s*i,s,mna_vo_vi)`);
     // console.log('0', Algebrite.eval("complex_response").toString());
-    var complex_freq = Algebrite.eval("abs(complex_response)").toString();
-    // console.log('a', complex_freq)
+    var complex_freq = Algebrite.eval("abs_complex_response").toString();
     var rep;
     for (const key in current.elements) {
       scaler = unitStrToVal(current.elements[key].unit);
       rep = RegExp(key, "g");
       complex_freq = complex_freq.replace(rep, current.elements[key].value * scaler); 
     }
-    // console.log(test, rep)
-
+    
     //Now only remaining variable is S, substitute that and solve. Also swap power ^ for **
     const re = /s/gi;
     const re2 = /\^/gi;
+    const re3 = /abs/gi;  //sometimes abs(C0) is left in the equation
     var res = complex_freq.replace(re2, "**");
+    res = res.replace(re3, "");
+    // console.log(res)
 
     var fmin = current.fmin.value * unitStrToVal(current.fmin.unit);
     var fmax = current.fmax.value * unitStrToVal(current.fmax.unit);
@@ -783,18 +896,22 @@ class Game extends React.Component {
     var absNew, evalNew;
     // console.log(fmin, fmax, fstep)
     // console.log(fmin, fmax, fstep, fstepdB_20, this.freq)
-    // console.log('bp9', this.resString, res)
 
+    try {
     for (var f = fmin; f < fmax; f = f * fstep) {
       this.freq.push(f);
       evalNew = eval(res.replace(re, 2 * Math.PI * f))
       absNew = Math.abs(evalNew);
       this.mag.push(20 * Math.log10(absNew));
     }
+  } catch (err) {
+    this.copiedToastError.show()
+    console.log("oh no", err)
+  }
 
     // console.log("response: ", this.freq, this.mag )
 
-    updateGraph(this.TESTER, this.freq, this.mag);
+    updateGraph(this.plotlyDiv, this.freq, this.mag);
   }
 
   //name it better
@@ -842,8 +959,8 @@ class Game extends React.Component {
     var schematicReadiness;
     var iinOrVin;
     var iprbList;
-    [schematicReadiness, mathMlResult, newElementMap, this.resString, iinOrVin, iprbList] = calculateMNA(canvasState, this.state.chosenPlot);
-    this.state.elOnSchematic = newElementMap;
+    [schematicReadiness, newElementMap, iinOrVin, iprbList, this.itemsForMatrixSolve] = calculateMNA(canvasState, this.state.chosenPlot);
+    // this.state.elOnSchematic = newElementMap;
 
     var schematicState = [];
 
@@ -866,21 +983,18 @@ class Game extends React.Component {
             unit: "u",
             displayName: key,
           };
+        } else if (firstLetter == "C") {
+          elements[key] = {
+            value: 10,
+            unit: "f",
+            displayName: key,
+          };
         } else {
           elements[key] = {
             value: 1,
             unit: "p",
             displayName: key,
           };
-        }
-      } else {
-        //handle renaming
-        if (elements[key].displayName != key) {
-          var dispLetters = Array.from(elements[key].displayName);
-          mathMlResult = mathMlResult.replaceAll(
-            `<mi>${firstLetter}</mi><mn>${allLetters.slice(1, allLetters.length).join("")}</mn>`,
-            `<mi>${firstLetter}</mi><mn>${dispLetters.slice(1, dispLetters.length).join("")}</mn>`
-          );
         }
       }
     }
@@ -928,26 +1042,24 @@ class Game extends React.Component {
         {
           iinOrVin: iinOrVin,
           iprbList: iprbList,
-          latex: mathMlResult,
           bilinearMathML: bilinearMathML,
           schematicReadiness: schematicReadiness,
-        },
-        this.calculateTF
-      );
+          elOnSchematic: newElementMap,
+          calculationDone: false,
+        }      );
     } else {
       // console.log(iprbList, iprbList.length);
       if (iprbList.length == 0) this.setState({ chosenPlot: "vo" });
       this.setState(
         {
           history: this.state.history.concat([current]),
-          latex: mathMlResult,
           bilinearMathML: bilinearMathML,
           schematicReadiness: schematicReadiness,
+          elOnSchematic: newElementMap,
           iinOrVin: iinOrVin,
           iprbList: iprbList,
-        },
-        this.calculateTF
-      );
+          calculationDone: false,
+        }      );
     }
   }
 
@@ -967,8 +1079,8 @@ class Game extends React.Component {
     );
     // pass this.tff as above
     this.wdk_draw2d.addEvL(this.wdk_draw2d.view, this.wdk_draw2d.writer, (canvasState) => this.handleCanvasChange(canvasState));
-    this.TESTER = document.getElementById("tester");
-    createGraph(this.TESTER);
+    // this.TESTER = document.getElementById("tester");
+    createGraph(this.plotlyDiv, [0], [0]); // FIXME - uncomment
     // updateGraph(this.TESTER, this.freq, this.mag)
 
     //enable the toasts
@@ -976,10 +1088,14 @@ class Game extends React.Component {
     this.copiedToast = bootstrap.Toast.getOrCreateInstance(this.toastCopiedLatex.current);
     this.copiedToastML = bootstrap.Toast.getOrCreateInstance(this.toastCopiedMathML.current);
     this.copiedToastURL = bootstrap.Toast.getOrCreateInstance(this.toastCopiedURL.current);
+    this.copiedToastError = bootstrap.Toast.getOrCreateInstance(this.toastError.current);
 
     //enable tooltips
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     const tooltipList = [...tooltipTriggerList].map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
+
+    //calculate TF
+    this.toggleCalculate()
   }
 
   handleElChange(e, i) {
@@ -1006,7 +1122,7 @@ class Game extends React.Component {
   handlePlotChange(e) {
     var current = JSON.parse(JSON.stringify(this.state.history[this.state.history.length - 1]));
 
-    // console.log(e.target.value);
+    console.log('boop', e.target.value, current);
     // return;
     this.setState(
       {
@@ -1075,18 +1191,24 @@ class Game extends React.Component {
       }
 
       this.preventNewState = true;
-      this.state.elOnSchematic = {};
 
       this.wdk_draw2d.reUpdateCanvas(this.state.history[this.state.history.length - 1].schematic, (b) => this.handleCanvasChange(b));
       this.preventNewState = false;
       this.setState({
         history: this.state.history,
+        elOnSchematic: {},
       });
     }
   }
 
   handleRequestBilin() {
     this.setState({ bilinearMathML: calcBilinear() });
+  }
+
+  toggleCalculate() {
+    const current = this.state.history[this.state.history.length - 1];
+    //FIXME - can setstate be re-ordered
+    this.setState({calculationDone: !this.state.calculationDone}, solveMatrixAlgebrite(this.itemsForMatrixSolve, ()=>this.calculateTF(), current.elements, (e)=>this.setState(e)));
   }
 
   render() {
@@ -1111,7 +1233,8 @@ class Game extends React.Component {
     // Update the DOM
     return html`
       <${navBar} title="ONLINE CIRCUIT SOLVER" key="navBar" onClickUndo=${() => this.handleUndo(true)} copiedToastURL=${this.copiedToastURL} />
-      <${Toasts} key="toasts" toastMxVIsource=${this.toastMxVIsource} toastCopiedLatex=${this.toastCopiedLatex} toastCopiedMathML=${this.toastCopiedMathML} toastCopiedURL=${this.toastCopiedURL} />
+      <${Toasts} key="toasts" toastMxVIsource=${this.toastMxVIsource} toastCopiedLatex=${this.toastCopiedLatex} toastCopiedMathML=${this.toastCopiedMathML} toastCopiedURL=${this.toastCopiedURL} toastError=${this.toastError} />
+      ${isTouchDevice ? html`<div className="row"><div className="col bg-danger text-light text-center">Touchscreen detected - this site requires a mouse</div></div>` : null}
       <div className="w-100 p-2 bg-green" key="wrapper">
         <div className="container-xl" key="topContainer">
           <div className="row">
@@ -1135,22 +1258,32 @@ class Game extends React.Component {
                 nameChange=${(e, i) => this.handleNameChange(e, i)} />
             </div>
           </div>
+          <!-- <button type="button" className="btn btn-primary" onClick=${() => this.toggleCalculate()} key="calculatef">toggle</button> -->
+
+          ${!this.state.calculationDone ? 
+              html`
+              <div key="laplfec" className="row my-2 py-1 shadow-sm rounded bg-lightgreen">
+              <div key="lapcol" className="col">
+              <button type="button" className="btn btn-outline-primary" onClick=${() => {this.toggleCalculate()}} key="calculate">Calculate Transfer Function</button>
+          </div></div>`
+          : null}
           <div key="lapl" className="row my-2 py-1 shadow-sm rounded bg-lightgreen">
             <${TransformResults}
               name="World"
               key="TransformResults"
               title="Laplace"
+              calculationDone=${this.state.calculationDone}
               latex=${this.state.latex}
               iinOrVin=${this.state.iinOrVin}
               iprbList=${this.state.iprbList}
               copiedToast=${this.copiedToast}
               copiedToastML=${this.copiedToastML}
-              resString=${this.resString}
+              resString=${this.state.resString}
               handlePlotChange=${(e) => this.handlePlotChange(e)}
               chosen=${this.state.chosenPlot} />
 
             <div className="col-12 pt-2">
-              <${FreqResponse} key="FreqResponse" />
+              <${FreqResponse} key="FreqResponse" plotlyDiv=${this.plotlyDiv} calculationDone=${this.state.calculationDone} />
               <${FreqResponseControllers}
                 key="FreqResponseControllers"
                 numStepsValue=${current.numSteps}
@@ -1168,6 +1301,7 @@ class Game extends React.Component {
               key="TransformResultsBilin"
               title="Bilinear"
               latex=${this.state.bilinearMathML}
+              calculationDone=${this.state.calculationDone}
               iinOrVin=${this.state.iinOrVin}
               iprbList=${[]}
               copiedToast=${this.copiedToast}

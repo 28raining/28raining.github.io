@@ -1,4 +1,5 @@
-- if add op amp with zero on input and LC on output, and change input to current source, it crashes
+- Add some self testing!
+- let algebrite do the parameter substitution so it can calculate abs with less issue
 
 
 
@@ -6,6 +7,19 @@
 3 - Show bilinear transform equation
 4 - Show state space representation
 5 - Draw amplitude response of those 3 transforms
+- if add op amp with zero on input and LC on output, and change input to current source, it crashes
+
+# Done on Jan 28th
+- handle errors in calculate mna better
+- use a calculate button
+- move algebrite out of mna and skip it until user clicks calculate TF
+- calculate only TF when values or fmin changes
+- note saying doesn't work on touchscreens
+- if theres an error show it to the user
+- safari overflow of laplace transform and reset not working?
+
+
+
 
 # Done on Jan 6 2024
 1 - mouse over tie to x
