@@ -372,7 +372,7 @@ function SchematicVal(props) {
       <${schematicValidator} name="vout connected" key="vout" ready=${props.schematicReadiness["vout"]} />
       <${schematicValidator} name="vin or iin connected" key="vin" ready=${props.schematicReadiness["vin"]} />
       <${schematicValidator} name="gnd connected" key="gnd" ready=${props.schematicReadiness["gnd"]} />
-      <${schematicValidator} name="solvable" key="solvable" ready=${props.schematicReadiness["solvable"]} />
+      <!-- <${schematicValidator} name="solvable" key="solvable" ready=${props.schematicReadiness["solvable"]} /> -->
     </div>
   `;
 }
@@ -1115,7 +1115,7 @@ class Game extends React.Component {
       {
         history: this.state.history.concat([current]),
       },
-      this.calculateTF
+      () => {if (this.state.calculationDone) this.calculateTF()}
     );
   }
 
@@ -1147,7 +1147,7 @@ class Game extends React.Component {
       {
         history: this.state.history.concat([current]),
       },
-      this.calculateTF
+      () => {if (this.state.calculationDone) this.calculateTF()}
     );
   }
 

@@ -1,5 +1,6 @@
 - Add some self testing!
 - let algebrite do the parameter substitution so it can calculate abs with less issue
+- re-add solvable flag
 
 
 
