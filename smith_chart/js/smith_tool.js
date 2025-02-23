@@ -1281,7 +1281,7 @@ function update_smith_chart() {
     type: "scatter",
   };
   var traceS21 = { ...traceS11 };
-  var traceS21Ph = { ...traceS11Ph };
+  // var traceS21Ph = { ...traceS11Ph };
 
   var sParamLayout = {
     yaxis: {
@@ -1338,27 +1338,27 @@ function update_smith_chart() {
   traceS11.x = [];
   traceS11Ph.x = [];
   traceS21.x = [];
-  traceS21Ph.x = [];
+  // traceS21Ph.x = [];
   traceS11.y = [];
   traceS11Ph.y = [];
   traceS21.y = [];
-  traceS21Ph.y = [];
+  // traceS21Ph.y = [];
   if (span_freq == 0) {
     var newSpanFreq = 1;
     traceS11.x = [scaledFreq];
     traceS11Ph.x = [scaledFreq];
     traceS21.x = [scaledFreq];
-    traceS21Ph.x = [scaledFreq];
+    // traceS21Ph.x = [scaledFreq];
     if (reflection_mag == 0) {
       traceS11.y.push(0);
       traceS11Ph.y.push(0);
       traceS21.y.push(1);
-      traceS21Ph.y.push(0);
+      // traceS21Ph.y.push(0);
     } else {
       traceS11.y.push(20 * Math.log10(reflection_mag));
       traceS11Ph.y.push(reflection_phase);
       traceS21.y.push(20 * Math.log10(1 - reflection_mag));
-      traceS21Ph.y.push(-reflection_phase);
+      // traceS21Ph.y.push(-reflection_phase);
     }
     // traceS22.x = [scaledFreq];
     // traceS22.y = [0.5];
@@ -1376,29 +1376,31 @@ function update_smith_chart() {
         traceS11.y.push(0);
         traceS11Ph.y.push(0);
         traceS21.y.push(0);
-        traceS21Ph.y.push(0);
+        // traceS21Ph.y.push(0);
       } else {
         traceS11.y.push(20 * Math.log10(reflection_mag));
         traceS11Ph.y.push(reflection_phase);
-        traceS21.y.push(20 * Math.log10(1 - reflection_mag));
-        traceS21Ph.y.push(-reflection_phase);
+        traceS21.y.push(20 * Math.log10(1 - Math.sqrt(reflection_mag)));
+        // traceS21Ph.y.push(-reflection_phase);
       }
       traceS11.x.push((freq + (span_freq * (i - span_res)) / span_res) / schematic[0].freq_unit.multiplier);
       traceS11Ph.x.push((freq + (span_freq * (i - span_res)) / span_res) / schematic[0].freq_unit.multiplier);
       traceS21.x.push((freq + (span_freq * (i - span_res)) / span_res) / schematic[0].freq_unit.multiplier);
-      traceS21Ph.x.push((freq + (span_freq * (i - span_res)) / span_res) / schematic[0].freq_unit.multiplier);
+      // traceS21Ph.x.push((freq + (span_freq * (i - span_res)) / span_res) / schematic[0].freq_unit.multiplier);
     }
     newSpanFreq = span_freq / schematic[0].freq_unit.multiplier;
   }
 
   sParamLayout.xaxis.range = [scaledFreq - newSpanFreq, scaledFreq + newSpanFreq];
+  sParamLayout2 = JSON.parse(JSON.stringify(sParamLayout));
+  sParamLayout2.yaxis.title="S21 (dB)"
 
   // var data = [traceS11, traceS22];
   var data = [traceS11, traceS11Ph];
-  var data21 = [traceS21, traceS21Ph];
+  var data21 = [traceS21];
 
   Plotly.react("SParamPlot", data, sParamLayout, config);
-  Plotly.react("SParamPlot_s21", data21, sParamLayout, config);
+  Plotly.react("SParamPlot_s21", data21, sParamLayout2, config);
 
   //update the HTML tables
   drawMakerTable();
