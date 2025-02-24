@@ -1357,7 +1357,7 @@ function update_smith_chart() {
     } else {
       traceS11.y.push(20 * Math.log10(reflection_mag));
       traceS11Ph.y.push(reflection_phase);
-      traceS21.y.push(20 * Math.log10(1 - reflection_mag));
+      traceS21.y.push(20 * Math.log10((Math.sqrt(1 - reflection_mag**2))));
       // traceS21Ph.y.push(-reflection_phase);
     }
     // traceS22.x = [scaledFreq];
@@ -1380,7 +1380,7 @@ function update_smith_chart() {
       } else {
         traceS11.y.push(20 * Math.log10(reflection_mag));
         traceS11Ph.y.push(reflection_phase);
-        traceS21.y.push(20 * Math.log10(1 - Math.sqrt(reflection_mag)));
+        traceS21.y.push(20 * Math.log10((Math.sqrt(1 - reflection_mag**2))));
         // traceS21Ph.y.push(-reflection_phase);
       }
       traceS11.x.push((freq + (span_freq * (i - span_res)) / span_res) / schematic[0].freq_unit.multiplier);
