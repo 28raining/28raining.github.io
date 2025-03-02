@@ -880,6 +880,11 @@ function update_smith_chart() {
   var vswr_live = (1 + reflection_mag) / (1 - reflection_mag);
   document.getElementById("vswr_live").innerHTML = '<div class="text_box">' + vswr_live.toPrecision(3) + "</div>";
 
+  //calculate Q factor
+  var q_factor = Math.abs(imag_old/real_old)
+  document.getElementById("q_factor").innerHTML = '<div class="text_box">' + q_factor.toPrecision(3) + "</div>";
+
+
   //populate vmin_distanceEl and vmax_distanceEl
   vmax_distanceEl.value = ((0.5 * reflection_phase) / 360).toPrecision(precision);
 
