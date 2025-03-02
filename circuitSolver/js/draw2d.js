@@ -30458,7 +30458,7 @@ _packages2.default.policy.canvas.DefaultKeyboardPolicy = _packages2.default.poli
    **/
   onKeyDown: function onKeyDown(canvas, keyCode, shiftKey, ctrlKey) {
     //
-    if (keyCode === 46 && canvas.getPrimarySelection() !== null) {
+    if (((keyCode === 46) || (keyCode===8)) && canvas.getPrimarySelection() !== null) {
       // create a single undo/redo transaction if the user delete more than one element. 
       // This happens with command stack transactions.
       //
