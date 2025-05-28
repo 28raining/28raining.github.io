@@ -1,3 +1,16 @@
+Smith chart tool re-write goals
+1 - Make the code more freiendly to read, so that "the community" can contribute
+2 - Hover on the smith chart
+3 - use a bundler and lint
+4 - Add sliders to components
+5 - Add custom circles
+6 - Add transformers
+7 - move to smithchart.com https://www.smithchart.com
+8 - series stub circuit elements
+9 - get advertising from that one commentor - count clicks with https://letscountapi.com/docs
+10 - put the state in the URL
+
+
 NOT GOING TO DO - 3 - Add a s-parameter to impedance converter
 
 DONE - 1 - Add tolerances to components
