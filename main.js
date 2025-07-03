@@ -20,7 +20,7 @@ function navBar(props) {
               </svg>
             </a>
             <a className="btn btn-light mx-1 py-0" href="https://onlinesmithchart.com" title="Go to the smith chart tool">Smith Chart</a>
-            <a className="btn btn-light py-0" href="../circuitSolver" title="Go to the circuit solver tool">Circuit Solver</a>
+            <a className="btn btn-light py-0" href="https://onlinecircuitsolver.com" title="Go to the circuit solver tool">Circuit Solver</a>
           </div>
         </div>
       </div>
